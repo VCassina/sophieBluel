@@ -6,29 +6,34 @@ async function getData() {
         const resp = await fetch(apiUrl);
         const respContent = await resp.json();
         return respContent;
-        
+
     } catch (error) {
-    console.error(error);
+        console.error(error);
     }
 }
-    
+
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    console.log(arrayData);         
+    //console.log(arrayData);         
     //console.log(arrayData[0].imageUrl);
-    //console.log(arrayData.length)
+    console.log(arrayData.length)
 
-    for (let i = arrayData.length - 1; i >= 0; i--) {                   // Boucle qui affichera les images dans le sens inverse.
-        let galleryTargeting = document.querySelector(".gallery");      // Placement pour incorporation future.
-        let galleryImage = document.createElement("img");               // Création de la balise.
+    for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
+
+        let galleryTargeting = document.querySelector(".gallery");
+        let galleryCard = document.createElement("figure");
+        let galleryImage = document.createElement("img");
         let galleryTxt = document.createElement("figcaption");
 
-        galleryImage.setAttribute("src", arrayData[i].imageUrl);        // Modification de l'attribut.
-        galleryTxt.innerText = arrayData[i].title;
+        galleryCard.setAttribute("class", "figureCard");                    // Attribution d'une class aux arrayData.length cards (balises <figure>).
+        galleryTargeting.prepend(galleryCard);                              // Ajout des cards (balises <figure>).
 
-        galleryTargeting.prepend(galleryImage, galleryTxt);             // L'incorporation.
-        
+        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
+        galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
+
+        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
+        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
     }
 })
 
