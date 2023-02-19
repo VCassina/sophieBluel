@@ -30,14 +30,6 @@ getData().then(result => {          // Une fois que la function aura été execu
     //console.log(arrayData[0].imageUrl);
     //console.log(arrayData.length)
     imageAdding();
-
-
-    // Ajouter le code à ajouter dynamiquement ici.
-    //___________________________________
-
 })
-
-    // Test du code à mettre ensuite dans getData().then [...], si la temporalité fonctionne belle et bien.
-    //___________________________________
 
 console.log("Script did execute.");
