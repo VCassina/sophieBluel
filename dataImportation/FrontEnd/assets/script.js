@@ -1,79 +1,5 @@
-/* Historique des avancés
-// Récuparation de toutes les données de l'API et affichage de ces dernières !
-//  fetch("http://localhost:5678/api/works/")
-//      .then(myRequest => myRequest.json())
-//      .then(myRequestReadable => console.log(myRequestReadable));
-// Récuparation d'un élement de l'API et affichage de ce dernier !
-// async function getTitles () {
-//     await fetch("http://localhost:5678/api/works/")
-//       .then(myRequest => myRequest.json())
-//       .then(myRequestReadable => console.log(myRequestReadable[0]))
-// }
-// Récuparation d'un élement précis de l'API et affichage de ce dernier !
-// async function getTitles () {
-//     await fetch(apiUrl)
-//       .then(myRequest => myRequest.json())
-//       .then(myRequestReadable => console.log(myRequestReadable[0].title))
-// }
-// Récuparation d'un élement précis de l'API et stockage de ce dernier !
-// async function getTitles () {
-//     const resp = await fetch(apiUrl);
-//     const titleInPurpose = await resp.json();
-//     console.log (titleInPurpose);   // L'intégralité du tableau.
-//     console.log (titleInPurpose[0].title); // Le titre du premier objet seulement.
-// }
-// function appliesData() {
-//     const parentImageBalise = document.getElementsByClassName("gallery");
-//     // for (let i = 0; i < imagesArray.length; i++) {
-//     //     console.log("J'essaie j'essaie");
-//     //     // var e=document.createElement("div");
-//     //     // e.innerHTML="Element n°"+i;
-//     //     // p.appendChild(e);
-//     //    }
-//     //    console.log("J'essaie j'essaie");
-// }
-//________________________________________
-// FIGUREZ DANS LA FUNCTION GET DATA POUR AVOIR DES DONNEES PRECISES !!
-//_________________________________________
-    let titleArray = [];
-    let imagesArray = [];
-    const parentImageBalise = document.getElementsByClassName("gallery");
-    for (let i = 0; i < respContent.length; i++) {
-        titleArray[i] = respContent[i].title;
-        imagesArray[i] = respContent[i].imageUrl;
-        console.log("Data " + titleArray[i] + " has been added to the titleArray");
-        console.log("Data " + imagesArray[i] + " has been added to the ImagesArray");
-        // let newElementTest = document.createElement("div");
-        // //newElementTest.innerHTML="Element n°"+i;
-        // //parentImageBalise.appendChild(newElementTest);
-        // console.log("The order get executed " + ([i+1]) + " time(s).");
-    }
-    //console.log(respContent.length);
-    //console.log(respContent);
-    //console.log("It works until here.");
-    // let arrTemp = [];
-    // for (let i in respContent)
-    //     arr.push(respContent[i]);
-    //return respContent;
-    //getData(); // Importation des données de l'API.
-// let arrayTest = [1,2,3,4,5,6,7];
-// let arrayTest2 = [8,9,10,11,12,13];
-// //arrayTest = getData();
-// arrayTest = arrayTest2;
-// arrayTest = getData();
-//let array = [];
-// let array = getData();
-// console.log(array);
-//console.log(getData());
-//const respContent = await resp.json();
-//console.log(respContent);
-//const obj = await JSON.parse(resp)
-//console.log('objet', obj)
-//return await respContent;
-*/
-// Récuparation automatiquement les données et return du JSON.
-
 console.log("The script starts.")
+
 async function getData() {
     try {
         const apiUrl = 'http://localhost:5678/api/works/';
@@ -89,10 +15,78 @@ async function getData() {
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    console.log(arrayData);         // Pour vérifier.
-    
+    //console.log(arrayData);         // Pour vérifier.
+
     // Ajouter le code à ajouter dynamiquement ici.
     //___________________________________
+
 })
+
+
+    // Test du code à mettre ensuite dans getData().then [...], si la temporalité fonctionne belle et bien.
+    //___________________________________
+
+        console.log("It started.");
+        let galleryTargeting = document.querySelector(".gallery");
+        let galleryImage = document.createElement("img");
+        galleryImage.setAttribute("src", "./assets/images/sophie-bluel.png");
+        galleryTargeting.prepend(galleryImage);
+
+    //let a = document.getElementsByClassName("gallery");
+    // let a = document.querySelector(".gallery");
+    // let newImg = document.createElement('p');
+    // newImg.textContent = 'Paragrapheaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa créé et inséré grâce au JavaScript';
+    // //Ajoute le paragraphe créé comme premier enfant de l'élément body
+    // a.prepend(newImg);
+
+    
+/*
+
+
+    
+    // let galleryTargeting = document.getElementsByClassName("gallery"); 
+    // let newImg = document.createElement('img');
+    // newImg.setAttribute("src", "./assets/images/sophie-bluel.png");
+    // galleryTargeting.prepend(newImg);
+        // let a = document.querySelector("#dynamiqueImg");
+        // a.setAttribute("src", "./assets/images/sophie-bluel.png");
+        // console.log(a);
+
+    //let b = document.body;
+    //let newP = document.createElement('p');
+    //let newTexte = document.createTextNode('Texte éaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacrit en JavaScript');
+    //newP.textContent = 'Paragrapheaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa créé et inséré grâce au JavaScript';
+    //Ajoute le paragraphe créé comme premier enfant de l'élément body
+    //b.prepend(newP);
+    //Ajoute le texte créé comme dernier enfant de l'élément body
+    //b.append(newTexte);
+        //let a = document.querySelector('#dynamiqueImg');
+        //let a = document.querySelectorAll("#dynamiqueImg").item[0];
+        //bannerImage.src="./assets/images/sophie-bluel.png";
+        // bannerImage.setAttribute()
+        // console.log("We go execute the function imageModification.")
+    // let newImage = document.getElementsByClassName("gallery");
+	//newImage.setAttribute("src", arrayData[0].imageUrl);
+    // newImage.textContent = "Test réussi";
+    // let newImage = document.getElementsByClassName("dynamiqueImg");
+    //let a = document.querySelector("dynamiqueImg");
+    //a.setAttribute("src", "./assets/images/sophie-bluel.png");
+    //a.setAttribute();
+   // document.getElementById("dynamiqueImg").src="./assets/images/sophie-bluel.png";
+   // a = document.getElementsByClassName("dynamiqueImg"); 
+    // let newImageTwo = document.getElementById("dynamiqueImg");
+    // newImageTwo.setAttribute("src", "./assets/images/sophie-bluel.png");
+    //newImage.set
+    //newImage.setAttribute("src", "./assets/images/sophie-bluel.png");
+    //  function imageModification() {
+    //      let bannerImage = document.getElementsByClassName("dynamiqueImg");
+    //      bannerImage.setAttribute("src", "./assets/images/sophie-bluel.png");
+    //  }
+    // let a = new Image();
+    // a.src="./assets/icons/instagram.png";
+    // let newImage = document.getElementById("dynamiqueImg");
+    // newImage.src='./assets/icons/instagram.png';
+    //  imageModification();
+*/
 
 console.log("Script did execute.");
