@@ -17,12 +17,14 @@ getData().then(result => {          // Une fois que la function aura été execu
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
     console.log(arrayData);         // Pour vérifier.
     console.log(arrayData[0].imageUrl);
+    console.log(arrayData.length)
 
-    console.log("It started.");
-    let galleryTargeting = document.querySelector(".gallery");
-    let galleryImage = document.createElement("img");
-    galleryImage.setAttribute("src", arrayData[0].imageUrl);
-    galleryTargeting.prepend(galleryImage);
+    for (let i = arrayData.length - 1; i >= 0; i--) {
+        let galleryTargeting = document.querySelector(".gallery");
+        let galleryImage = document.createElement("img");
+        galleryImage.setAttribute("src", arrayData[i].imageUrl);
+        galleryTargeting.prepend(galleryImage);
+    }
 
     // Ajouter le code à ajouter dynamiquement ici.
     //___________________________________
