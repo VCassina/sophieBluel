@@ -11,6 +11,17 @@ async function getData() {
     console.error(error);
     }
 }
+
+function imageAdding() {
+    for (let i = arrayData.length - 1; i >= 0; i--) {                   // Boucle qui affichera les images dans le sens inverse.
+        let galleryTargeting = document.querySelector(".gallery");      // Placement pour incorporation future.
+        let galleryImage = document.createElement("img");               // Création de la balise.
+        galleryImage.setAttribute("src", arrayData[i].imageUrl);        // Modification de l'attribut.
+        galleryTargeting.prepend(galleryImage);                         // L'incorporation.
+
+        
+    }
+}
     
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
@@ -18,13 +29,8 @@ getData().then(result => {          // Une fois que la function aura été execu
     //console.log(arrayData);         
     //console.log(arrayData[0].imageUrl);
     //console.log(arrayData.length)
+    imageAdding();
 
-    for (let i = arrayData.length - 1; i >= 0; i--) {                   // Boucle qui affichera les images dans le sens inverse.
-        let galleryTargeting = document.querySelector(".gallery");      // Placement pour incorporation future.
-        let galleryImage = document.createElement("img");               // Création de la balise.
-        galleryImage.setAttribute("src", arrayData[i].imageUrl);        // Modification de l'attribut.
-        galleryTargeting.prepend(galleryImage);                         // L'incorporation.
-    }
 
     // Ajouter le code à ajouter dynamiquement ici.
     //___________________________________
