@@ -29,7 +29,7 @@ getData().then(result => {          // Une fois que la function aura été execu
         galleryTargeting.prepend(galleryCard);                              // Ajout des cards (balises <figure>).
 
         galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
-        galleryImage.setAttribute("alt", arrayData[i].imageUrl);
+        galleryImage.setAttribute("alt", arrayData[i].title);
         galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
 
         let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
