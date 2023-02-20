@@ -36,4 +36,4 @@ getData().then(result => {          // Une fois que la function aura été execu
     }
 })
 
-console.log("Script did execute.");
+console.log("Script did execute well.");
