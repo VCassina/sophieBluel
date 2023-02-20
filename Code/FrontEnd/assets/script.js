@@ -16,7 +16,6 @@ let arrayData;                      // Mise en place des data de l'API dans un t
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
     //console.log(arrayData);         
-    //console.log(arrayData[0].imageUrl);
     console.log(arrayData.length)
 
     for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
