@@ -40,7 +40,6 @@ getData().then(result => {          // Une fois que la function aura été execu
     }
 })
 
-
 let i;
 let arrayClassFilters;
 let arrayFiltersComponent;
@@ -103,9 +102,11 @@ for (let i = 0; i < buttonItem.length; i++) {                               // P
     });
 }
 
-window.onload = (event) => {
-    filterSelection("all");
+window.onload = (event) => {   
+    filterSelection("all");         // Ne marche pas à tous les coups.
 }
+
+filterSelection("all");             // Plan B, n'aide visiblement pas.
 
 console.log("Script did execute well.");
 
