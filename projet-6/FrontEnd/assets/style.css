@@ -175,7 +175,7 @@ margin: auto;
 }
 
 /* _______________________________ */
-/* Rajout des filters	   */
+/* Rajout des filters	   		   */
 /* _______________________________ */
 
 .filter {
@@ -211,12 +211,20 @@ margin: auto;
 	display: none;
   }
 
+  /* _______________________________ */
+  /* Doivent être à la fin pour être lu dans le bon ordre ! */
   .show {
 	display: block;
   }
 
+  .active {
+	background-color: #666;
+	color: white;
+}
 /* _______________________________ */
+
 /* _______________________________ */
+/* Fin du rajout filtres  		   */
 /* _______________________________ */
 
  input[type="submit"]{
