@@ -169,8 +169,13 @@ margin: auto;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
+.img_title {
+	padding: 5px 0 0 0;
+	color: #3D3D3D;
+}
+
 /* _______________________________ */
-/* Rajout des checkboxs filters	   */
+/* Rajout des filters	   */
 /* _______________________________ */
 
 .filter {
@@ -178,7 +183,7 @@ margin: auto;
 	justify-content: center;
 	padding: 50px 0;
 	gap: 10px;
-}
+} 
 
 .filter_button:hover {
 	cursor: pointer;
@@ -188,26 +193,38 @@ margin: auto;
 }
 
 .filter_button {	/* Pixel perfect (figma) ! */
-	color: #1D6154;
+	 color: #1D6154;
 	border: solid 1px #1D6154;
 	border-radius: 60px;
+	background-color: #FFF;
 	padding: 10px;
 	min-width: 100px;
 	
 	font-family: Syne;
 	font-size: 16px;
-	text-align: center;
+	text-align: center; 
 }
+  
+  .filterDivTEST {
+	float: left;
+	background-color: #2196F3;
+	color: #ffffff;
+	width: 100px;
+	line-height: 100px;
+	text-align: center;
+	margin: 2px;
+	display: none;
+  }
 
-input[type=checkbox] {
-	display: none; /* Marche mais pas de pointeur ATM ! */
+  .show {
+	display: block;
   }
 
 /* _______________________________ */
 /* _______________________________ */
 /* _______________________________ */
 
-input[type="submit"]{
+ input[type="submit"]{
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
@@ -222,5 +239,5 @@ footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
-}
+} 
 
