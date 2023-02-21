@@ -108,7 +108,7 @@ function filterSelection(choose) {                                   // L'argume
 // _____________________________
 
 // Add active class to the current control button (highlight it)
-// let buttonContainer = document.getElementById("sortingButton");
+ let buttonContainer = document.getElementById("sortingButton");
 // let buttonItem = buttonContainer.getElementsByClassName("filter_button");
 
 // for (let i = 0; i < btns.length; i++) {
