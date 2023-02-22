@@ -12,34 +12,6 @@ async function getData() {
     }
 }
 
-let arrayData;                      // Mise en place des data de l'API dans un tableau.
-getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
-    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    console.log(arrayData);
-    //console.log(arrayData.length)
-
-    for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
-
-        let galleryTargeting = document.querySelector(".gallery");
-        let galleryCard = document.createElement("figure");
-        let galleryImage = document.createElement("img");
-        let galleryTxt = document.createElement("figcaption");
-
-        console.log(arrayData[i].categoryId);
-        galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId); // Attribution d'une class aux arrayData.length cards (balises <figure>).         
-        galleryTargeting.prepend(galleryCard);                              // Ajout des cards (balises <figure>).
-
-        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
-        galleryImage.setAttribute("alt", arrayData[i].title);
-
-        galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
-        galleryTxt.setAttribute("class", "img_title");
-
-        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
-        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
-    }
-})
-
 let i;
 let arrayClassFilters;
 let arrayFiltersComponent;
@@ -69,7 +41,6 @@ function hideClass(element, name) {
     element.className = arrayClassFilters.join(" "); // Toutes les classes ayant été delete. On lance une actualisation avec join(" ").
 }
 
-
 function filterSelection(choose) {                                   // L'argument va être le button sélectionné.
     let x = document.getElementsByClassName("figureCard");           // Séléction des filterDiv.
     if (choose == "all") {                                           // Si le button "tout" est selectionné.
@@ -83,6 +54,36 @@ function filterSelection(choose) {                                   // L'argume
     }
 }
 
+
+let arrayData;                      // Mise en place des data de l'API dans un tableau.
+getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
+    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
+    console.log(arrayData);
+    //console.log(arrayData.length)
+
+    for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
+
+        let galleryTargeting = document.querySelector(".gallery");
+        let galleryCard = document.createElement("figure");
+        let galleryImage = document.createElement("img");
+        let galleryTxt = document.createElement("figcaption");
+
+        console.log(arrayData[i].categoryId);
+        galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
+        galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
+
+        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
+        galleryImage.setAttribute("alt", arrayData[i].title);
+
+        galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
+        galleryTxt.setAttribute("class", "img_title");
+
+        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
+        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+    }
+
+    filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
+})
 
 let buttonContainer = document.getElementById("sortingButton");             // Récupération de la <div> contenant les filtres.
 let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
@@ -101,12 +102,6 @@ for (let i = 0; i < buttonItem.length; i++) {                               // P
         }
     });
 }
-
-window.onload = (event) => {   
-    filterSelection("all");         // Ne marche pas à tous les coups.
-}
-
-filterSelection("all");             // Plan B, n'aide visiblement pas.
 
 console.log("Script did execute well.");
 
