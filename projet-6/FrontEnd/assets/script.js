@@ -1,5 +1,6 @@
 console.log("The script starts.")
 
+// Récuparation des données de l'API.
 async function getData() {
     try {
         const apiUrl = 'http://localhost:5678/api/works/';
@@ -81,7 +82,6 @@ getData().then(result => {          // Une fois que la function aura été execu
         let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
         InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
     }
-
     filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
 })
 
@@ -91,7 +91,6 @@ let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // R
 for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
     buttonItem[i].addEventListener("click", function () {                   // Pour chaque bouton, un EventListener par clique est initié.
         let current = document.getElementsByClassName("active");            // Ce clique déclanche la récupération éléments avec classe "active" et le stock.
-
 
         if (current.length == 0) {              // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
             this.className += " active";        // En cas d'action, du click, la classe "active" est ajoutée.
