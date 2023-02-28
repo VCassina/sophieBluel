@@ -449,10 +449,10 @@ input[type="submit"] {
 	justify-content: center;
 	align-items: center;
 	color: white;
-	gap: 20px;
+	gap: 30px;
 }
 
-#edit_bar .edit_texte, i {
+#edit_bar .edit_texte, #edit_bar i {
 	color: white;
 }
 
