@@ -133,8 +133,6 @@ function dataShowModal() {
     }
 }
 
-
-
 const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
 
 modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
