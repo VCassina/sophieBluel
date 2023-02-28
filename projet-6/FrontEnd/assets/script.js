@@ -110,6 +110,10 @@ console.log("The 'modal'-part of the script just started.")
 /* Utilisation différente de "dataShow", adaptée à la modale ! */
 /* ___________________________________________________________ */
 
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+/* !  N'est pas encore fonctionnelle                       ! */
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+
 function dataShowModal() {   
     for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
 
