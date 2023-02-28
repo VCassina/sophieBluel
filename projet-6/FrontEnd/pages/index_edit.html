@@ -16,15 +16,15 @@
 </head>
 
 <body id="edit_body">
-	<div id="edit_bar">
-		<div class="edit">
-			<i class="fa-regular fa-pen-to-square"></i>
-			<span class="edit_texte">Mode édition</span>
-		</div>
-		<button>publier les changements</button>
-	</div>
 
 	<header>
+		<div id="edit_bar">
+			<div class="edit">
+				<i class="fa-regular fa-pen-to-square"></i>
+				<span class="edit_texte">Mode édition</span>
+			</div>
+			<button>publier les changements</button>
+		</div>
 		<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
 		<nav>
 			<ul>
@@ -35,12 +35,13 @@
 			</ul>
 		</nav>
 	</header>
+
 	<main>
 		<section id="introduction">
 			<figure>
 				<img src="../assets/images/sophie-bluel.png" alt="">
 				<div class="edit">
-					<a href>
+					<a href="#modalBox" class="js-modalBox">
 						<i class="fa-regular fa-pen-to-square"></i>
 						<span>modifier</span>
 					</a>
@@ -62,7 +63,7 @@
 			<div id="edit_portfolio-title">
 				<h2>Mes Projets</h2>
 				<div class="edit">
-					<a href>
+					<a href="#modalBox" class="js-modalBox">
 						<i class="fa-regular fa-pen-to-square"></i>
 						<span>modifier</span>
 					</a>
@@ -87,7 +88,20 @@
 				<input type="submit" value="Envoyer">
 			</form>
 		</section>
+		
+		<aside id="modalBox" class="modalBox modalBox-hidden" aria-hidden="true" aria-labelledby="modalBox-title" role="dialog">
+			<div class="modalBox_wrapper">
+				<i class="fa-solid fa-xmark"></i>
+				<h3 id="modalBox-title">Galerie photo</h3>
+				<div class="edit_gallery">
+				</div>
+				<button>Ajouter une photo</button>
+				<span id="gallery_delete">Supprimer la galerie</span>
+			</div>
+		</aside>
 	</main>
+
+
 
 	<footer>
 		<nav>

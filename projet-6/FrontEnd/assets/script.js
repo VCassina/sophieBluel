@@ -55,13 +55,7 @@ function filterSelection(choose) {                                   // L'argume
     }
 }
 
-
-let arrayData;                      // Mise en place des data de l'API dans un tableau.
-getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
-    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    console.log(arrayData);
-    //console.log(arrayData.length)
-
+function dataShow() {   
     for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
 
         let galleryTargeting = document.querySelector(".gallery");
@@ -69,7 +63,7 @@ getData().then(result => {          // Une fois que la function aura été execu
         let galleryImage = document.createElement("img");
         let galleryTxt = document.createElement("figcaption");
 
-        console.log(arrayData[i].categoryId);
+        //console.log(arrayData[i].categoryId);
         galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
         galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
 
@@ -83,28 +77,77 @@ getData().then(result => {          // Une fois que la function aura été execu
         InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
     }
     filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
+}
+
+let arrayData;                      // Mise en place des data de l'API dans un tableau.
+getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
+    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
+    dataShow();
 })
 
 let buttonContainer = document.getElementById("sortingButton");             // Récupération de la <div> contenant les filtres.
-let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
+if (buttonContainer != null) {
+    let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
 
-for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
-    buttonItem[i].addEventListener("click", function () {                   // Pour chaque bouton, un EventListener par clique est initié.
-        let current = document.getElementsByClassName("active");            // Ce clique déclanche la récupération éléments avec classe "active" et le stock.
+    for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
+        buttonItem[i].addEventListener("click", function () {                   // Pour chaque bouton, un EventListener par clique est initié.
+            let current = document.getElementsByClassName("active");            // Ce clique déclanche la récupération éléments avec classe "active" et le stock.
 
-        if (current.length == 0) {              // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
-            this.className += " active";        // En cas d'action, du click, la classe "active" est ajoutée.
-        }
-        else {
-            current[0].className = current[0].className.replace(" active", ""); // Mais si quelque chose était déjà séléctionné, retire le via replace dans le tableau listant les classes.
-            this.className += " active";                                        // Puis ajoute active sur le "bouton" cliqué.
-        }
-    });
+            if (current.length == 0) {              // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
+                this.className += " active";        // En cas d'action, du click, la classe "active" est ajoutée.
+            }
+            else {
+                current[0].className = current[0].className.replace(" active", ""); // Mais si quelque chose était déjà séléctionné, retire le via replace dans le tableau listant les classes.
+                this.className += " active";                                        // Puis ajoute active sur le "bouton" cliqué.
+            }
+        });
+    }
+}
+
+console.log("The 'modal'-part of the script just started.")
+
+/* ___________________________________________________________ */
+/* Utilisation différente de "dataShow", adaptée à la modale ! */
+/* ___________________________________________________________ */
+
+function dataShowModal() {   
+    for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
+
+        let galleryTargeting = document.querySelector(".edit_gallery");     // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
+        let galleryCard = document.createElement("figure");
+        let galleryImage = document.createElement("img");
+
+        //console.log(arrayData[i].categoryId);
+        galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
+        galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
+
+        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
+        galleryImage.setAttribute("alt", arrayData[i].title);
+
+        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
+        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+    }
 }
 
 
 
-console.log("Script did execute well.");
+const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
+
+modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
+  link.addEventListener("click", (event) => {
+    event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
+    const modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
+    modalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
+    modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+    modalBox.setAttribute("aria-modal", "true");                     // //
+    dataShowModal();
+
+});
+});
+
+console.log("The script just ended.")
+
+
 
 //________________________
 // Version "cours" du code relative aux filtres :

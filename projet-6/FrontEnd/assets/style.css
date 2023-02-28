@@ -210,7 +210,8 @@ li:hover {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 15px;	/* Pixel perfect ! */
+	gap: 15px;
+	/* Pixel perfect ! */
 }
 
 #introduction img {
@@ -230,13 +231,15 @@ li:hover {
 	margin-bottom: 0.5em;
 }
 
- #portfolio h2 {
+#portfolio h2 {
 	text-align: center;
-	padding-top: 80px; /* Pixel perfect ! */
-} 
+	padding-top: 80px;
+	/* Pixel perfect ! */
+}
 
 #login {
-	padding-bottom: 355px; /* Pixel perfect ! */
+	padding-bottom: 355px;
+	/* Pixel perfect ! */
 }
 
 #login h2 {
@@ -298,7 +301,7 @@ li:hover {
 	margin: auto;
 }
 
-#login_form > * {
+#login_form>* {
 	text-align: center;
 }
 
@@ -435,7 +438,8 @@ input[type="submit"] {
 }
 
 #edit_body {
-	margin-top: 100px;	/* Pixel perfect (60px edit_bar + 40px d'espacement) ! */
+	margin-top: 100px;
+	/* Pixel perfect (60px edit_bar + 40px d'espacement) ! */
 }
 
 #edit_bar {
@@ -452,7 +456,8 @@ input[type="submit"] {
 	gap: 30px;
 }
 
-#edit_bar .edit_texte, #edit_bar i {
+#edit_bar .edit_texte,
+#edit_bar i {
 	color: white;
 }
 
@@ -470,7 +475,8 @@ input[type="submit"] {
 
 #button_login {
 	width: auto;
-	padding: 0 40px;	/* Pixel perfect ! */
+	padding: 0 40px;
+	/* Pixel perfect ! */
 }
 
 #error_login {
@@ -496,4 +502,81 @@ input[type="submit"] {
 
 #edit_portfolio .edit {
 	align-self: center;
+}
+
+/* _______________________________ */
+/* Boite modale !		  		   */
+/* _______________________________ */
+
+.modalBox {
+	position: fixed;
+	display: flex;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0.75);
+}
+
+.modalBox-hidden {
+	display: none;
+}
+
+.modalBox_wrapper {
+	overflow: auto;
+	width: 50%;
+	max-width: calc(100vw - 20px);
+	height: fit-content;
+	max-height: calc(100vh - 20px);
+	background: white;
+	border-radius: 10px;
+
+	display: flex;
+	flex-direction: column;
+	padding: 30px 100px;
+	/* Pixel perfect ! */
+	text-align: center;
+	align-items: center;
+}
+
+#modalBox-title {
+	font-family: 'Work Sans';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 26px;
+	line-height: 30px;
+	padding: 15px 0 40px;
+	/* Pixel perfect ! */
+}
+
+.edit_gallery {
+	padding-bottom: 60px;
+	width: 100%;
+	border-bottom: 1px solid #B3B3B3;
+}
+
+.modalBox_wrapper .fa-xmark {
+	align-self: flex-end;
+}
+
+.modalBox_wrapper button {
+	margin-top: 40px;
+	width: 240px;
+	height: 40px;
+	color: white;
+	background: #1D6154;
+	border-radius: 60px;
+	font-family: 'Syne';
+	font-weight: 700;
+}
+
+.modalBox_wrapper #gallery_delete {
+	padding: 20px 0 50px;
+	font-family: 'Syne';
+	font-weight: 400;
+	color: #D65353;
 }
