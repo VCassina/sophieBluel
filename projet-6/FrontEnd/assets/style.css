@@ -416,9 +416,14 @@ input[type="submit"] {
 	border-radius: 60px;
 }
 
-#login_input_button {
+#button_login {
 	width: auto;
 	padding: 0 40px;	/* Pixel perfect ! */
+}
+
+#error_login {
+	color: red;
+	font-style: italic;
 }
 
 footer nav ul {
