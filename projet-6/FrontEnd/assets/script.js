@@ -102,6 +102,8 @@ for (let i = 0; i < buttonItem.length; i++) {                               // P
     });
 }
 
+
+
 console.log("Script did execute well.");
 
 //________________________

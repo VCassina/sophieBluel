@@ -135,3 +135,22 @@
 //   }
 
 //   formAsking();
+
+async function getData() {      // Get renvoie egalement la même erreur. Je pense vraiment que l'API a un soucis.
+  try {
+      const apiUrl = 'http://127.0.0.1:5678/api-docs/users/login';
+      console.log("1");
+      const resp = await fetch(apiUrl);
+      console.log("2");
+      const respContent = await resp.json();
+      console.log("3"); // L'importation du JSON pose problème, 3 n'arrive jamais dans le console.log.
+      console.log(respContent);
+      console.log(resp.json());
+      return respContent;
+
+  } catch (error) {
+      console.error(error);
+  }
+}
+
+getData();

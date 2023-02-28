@@ -10,27 +10,33 @@
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
 		rel="stylesheet">
 	<meta name="description" content="">
-	<script src="./assets/script.js" defer></script>
-	<link rel="stylesheet" href="./assets/style.css">
+	<script src="../assets/script.js" defer></script>
+	<script src="https://kit.fontawesome.com/4925cffcbc.js" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="../assets/style.css">
 </head>
 
 <body>
-
 	<header>
 		<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
 		<nav>
 			<ul>
 				<li><a href="">projets</a></li>
 				<li><a href="">contact</a></li>
-				<li><a href="./pages/login.html">login</a></li>
-				<li><img class="insta_img" src="./assets/icons/instagram.png" alt="Instagram"></li>
+				<li><a href="../pages/login.html">login</a></li>
+				<li><img class="insta_img" src="../assets/icons/instagram.png" alt="Instagram"></li>
 			</ul>
 		</nav>
 	</header>
 	<main>
 		<section id="introduction">
 			<figure>
-				<img src="./assets/images/sophie-bluel.png" alt="">
+				<img src="../assets/images/sophie-bluel.png" alt="">
+				<div class="edit">
+					<a href>
+						<i class="fa-regular fa-pen-to-square"></i>
+						<span>modifier</span>
+					</a>
+				</div>
 			</figure>
 			<article>
 				<h2>Designer d'espace</h2>
@@ -44,20 +50,24 @@
 			</article>
 		</section>
 
-		<section id="portfolio">
-			<h2>Mes Projets</h2>
-			<div class="filter">
-				<div id="sortingButton">
-					<button class="filter_button active" onclick="filterSelection('all')"> Tous </button>
-					<button class="filter_button" onclick="filterSelection('1')"> Objets </button>
-					<button class="filter_button" onclick="filterSelection('2')"> Appartements </button>
-					<button class="filter_button" onclick="filterSelection('3')"> Hôtels & restaurants </button>
+
+
+
+		<section id="edit_portfolio">
+			<div id="edit_portfolio-title">
+				<h2>Mes Projets</h2>
+				<div class="edit">
+						<a href>
+							<i class="fa-regular fa-pen-to-square"></i>
+							<span>modifier</span>
+						</a>
 				</div>
 			</div>
-			
+
+			<div class="filter">
+			</div>
 			<div class="gallery">
 			</div>
-			
 		</section>
 
 		<section id="contact">
