@@ -115,23 +115,28 @@ console.log("The 'modal'-part of the script just started.")
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 function dataShowModal() {   
-    for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
+    for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
 
-        let galleryTargeting = document.querySelector(".edit_gallery");     // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
-        let galleryCard = document.createElement("figure");
-        let galleryImage = document.createElement("img");
+        let galleryTargetingEdit = document.querySelector(".edit_gallery");     // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
+        let galleryCardEdit = document.createElement("figure");
+        let galleryTxtEdit = document.createElement("a");
 
-        //console.log(arrayData[i].categoryId);
-        galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
-        galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
+        let galleryImageEdit = document.createElement("img");
+        galleryImageEdit.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via les données importées de l'API.
+        galleryImageEdit.setAttribute("alt", arrayData[i].title);
 
-        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
-        galleryImage.setAttribute("alt", arrayData[i].title);
+        galleryTxtEdit.innerText = "éditer";
 
-        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
-        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+        // Pour le futur du site, même système que pour appeler la modale, on fait réfèrence dans l'href à un ancrage ou un élément de la page.
+        // galleryTxt.setAttribute("href", "");    
+
+        galleryCardEdit.setAttribute("class", "edit_figureCard");                    // Attribution d'une class aux balises <figure>.         
+        galleryTargetingEdit.prepend(galleryCardEdit);                               // Ajout des cards (balises <figure>).
+
+        let InsideCardTargetingEdit = document.querySelector(".edit_figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
+        InsideCardTargetingEdit.prepend(galleryImageEdit, galleryTxtEdit);                           // L'incorporation des deux sous-balises.
     }
-}
+};
 
 const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
 

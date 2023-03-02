@@ -528,10 +528,8 @@ input[type="submit"] {
 
 .modalBox_wrapper {
 	overflow: auto;
-	width: 50%;
-	max-width: calc(100vw - 20px);
+	width: fit-content;
 	height: fit-content;
-	max-height: calc(100vh - 20px);
 	background: white;
 	border-radius: 10px;
 
@@ -555,12 +553,37 @@ input[type="submit"] {
 
 .edit_gallery {
 	padding-bottom: 60px;
-	width: 100%;
+	width: auto;
+	height: fit-content;
 	border-bottom: 1px solid #B3B3B3;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.edit_gallery img {
+	width: 80px;
+	padding-bottom: 2px;
+	/* Pixel perfect ! */
+}
+
+.edit_figureCard {
+	height: 120px;
+	padding: 10px 5px;
+	/* Pixel perfect ! */
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+}
+
+.edit_figureCard a {
+	cursor: pointer;
 }
 
 .modalBox_wrapper .fa-xmark {
 	align-self: flex-end;
+	position: relative;
+	left: 50px;
+	/* Pixel perfect ! */
 }
 
 .modalBox_wrapper button {
