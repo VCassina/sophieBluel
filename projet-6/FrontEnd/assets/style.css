@@ -579,6 +579,29 @@ input[type="submit"] {
 	cursor: pointer;
 }
 
+.edit_iconeManagement {
+	display: flex;
+	flex-direction: row-reverse;
+	position: relative;
+	top: 30px;
+	left: 50px;
+	width: fit-content;
+}
+
+.edit_iconeManagement i {
+	background-color: black;
+	color: white;
+
+	padding: 5px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.fa-up-down-left-right {
+	position: relative;
+	left: -50px;
+}
+
 .modalBox_wrapper .fa-xmark {
 	align-self: flex-end;
 	position: relative;
@@ -603,8 +626,3 @@ input[type="submit"] {
 	font-weight: 400;
 	color: #D65353;
 }
-
-
-
-
-

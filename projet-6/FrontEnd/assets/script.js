@@ -117,24 +117,40 @@ console.log("The 'modal'-part of the script just started.")
 function dataShowModal() {   
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
 
+        /* Déclaration des variables ! */
         let galleryTargetingEdit = document.querySelector(".edit_gallery");     // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
         let galleryCardEdit = document.createElement("figure");
         let galleryTxtEdit = document.createElement("a");
-
+        let galleryIconeEdit = document.createElement("div");
+        let galleryIconeTrashEdit = document.createElement("i");              
+        let galleryIconeMoveEdit = document.createElement("i");                 
         let galleryImageEdit = document.createElement("img");
+
+       /* Gestion des attributs ! */
         galleryImageEdit.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via les données importées de l'API.
         galleryImageEdit.setAttribute("alt", arrayData[i].title);
+        galleryTxtEdit.innerText = "éditer";                                    // Ne renvoie à rien mais pourrait à l'avenir.
+        galleryIconeTrashEdit.setAttribute("class", "fa-solid fa-trash-can");
+        galleryIconeMoveEdit.setAttribute("class", "fa-solid fa-up-down-left-right");
 
-        galleryTxtEdit.innerText = "éditer";
-
-        // Pour le futur du site, même système que pour appeler la modale, on fait réfèrence dans l'href à un ancrage ou un élément de la page.
-        // galleryTxt.setAttribute("href", "");    
-
+        /* Ajout des balises-parents ! */
         galleryCardEdit.setAttribute("class", "edit_figureCard");                    // Attribution d'une class aux balises <figure>.         
         galleryTargetingEdit.prepend(galleryCardEdit);                               // Ajout des cards (balises <figure>).
 
-        let InsideCardTargetingEdit = document.querySelector(".edit_figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
-        InsideCardTargetingEdit.prepend(galleryImageEdit, galleryTxtEdit);                           // L'incorporation des deux sous-balises.
+        /* Ajout des balises-enfants ! */
+        let insideCardTargetingEdit = document.querySelector(".edit_figureCard");       // On se replace au niveau de notre balise fraichement ajoutée :
+        insideCardTargetingEdit.prepend(galleryImageEdit, galleryTxtEdit);              // Ajout des composants précedemment définis.
+
+        /* Gestion des icones ! */
+        galleryIconeEdit.setAttribute("class", "edit_iconeManagement");
+        insideCardTargetingEdit.prepend(galleryIconeEdit);
+        let insideGalleryIconeEdit = document.querySelector(".edit_iconeManagement");   // Je me place au niveau de cette nouvelle balise enfants, qui va devenir parent.
+        if (i == 0) {
+            insideGalleryIconeEdit.prepend(galleryIconeMoveEdit, galleryIconeTrashEdit);
+        }
+        else {
+            insideGalleryIconeEdit.prepend(galleryIconeTrashEdit);
+        }
     }
 };
 
