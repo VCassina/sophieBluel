@@ -584,22 +584,21 @@ input[type="submit"] {
 	flex-direction: row-reverse;
 	position: relative;
 	top: 30px;
-	left: 50px;
+	left: 54px;
 	width: fit-content;
 }
 
 .edit_iconeManagement i {
 	background-color: black;
 	color: white;
-
-	padding: 5px;
+	padding: 4px;
 	border-radius: 5px;
 	cursor: pointer;
 }
 
 .fa-up-down-left-right {
 	position: relative;
-	left: -50px;
+	left: -46px; /* Pixel perfect en fonction d'edit_iconeManagement (value:left). */
 }
 
 .modalBox_wrapper .fa-xmark {

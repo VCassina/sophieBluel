@@ -1,6 +1,9 @@
 console.log("The script starts.")
 
-// Récuparation des données de l'API.
+
+/* ___________________________________________________________ */
+/* Récupération des données de l'API !                         */
+/* ___________________________________________________________ */
 async function getData() {
     try {
         const apiUrl = 'http://localhost:5678/api/works/';
@@ -13,11 +16,15 @@ async function getData() {
     }
 }
 
-let i;
+/* ___________________________________________________________ */
+/* Variables utilitaires communes.                             */
+/* ___________________________________________________________ */
 let arrayClassFilters;
 let arrayFiltersComponent;
 
-// Affiche les éléments séléctionnés.
+/* ___________________________________________________________ */
+/* Modification des éléments pour correspondre au filtrage.    */
+/* ___________________________________________________________ */
 function showClass(element, name) {
     arrayClassFilters = element.className.split(" ");                           // Split permet de "séparer" les éléments dans un tableau.
     arrayFiltersComponent = name.split(" ");                                    // Espacement d'un espace dans le tableau.
@@ -29,7 +36,9 @@ function showClass(element, name) {
     }
 }
 
-// Masque les éléments non concernés, fonctionnement identique à celui du dessus.
+/* ___________________________________________________________ */
+/* Masquage des éléments non demandés au filtrage.             */
+/* ___________________________________________________________ */
 function hideClass(element, name) {
     arrayClassFilters = element.className.split(" ");                                          // Nos deux tableaux sont de retour.
     arrayFiltersComponent = name.split(" ");
@@ -42,6 +51,9 @@ function hideClass(element, name) {
     element.className = arrayClassFilters.join(" "); // Toutes les classes ayant été delete. On lance une actualisation avec join(" ").
 }
 
+/* ___________________________________________________________ */
+/* Applique un filtre de séléction !                           */
+/* ___________________________________________________________ */
 function filterSelection(choose) {                                   // L'argument va être le button sélectionné.
     let x = document.getElementsByClassName("figureCard");           // Séléction des filterDiv.
     if (choose == "all") {                                           // Si le button "tout" est selectionné.
@@ -55,6 +67,9 @@ function filterSelection(choose) {                                   // L'argume
     }
 }
 
+/* ___________________________________________________________ */
+/* Affiche les éléments.                                       */
+/* ___________________________________________________________ */
 function dataShow() {   
     for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
 
@@ -79,20 +94,24 @@ function dataShow() {
     filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
 }
 
+/* ___________________________________________________________ */
+/* ACTION - Stockage de l'API dans un tableau.                 */
+/* ___________________________________________________________ */
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
     dataShow();
 })
 
-let buttonContainer = document.getElementById("sortingButton");             // Récupération de la <div> contenant les filtres.
-if (buttonContainer != null) {
+/* ___________________________________________________________ */
+/* ACTION - Ecoute des menus filtres S'IL Y EN A !             */
+/* ___________________________________________________________ */
+let buttonContainer = document.getElementById("sortingButton");                 // Récupération de la <div> contenant les filtres.
+if (buttonContainer != null) {                                                  // S'il y a un "sortingButton" de trouvé, alors :
     let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
-
     for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
         buttonItem[i].addEventListener("click", function () {                   // Pour chaque bouton, un EventListener par clique est initié.
             let current = document.getElementsByClassName("active");            // Ce clique déclanche la récupération éléments avec classe "active" et le stock.
-
             if (current.length == 0) {              // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
                 this.className += " active";        // En cas d'action, du click, la classe "active" est ajoutée.
             }
@@ -109,11 +128,6 @@ console.log("The 'modal'-part of the script just started.")
 /* ___________________________________________________________ */
 /* Utilisation différente de "dataShow", adaptée à la modale ! */
 /* ___________________________________________________________ */
-
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-/* !  N'est pas encore fonctionnelle                       ! */
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-
 function dataShowModal() {   
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
 
@@ -154,8 +168,21 @@ function dataShowModal() {
     }
 };
 
-const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
+/* ___________________________________________________________ */
+/* Suppression du DOM généré par dataShowModal !               */
+/* ___________________________________________________________ */
+function modalRemove() {
+    /* Déclaration des variables à supprimer ! */
+    let figureCardsToDeleteEdit = document.querySelectorAll(".edit_figureCard");        // Selection de toutes les classes .edit_figureCard.
+    figureCardsToDeleteEdit.forEach(function(e) {                                       // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
+        e.remove();                                                                     // Remove.
+    });
+}
 
+/* ___________________________________________________________ */
+/* Ouverture de la modale !                                    */
+/* ___________________________________________________________ */
+const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
 modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
   link.addEventListener("click", (event) => {
     event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
@@ -164,9 +191,27 @@ modalLinks.forEach(link => {                                         // Ecoute c
     modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
     modalBox.setAttribute("aria-modal", "true");                     // //
     dataShowModal();
+});
+});
 
-});
-});
+/* ___________________________________________________________ */
+/* Fermeture de la modale !                                    */
+/* ___________________________________________________________ */
+function closeModal() {                                  
+    modalBox.classList.add("modalBox-hidden");                    // On lui remet la modalBox-hidden, ce qui le cache. 
+    modalBox.setAttribute("aria-hidden", "true");                 // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+    modalBox.setAttribute("aria-modal", "false");                 // //                                             // La modale n'est plus ouverte.
+    modalRemove();                                                // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
+    console.log("modalRemove has been executed !");
+}
+
+/* ___________________________________________________________ */
+/* Fermeture de la modale possible au click de la croix.       */
+/* ___________________________________________________________ */
+const modalCross = document.querySelector(".fa-xmark");
+modalCross.addEventListener('click', () => {
+    closeModal();
+})
 
 console.log("The script just ended.")
 
