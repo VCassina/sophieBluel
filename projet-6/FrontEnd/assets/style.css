@@ -601,11 +601,20 @@ input[type="submit"] {
 	left: -46px; /* Pixel perfect en fonction d'edit_iconeManagement (value:left). */
 }
 
-.modalBox_wrapper .fa-xmark {
+.fa-xmark {
 	align-self: flex-end;
 	position: relative;
 	left: 50px;
 	/* Pixel perfect ! */
+	cursor: pointer;
+	font-size: x-large;
+	padding: 10px;	/* Plus grosse hit-box ! */
+}
+
+.fa-xmark:hover {
+	color: rgba(0, 0, 0, 0.25);
+	transform: rotate(45deg);
+	transition: transform 0.1s linear;
 }
 
 .modalBox_wrapper button {

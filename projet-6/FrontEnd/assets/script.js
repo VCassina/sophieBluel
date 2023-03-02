@@ -212,10 +212,7 @@ const modalCross = document.querySelector(".fa-xmark");
 modalCross.addEventListener('click', () => {
     closeModal();
 })
-
 console.log("The script just ended.")
-
-
 
 //________________________
 // Version "cours" du code relative aux filtres :
