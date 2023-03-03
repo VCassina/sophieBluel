@@ -1,3 +1,5 @@
+let token = "";
+
 async function postData(url = "", data = {}) {              // Function async ayant besoin d'une URL et de données. 
   const response = await fetch(url, {                       // une réponse sous forme de constante est attendue.
     method: "POST",                                         // Le fetch initié est en méthode POST.
@@ -6,7 +8,10 @@ async function postData(url = "", data = {}) {              // Function async ay
     },
     body: JSON.stringify(data),                             // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
   });
-  return response.json();                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
+
+  const responseJSON = await response.json();            // 
+  token = responseJSON.token;                            // Stocker le token de réponse dans la variable "token"
+  return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
 
 let form = document.getElementById('login_form');     // Selection de notre formulaire.
@@ -20,6 +25,7 @@ form.addEventListener("submit", (ev)=>{               // Si on clique sur Submit
 
     postData('http://127.0.0.1:5678/api/users/login', user).then(data=>{    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
       console.log(data);                                                    // Vérification du bon contenu de "data".
+      console.log(token);
     })
 })
 

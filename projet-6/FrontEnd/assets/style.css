@@ -109,6 +109,7 @@ section {
 
 body {
 	line-height: 1;
+	padding: 0 25px;
 }
 
 ol,
@@ -206,12 +207,15 @@ li:hover {
 }
 
 #introduction figure {
-	flex: 1
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	/* Pixel perfect ! */
 }
 
 #introduction img {
 	display: block;
-	margin: auto;
 	width: 80%;
 }
 
@@ -229,11 +233,13 @@ li:hover {
 
 #portfolio h2 {
 	text-align: center;
-	margin-bottom: 1em;
+	padding-top: 80px;
+	/* Pixel perfect ! */
 }
 
 #login {
-	padding-bottom: 355px; /* Pixel perfect ! */
+	padding-bottom: 355px;
+	/* Pixel perfect ! */
 }
 
 #login h2 {
@@ -295,7 +301,7 @@ li:hover {
 	margin: auto;
 }
 
-#login_form > * {
+#login_form>* {
 	text-align: center;
 }
 
@@ -348,6 +354,12 @@ li:hover {
 .img_title {
 	padding: 5px 0 0 0;
 	color: #3D3D3D;
+}
+
+footer nav ul {
+	display: flex;
+	justify-content: flex-end;
+	margin: 2em
 }
 
 /* _______________________________ */
@@ -405,6 +417,10 @@ li:hover {
 /* Fin du rajout filtres  		   */
 /* _______________________________ */
 
+/* _______________________________ */
+/* Mes ajouts			  		   */
+/* _______________________________ */
+
 input[type="submit"] {
 	font-family: 'Syne';
 	font-weight: 700;
@@ -416,9 +432,51 @@ input[type="submit"] {
 	border-radius: 60px;
 }
 
+.edit {
+	display: flex;
+	gap: 8px;
+}
+
+#edit_body {
+	margin-top: 100px;
+	/* Pixel perfect (60px edit_bar + 40px d'espacement) ! */
+}
+
+#edit_bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 60px;
+	background: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	gap: 30px;
+}
+
+#edit_bar .edit_texte,
+#edit_bar i {
+	color: white;
+}
+
+#edit_bar button {
+	padding: 11px 22px;
+	border-radius: 60px;
+	background: white;
+	font-family: 'Work Sans';
+	cursor: pointer;
+}
+
+#edit_mode {
+	gap: 50px;
+}
+
 #button_login {
 	width: auto;
-	padding: 0 40px;	/* Pixel perfect ! */
+	padding: 0 40px;
+	/* Pixel perfect ! */
 }
 
 #error_login {
@@ -426,8 +484,153 @@ input[type="submit"] {
 	font-style: italic;
 }
 
-footer nav ul {
+.insta_img {
+	width: 20px;
+	height: 20px;
+}
+
+#edit_portfolio {
+	padding-top: 80px;
+}
+
+#edit_portfolio-title {
 	display: flex;
-	justify-content: flex-end;
-	margin: 2em
+	flex-direction: row;
+	justify-content: center;
+	gap: 30px;
+}
+
+#edit_portfolio .edit {
+	align-self: center;
+}
+
+/* _______________________________ */
+/* Boite modale !		  		   */
+/* _______________________________ */
+
+.modalBox {
+	position: fixed;
+	display: flex;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+	height: 100%;
+
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0.75);
+}
+
+.modalBox-hidden {
+	display: none;
+}
+
+.modalBox_wrapper {
+	overflow: auto;
+	width: fit-content;
+	height: fit-content;
+	background: white;
+	border-radius: 10px;
+
+	display: flex;
+	flex-direction: column;
+	padding: 30px 100px;
+	/* Pixel perfect ! */
+	text-align: center;
+	align-items: center;
+}
+
+#modalBox-title {
+	font-family: 'Work Sans';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 26px;
+	line-height: 30px;
+	padding: 15px 0 40px;
+	/* Pixel perfect ! */
+}
+
+.edit_gallery {
+	padding-bottom: 60px;
+	width: auto;
+	height: fit-content;
+	border-bottom: 1px solid #B3B3B3;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.edit_gallery img {
+	width: 80px;
+	padding-bottom: 2px;
+	/* Pixel perfect ! */
+}
+
+.edit_figureCard {
+	height: 120px;
+	padding: 10px 5px;
+	/* Pixel perfect ! */
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+}
+
+.edit_figureCard a {
+	cursor: pointer;
+}
+
+.edit_iconeManagement {
+	display: flex;
+	flex-direction: row-reverse;
+	position: relative;
+	top: 30px;
+	left: 54px;
+	width: fit-content;
+}
+
+.edit_iconeManagement i {
+	background-color: black;
+	color: white;
+	padding: 4px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.fa-up-down-left-right {
+	position: relative;
+	left: -46px; /* Pixel perfect en fonction d'edit_iconeManagement (value:left). */
+}
+
+.fa-xmark {
+	align-self: flex-end;
+	position: relative;
+	left: 50px;
+	/* Pixel perfect ! */
+	cursor: pointer;
+	font-size: x-large;
+	padding: 10px;	/* Plus grosse hit-box ! */
+}
+
+.fa-xmark:hover {
+	color: rgba(0, 0, 0, 0.25);
+	transform: rotate(45deg);
+	transition: transform 0.1s linear;
+}
+
+.modalBox_wrapper button {
+	margin-top: 40px;
+	width: 240px;
+	height: 40px;
+	color: white;
+	background: #1D6154;
+	border-radius: 60px;
+	font-family: 'Syne';
+	font-weight: 700;
+}
+
+.modalBox_wrapper #gallery_delete {
+	padding: 20px 0 50px;
+	font-family: 'Syne';
+	font-weight: 400;
+	color: #D65353;
 }
