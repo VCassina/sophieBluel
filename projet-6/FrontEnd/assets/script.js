@@ -133,11 +133,12 @@ let tokenSaved = "";
 /* ___________________________________________________________ */
 /* Stockage du token reçu vers un cookie - function.           */
 /* ___________________________________________________________ */
-function setAuthToken(token) {
-    const cookieValue = `authToken=${token}`;
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + 7);   // Expiration dans 7 jours (arbitraire).
-    document.cookie = `${cookieValue}; expires=${expirationDate.toUTCString()}; path=/`;
+function setAuthToken(token) {                                    // Prendra le tokenSaved en argument pour le sauvegarder.
+    let cookieValue = `authToken=${token}`;                       // Déclaration d'une chaine de charactère qui servira de "chemin relatif".
+    let expirationDate = new Date();                              // Représente la date et heure actuelle en fonction de quand on appelle la fonction.
+    expirationDate.setDate(expirationDate.getDate() + 7);         // Expiration dans 7 jours (arbitraire).
+    document.cookie = `authToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
+    console.log(document.cookie);                                                                           // Affiche tous les cookies en string - Il est stocké !
   }
 
 /* ___________________________________________________________ */
@@ -153,11 +154,9 @@ async function postData(url = "", data = {}) {                  // Function asyn
     });
     const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
     tokenSaved = responseJSON.token;                       // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
-    setAuthToken(tokenSaved);                              // Stockage du cookie dans le navigateur.
+    setAuthToken(tokenSaved);                              // Stockage du token dans le navigateur sous forme de cookie.
     return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
-
-
 
 /* ___________________________________________________________ */
 /* Comportement du formulaire         .                        */
