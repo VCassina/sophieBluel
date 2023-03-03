@@ -70,28 +70,30 @@ function filterSelection(choose) {                                   // L'argume
 /* ___________________________________________________________ */
 /* Affiche les éléments.                                       */
 /* ___________________________________________________________ */
-function dataShow() {   
+function dataShow() {
     for (let i = arrayData.length - 1; i >= 0; i--) {                       // Boucle qui affichera les images dans le sens inverse.
 
         let galleryTargeting = document.querySelector(".gallery");
-        let galleryCard = document.createElement("figure");
-        let galleryImage = document.createElement("img");
-        let galleryTxt = document.createElement("figcaption");
+        if (galleryTargeting != null) {
+            let galleryCard = document.createElement("figure");
+            let galleryImage = document.createElement("img");
+            let galleryTxt = document.createElement("figcaption");
 
-        //console.log(arrayData[i].categoryId);
-        galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
-        galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
+            //console.log(arrayData[i].categoryId);
+            galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
+            galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
 
-        galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
-        galleryImage.setAttribute("alt", arrayData[i].title);
+            galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
+            galleryImage.setAttribute("alt", arrayData[i].title);
 
-        galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
-        galleryTxt.setAttribute("class", "img_title");
+            galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
+            galleryTxt.setAttribute("class", "img_title");
 
-        let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
-        InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+            let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
+            InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+        }
+        filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
     }
-    filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
 }
 
 /* ___________________________________________________________ */
@@ -128,7 +130,7 @@ console.log("The 'modal'-part of the script just started.")
 /* ___________________________________________________________ */
 /* Utilisation différente de "dataShow", adaptée à la modale ! */
 /* ___________________________________________________________ */
-function dataShowModal() {   
+function dataShowModal() {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
 
         /* Déclaration des variables ! */
@@ -136,11 +138,11 @@ function dataShowModal() {
         let galleryCardEdit = document.createElement("figure");
         let galleryTxtEdit = document.createElement("a");
         let galleryIconeEdit = document.createElement("div");
-        let galleryIconeTrashEdit = document.createElement("i");              
-        let galleryIconeMoveEdit = document.createElement("i");                 
+        let galleryIconeTrashEdit = document.createElement("i");
+        let galleryIconeMoveEdit = document.createElement("i");
         let galleryImageEdit = document.createElement("img");
 
-       /* Gestion des attributs ! */
+        /* Gestion des attributs ! */
         galleryImageEdit.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via les données importées de l'API.
         galleryImageEdit.setAttribute("alt", arrayData[i].title);
         galleryTxtEdit.innerText = "éditer";                                    // Ne renvoie à rien mais pourrait à l'avenir.
@@ -174,7 +176,7 @@ function dataShowModal() {
 function modalRemove() {
     /* Déclaration des variables à supprimer ! */
     let figureCardsToDeleteEdit = document.querySelectorAll(".edit_figureCard");        // Selection de toutes les classes .edit_figureCard.
-    figureCardsToDeleteEdit.forEach(function(e) {                                       // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
+    figureCardsToDeleteEdit.forEach(function (e) {                                      // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
         e.remove();                                                                     // Remove.
     });
 }
@@ -184,126 +186,106 @@ function modalRemove() {
 /* ___________________________________________________________ */
 const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
 modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
-  link.addEventListener("click", (event) => {
-    event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
-    const modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
-    modalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
-    modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
-    modalBox.setAttribute("aria-modal", "true");                     // //
-    dataShowModal();
-});
+    link.addEventListener("click", (event) => {
+        event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
+        const modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
+        modalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
+        modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+        modalBox.setAttribute("aria-modal", "true");                     // //
+        dataShowModal();
+    });
 });
 
 /* ___________________________________________________________ */
 /* Fermeture de la modale !                                    */
 /* ___________________________________________________________ */
-function closeModal() {                                  
+function closeModal() {
     modalBox.classList.add("modalBox-hidden");                    // On lui remet la modalBox-hidden, ce qui le cache. 
     modalBox.setAttribute("aria-hidden", "true");                 // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
     modalBox.setAttribute("aria-modal", "false");                 // //                                             // La modale n'est plus ouverte.
     modalRemove();                                                // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
-    console.log("modalRemove has been executed !");
 }
 
 /* ___________________________________________________________ */
 /* Fermeture de la modale possible au click de la croix.       */
 /* ___________________________________________________________ */
 const modalCross = document.querySelector(".fa-xmark");
-modalCross.addEventListener('click', () => {
-    closeModal();
-})
+if (modalCross != null) {
+    modalCross.addEventListener('click', () => {
+        closeModal();
+    });
+}
 console.log("The script just ended.")
 
-//________________________
-// Version "cours" du code relative aux filtres :
-// Code inspiré du W3schools : https://www.w3schools.com/howto/howto_js_filter_elements.asp.
-// Code qui a été analysé et compris LIGNE par LIGNE !
-// Actuallement : L'analyse est en cours, une version API sortira ensuite une fois la version locale parfaitement comprise.
-//________________________
+/* ___________________________________________________________ */
+/* Formulaire.                                                 */
+/* ___________________________________________________________ */
+let tokenSaved = "";
 
-// let i;
-// let arrayClassFilters;
-// let arrayFiltersComponent;
+/* ___________________________________________________________ */
+/* Envoie des ID et attente de réponse.                        */
+/* ___________________________________________________________ */
+async function postData(url = "", data = {}) {              // Function async ayant besoin d'une URL et de données. 
+    const response = await fetch(url, {                       // une réponse sous forme de constante est attendue.
+        method: "POST",                                         // Le fetch initié est en méthode POST.
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),                          // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
+    });
 
-// // Affiche les éléments selectionnsé.
-// function showClass(element, name) {
-//     arrayClassFilters = element.className.split(" ");            // Split permet de "séparer" les éléments individuellement, toutes les classes résident donc ici dans un tableau en string, espacée par un espace.
-//     arrayFiltersComponent = name.split(" ");                         // Le type d'espacement ("") permet le choix de leur intervalle de sélection.
-//     // Ici, chaque mot.
-//     // On a donc 2 tableaux, un avec le nom de la classe. L'autre avec le contenu.
-//     for (let i = 0; i < arrayFiltersComponent.length; i++) {         // Parcours le contenu du tableau contenant les objets renseignés (Abajour, Appartement parisien, etc...).
-//         if (arrayClassFilters.indexOf(arrayFiltersComponent[i]) == -1) {          // indexOf renvoi au positionnement de l'objet dans le tableau.
+    const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
+    tokenSaved = responseJSON.token;                       // Stocker le token de réponse dans la variable "token"
+    return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
+}
 
-//             // Dans mon tableau, l'index de l'élement "nombre d'itération de tableau 2".
-//             // Ex. arrayClassFilters attrape de l'argument "objet (Abajour)" > [0 filterDiv] & [1 item].
-//             //
-//             // Donc "Si l'index de "Objet (Abajour)" ==-1", "Si l'index de "Appartement parisien" ==-1", etc...
-//             // Pq -1 ? Renvoi à une sortie du tableau. L'élément n'est pas là.
-//             // Le conditionnement
+let form = document.getElementById('login_form');     // Selection de notre formulaire.
+if (form != null) {                                   // Si l'ID "form" correspond à qq chose, alors :
+    form.addEventListener("submit", (ev) => {             // Si on clique sur Submit avec l'argument étant le contenu du form !
+        ev.preventDefault();                              // N'actualise pas la page quand on clique.
+        let data = new FormData(ev.target);               // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
+        let user = {                                      // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
+            email: data.get('email_login'),
+            password: data.get('password_login')
+        };
 
-//             element.className += " " + arrayFiltersComponent[i];     // Alors on update le className avec un espacement et la classe à rajouter.
-//             // Le tableau
-//         }
-//     }
-// }   //Function prête, en attente d'argument pour savoir quoi filtrer.
+        let errorField = document.querySelector(".errorEmptyField");    // S'il y a déjà un message d'erreur car le formulaire n'est pas correctement reseigné.
+        if (errorField != null) {                                       // Si l'élément est trouvé, alors :
+            errorField.parentNode.removeChild(errorField);              // On supprime l'élément du DOM.
+        }
 
-// // Masque les éléments non concernés, fonctionnement identique à celui du dessus.
-// function hideClass(element, name) {
-//     arrayClassFilters = element.className.split(" ");            // Nos deux tableaux sont de retour.
-//     arrayFiltersComponent = name.split(" ");
+        if (user.email.trim() !== '' && user.password.trim() !== '') {                // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
+            postData('http://127.0.0.1:5678/api/users/login', user).then(data => {    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
+                console.log(data);                                                    // Vérification du bon contenu de "data".
+                console.log(tokenSaved);                                              // Vérification du bon contenu du token !
+                                                                                      // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
+            /* ___________________________________________________________ */
+            /* Dans le cas où l'API ne retourne pas d'erreur :             */
+            /* ___________________________________________________________ */
+            if (data.userId == 1) {
+                window.location.href = '../pages/index_edit.html';
+            }
 
-//     for (let i = 0; i < arrayFiltersComponent.length; i++) {         // Même boucle.
-//         while (arrayClassFilters.indexOf(arrayFiltersComponent[i]) > -1) {        // On vient selectionner l'inverse, les autres composants du tableau via le changement if => while.
-//             arrayClassFilters.splice(arrayClassFilters.indexOf(arrayFiltersComponent[i]), 1);  // Splice permet de supprimer les éléments précis du tableau.
+            /* ___________________________________________________________ */
+            /* Dans le cas où l'API retourne une erreur :                  */
+            /* ___________________________________________________________ */
+            else {
+                let link = document.querySelector("#button_login");
+                let p = document.createElement("p");
+                p.setAttribute("class", "errorEmptyField")
+                let textError = document.createTextNode("Les informations ne correspondent pas.");
+                p.appendChild(textError);
+                link.parentNode.insertBefore(p, link);
+            }
+            })
 
-//             // Ici, ce sont les classes CSS présentent dans arrayClassFilters renseigné via l'index d'arrayFiltersComponent (en rapport avec l'itération qui sont visées).
-//             // Désolé pour la phrase précédente mais on se comprend.
-//         }
-//     }
-//     element.className = arrayClassFilters.join(" "); // Toutes les classes ayant été delete. On lance une actualisation avec join(" ").
-// }
-
-// function filterSelection(choose) {                                   // L'argument va être le button sélectionné..
-//     let x = document.getElementsByClassName("figureCard");            // Selection des filterDiv.
-//     if (choose == "all") {                                           // Si le button "tout" est selectionné.
-//         choose = "";                                                     // Il n'y a plus de filtrage (suite de la function).
-//     }
-//     for (let i = 0; i < x.length; i++) {                                  // Lecture du tableau contenant toutes les classes filterDiv.
-//         hideClass(x[i], "show");                                            // Remove de la class "show" sur tous les éléments (clear).
-//         if (x[i].className.indexOf(choose) > -1) {
-
-//             // Si l'object en cours (numéro d'itération) a, comme index pour ce qui est séléctionné :
-//             // -1, cela signifie qu'il n'est pas dans le tableau, alors :
-//             showClass(x[i], "show");
-//             // On l'ajoute via la function showClass, la class "show" est ajouté comme vu précedemment.
-//         }
-//     }
-// }
-
-// let buttonContainer = document.getElementById("sortingButton");             // Récupération de la <div> contenant les filtres.
-// let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
-
-// for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
-//     buttonItem[i].addEventListener("click", function () {                  // Pour chaque bouton, un EventListener par clique est initié.
-//         let current = document.getElementsByClassName("active");
-//         //  Ce clique déclanche la récupération éléments avec classe "active" et le stock.
-
-//         if (current.length == 0) {              // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
-//             this.className += " active";        // En cas d'action, du click, la classe "active" est ajoutée.
-//         }
-//         else {
-//             current[0].className = current[0].className.replace(" active", ""); // Mais si quelque chose était déjà séléctionné, retire le via replace dans le tableau listant les classes.
-//             this.className += " active";                                        // Puis ajoute active sur le "bouton" cliqué.
-//         }
-//     });
-//     // Il y a encore une logique de "clear" des boutons avant d'effectuer une attribution au bon bouton, celui qui reçoit le click.
-// }
-
-// window.onload = (event) => {
-// 	filterSelection("all");             // Au chargement de la page, déclanche le filtre sur "all", la selection CSS initiale étant déjà préparée via la classe "active" dans l'HTML sur le button "all".
-// };
-
-// // Applique une sélection "de base" sur "all" dès l'affichage de la page.
-// //________________________
-// // FIN DU COURS !
-// //________________________ 
+        } else {                                                                      // Et sinon, on insère en DOM à l'utilisateur qu'il doit remplir tous les champs !
+            let link = document.querySelector("#button_login");
+            let p = document.createElement("p");
+            p.setAttribute("class", "errorEmptyField")
+            let textError = document.createTextNode("Veuillez remplir tous les champs.");
+            p.appendChild(textError);
+            link.parentNode.insertBefore(p, link);
+        }
+    })
+};
