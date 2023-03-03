@@ -125,6 +125,97 @@ if (buttonContainer != null) {                                                  
     }
 }
 
+/* ___________________________________________________________ */
+/* PARTIE FORMULAIRE !                                         */
+/* ___________________________________________________________ */
+let tokenSaved = "";
+
+/* ___________________________________________________________ */
+/* Stockage du token reçu vers un cookie - function.           */
+/* ___________________________________________________________ */
+function setAuthToken(token) {
+    const cookieValue = `authToken=${token}`;
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 7);   // Expiration dans 7 jours (arbitraire).
+    document.cookie = `${cookieValue}; expires=${expirationDate.toUTCString()}; path=/`;
+  }
+
+/* ___________________________________________________________ */
+/* Envoie des ID et attente de réponse.                        */
+/* ___________________________________________________________ */
+async function postData(url = "", data = {}) {                  // Function async ayant besoin d'une URL et de données. 
+    const response = await fetch(url, {                         // une réponse sous forme de constante est attendue.
+        method: "POST",                                         // Le fetch initié est en méthode POST.
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),                        // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
+    });
+    const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
+    tokenSaved = responseJSON.token;                       // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
+    setAuthToken(tokenSaved);                              // Stockage du cookie dans le navigateur.
+    return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
+}
+
+
+
+/* ___________________________________________________________ */
+/* Comportement du formulaire         .                        */
+/* ___________________________________________________________ */
+let form = document.getElementById('login_form');     // Selection de notre formulaire.
+if (form != null) {                                   // Si l'ID "form" correspond à qq chose, alors :
+    form.addEventListener("submit", (ev) => {             // Si on clique sur Submit avec l'argument étant le contenu du form !
+        ev.preventDefault();                              // N'actualise pas la page quand on clique.
+        let data = new FormData(ev.target);               // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
+        let user = {                                      // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
+            email: data.get('email_login'),
+            password: data.get('password_login')
+        };
+
+        let errorField = document.querySelector(".errorEmptyField");    // S'il y a déjà un message d'erreur car le formulaire n'est pas correctement reseigné.
+        if (errorField != null) {                                       // Si l'élément est trouvé, alors :
+            errorField.parentNode.removeChild(errorField);              // On supprime l'élément du DOM.
+        }
+
+        if (user.email.trim() !== '' && user.password.trim() !== '') {                // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
+            postData('http://127.0.0.1:5678/api/users/login', user).then(data => {    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
+                console.log(data);                                                    // Vérification du bon contenu de "data".
+                console.log(tokenSaved);                                              // Vérification du bon contenu du token !
+                // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
+                /* ___________________________________________________________ */
+                /* Dans le cas où l'API ne retourne pas d'erreur :             */
+                /* ___________________________________________________________ */
+                if (data.userId == 1) {
+                    window.location.href = '../pages/index_edit.html';
+                }
+
+                /* ___________________________________________________________ */
+                /* Dans le cas où l'API retourne une erreur :                  */
+                /* ___________________________________________________________ */
+                else {
+                    let link = document.querySelector("#button_login");
+                    let p = document.createElement("p");
+                    p.setAttribute("class", "errorEmptyField")
+                    let textError = document.createTextNode("Les informations ne correspondent pas.");
+                    p.appendChild(textError);
+                    link.parentNode.insertBefore(p, link);
+                }
+            })
+
+        } else {                                                                      // Et sinon, on insère en DOM à l'utilisateur qu'il doit remplir tous les champs !
+            let link = document.querySelector("#button_login");
+            let p = document.createElement("p");
+            p.setAttribute("class", "errorEmptyField")
+            let textError = document.createTextNode("Veuillez remplir tous les champs.");
+            p.appendChild(textError);
+            link.parentNode.insertBefore(p, link);
+        }
+    })
+};
+
+/* ___________________________________________________________ */
+/* PARTIE MODALE !                                             */
+/* ___________________________________________________________ */
 console.log("The 'modal'-part of the script just started.")
 
 /* ___________________________________________________________ */
@@ -193,6 +284,7 @@ modalLinks.forEach(link => {                                         // Ecoute c
         modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
         modalBox.setAttribute("aria-modal", "true");                     // //
         dataShowModal();
+        removePictureListening();
     });
 });
 
@@ -213,79 +305,42 @@ const modalCross = document.querySelector(".fa-xmark");
 if (modalCross != null) {
     modalCross.addEventListener('click', () => {
         closeModal();
-    });
-}
-console.log("The script just ended.")
-
-/* ___________________________________________________________ */
-/* Formulaire.                                                 */
-/* ___________________________________________________________ */
-let tokenSaved = "";
-
-/* ___________________________________________________________ */
-/* Envoie des ID et attente de réponse.                        */
-/* ___________________________________________________________ */
-async function postData(url = "", data = {}) {              // Function async ayant besoin d'une URL et de données. 
-    const response = await fetch(url, {                       // une réponse sous forme de constante est attendue.
-        method: "POST",                                         // Le fetch initié est en méthode POST.
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),                          // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
-    });
-
-    const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
-    tokenSaved = responseJSON.token;                       // Stocker le token de réponse dans la variable "token"
-    return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
+    })
 }
 
-let form = document.getElementById('login_form');     // Selection de notre formulaire.
-if (form != null) {                                   // Si l'ID "form" correspond à qq chose, alors :
-    form.addEventListener("submit", (ev) => {             // Si on clique sur Submit avec l'argument étant le contenu du form !
-        ev.preventDefault();                              // N'actualise pas la page quand on clique.
-        let data = new FormData(ev.target);               // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
-        let user = {                                      // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
-            email: data.get('email_login'),
-            password: data.get('password_login')
-        };
-
-        let errorField = document.querySelector(".errorEmptyField");    // S'il y a déjà un message d'erreur car le formulaire n'est pas correctement reseigné.
-        if (errorField != null) {                                       // Si l'élément est trouvé, alors :
-            errorField.parentNode.removeChild(errorField);              // On supprime l'élément du DOM.
-        }
-
-        if (user.email.trim() !== '' && user.password.trim() !== '') {                // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
-            postData('http://127.0.0.1:5678/api/users/login', user).then(data => {    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
-                console.log(data);                                                    // Vérification du bon contenu de "data".
-                console.log(tokenSaved);                                              // Vérification du bon contenu du token !
-                                                                                      // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
-            /* ___________________________________________________________ */
-            /* Dans le cas où l'API ne retourne pas d'erreur :             */
-            /* ___________________________________________________________ */
-            if (data.userId == 1) {
-                window.location.href = '../pages/index_edit.html';
-            }
+/* ___________________________________________________________ */
+/* Supprimer quelque chose dans la modale.                     */
+/* ___________________________________________________________ */
+    function  removePictureListening() {
+        const trashCans = Array.from(document.querySelectorAll('.fa-trash-can'));          // Une constante tableau ayant regroupés toutes les trashcans icones.
+        const trashCanId = trashCans.map(trashCan => trashCan.id);                         // Dans ce tableau, je rajoute la colonne "id" et stock ces valeurs dans trashCanIds.
+        console.log(trashCanId);                                                           // trashCans ne contient que les balises en plus de l'ID du tableau et c'est l'ID qui m'intéresse.
+        
+        trashCans.forEach((element, index) => {                                            // Pour tout nos trashCans, on va manipuler les éléments trouvés et leur ID (index) ! 
+            element.addEventListener('click', event => {                                   // Au click sur l'élément (la trashcan x).
+              let trashCanSelected = `${index}`;                                           // On lui donne son numéro sous la variable trashCanSelected.
+              console.log(`Clicked trash can ${trashCanSelected}`);                        // Vérification de l'index de la trashcan séléctionnée. 
 
             /* ___________________________________________________________ */
-            /* Dans le cas où l'API retourne une erreur :                  */
+            /* Envoie de la demande de suppression.                        */
             /* ___________________________________________________________ */
-            else {
-                let link = document.querySelector("#button_login");
-                let p = document.createElement("p");
-                p.setAttribute("class", "errorEmptyField")
-                let textError = document.createTextNode("Les informations ne correspondent pas.");
-                p.appendChild(textError);
-                link.parentNode.insertBefore(p, link);
-            }
+            const pictureTargeted = event.target.dataset.pictureTargeted;
+            const headers = { 'Authorization': `Bearer ${tokenSaved}` };
+            console.log(tokenSaved)
+
+            fetch(`http://localhost:5678/api/works/${trashCanSelected}`, { method: 'DELETE', headers })
+              .then(response => {
+                if (response.ok) {
+                  console.log("It worked !");
+                } else {
+                  console.log("It didn't work...");
+                    /* JE NE SUIS PAS AUTORISE !! Histoire de TOKEN ?? */
+                }
             })
 
-        } else {                                                                      // Et sinon, on insère en DOM à l'utilisateur qu'il doit remplir tous les champs !
-            let link = document.querySelector("#button_login");
-            let p = document.createElement("p");
-            p.setAttribute("class", "errorEmptyField")
-            let textError = document.createTextNode("Veuillez remplir tous les champs.");
-            p.appendChild(textError);
-            link.parentNode.insertBefore(p, link);
+            });
+          });
         }
-    })
-};
+        
+
+console.log("The script just ended.")
