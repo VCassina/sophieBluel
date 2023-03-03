@@ -128,18 +128,33 @@ if (buttonContainer != null) {                                                  
 /* ___________________________________________________________ */
 /* PARTIE FORMULAIRE !                                         */
 /* ___________________________________________________________ */
-let tokenSaved = "";
+let tokenToSave = "";
 
 /* ___________________________________________________________ */
 /* Stockage du token reçu vers un cookie - function.           */
 /* ___________________________________________________________ */
-function setAuthToken(token) {                                    // Prendra le tokenSaved en argument pour le sauvegarder.
-    let cookieValue = `authToken=${token}`;                       // Déclaration d'une chaine de charactère qui servira de "chemin relatif".
+function stockTokenCookie(token) {                                // Prendra le tokenSaved en argument pour le sauvegarder.
+    let cookieValue = `loginToken=${token}`;                      // Déclaration d'une chaine de charactère qui servira de "chemin relatif".
     let expirationDate = new Date();                              // Représente la date et heure actuelle en fonction de quand on appelle la fonction.
     expirationDate.setDate(expirationDate.getDate() + 7);         // Expiration dans 7 jours (arbitraire).
-    document.cookie = `authToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
+    document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
     console.log(document.cookie);                                                                           // Affiche tous les cookies en string - Il est stocké !
-  }
+}
+
+/* ___________________________________________________________ */
+/* Récupérer le token stocké.                                  */
+/* ___________________________________________________________ */
+function getTokenCookie(tokenWanted) {
+    let cookieData = document.cookie;            // Parmis tous les cookies du domaine stockés //
+    let cookieArray = cookieData.split(';');           // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, on connait.
+    for (let i = 0; i < cookieArray.length; i++) {     // Tableau qu'on va mtn parcourir.
+        let cookie = cookieArray[i].trim();                   // A chaque cookie parcouru, on les trims par sécurité.
+        if (cookie.startsWith(tokenWanted + '=')) {           // Quand on a trouvé le cookie que nous recherchons via l'argument fournis dans la function.
+            return cookie.substring(tokenWanted.length + 1);    // On le return.
+        }
+    }                                                           // Else non permit !?
+    return null;
+}
 
 /* ___________________________________________________________ */
 /* Envoie des ID et attente de réponse.                        */
@@ -153,13 +168,13 @@ async function postData(url = "", data = {}) {                  // Function asyn
         body: JSON.stringify(data),                        // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
     });
     const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
-    tokenSaved = responseJSON.token;                       // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
-    setAuthToken(tokenSaved);                              // Stockage du token dans le navigateur sous forme de cookie.
+    tokenToSave = responseJSON.token;                       // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
+    stockTokenCookie(tokenToSave);                              // Stockage du token dans le navigateur sous forme de cookie.
     return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
 
 /* ___________________________________________________________ */
-/* Comportement du formulaire         .                        */
+/* Comportement du formulaire.                                 */
 /* ___________________________________________________________ */
 let form = document.getElementById('login_form');     // Selection de notre formulaire.
 if (form != null) {                                   // Si l'ID "form" correspond à qq chose, alors :
@@ -179,7 +194,7 @@ if (form != null) {                                   // Si l'ID "form" correspo
         if (user.email.trim() !== '' && user.password.trim() !== '') {                // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
             postData('http://127.0.0.1:5678/api/users/login', user).then(data => {    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
                 console.log(data);                                                    // Vérification du bon contenu de "data".
-                console.log(tokenSaved);                                              // Vérification du bon contenu du token !
+                console.log(tokenToSave);                                              // Vérification du bon contenu du token !
                 // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
                 /* ___________________________________________________________ */
                 /* Dans le cas où l'API ne retourne pas d'erreur :             */
@@ -307,39 +322,48 @@ if (modalCross != null) {
     })
 }
 
+
 /* ___________________________________________________________ */
 /* Supprimer quelque chose dans la modale.                     */
 /* ___________________________________________________________ */
-    function  removePictureListening() {
-        const trashCans = Array.from(document.querySelectorAll('.fa-trash-can'));          // Une constante tableau ayant regroupés toutes les trashcans icones.
-        const trashCanId = trashCans.map(trashCan => trashCan.id);                         // Dans ce tableau, je rajoute la colonne "id" et stock ces valeurs dans trashCanIds.
-        console.log(trashCanId);                                                           // trashCans ne contient que les balises en plus de l'ID du tableau et c'est l'ID qui m'intéresse.
-        
-        trashCans.forEach((element, index) => {                                            // Pour tout nos trashCans, on va manipuler les éléments trouvés et leur ID (index) ! 
-            element.addEventListener('click', event => {                                   // Au click sur l'élément (la trashcan x).
-              let trashCanSelected = `${index}`;                                           // On lui donne son numéro sous la variable trashCanSelected.
-              console.log(`Clicked trash can ${trashCanSelected}`);                        // Vérification de l'index de la trashcan séléctionnée. 
+function removePictureListening() {
+    const trashCans = Array.from(document.querySelectorAll('.fa-trash-can'));          // Une constante tableau ayant regroupés toutes les trashcans icones.
+    const trashCanId = trashCans.map(trashCan => trashCan.id);                         // Dans ce tableau, je rajoute la colonne "id" et stock ces valeurs dans trashCanIds.
+    console.log(trashCanId);                                                           // trashCans ne contient que les balises en plus de l'ID du tableau et c'est l'ID qui m'intéresse.
+
+    trashCans.forEach((element, index) => {                                            // Pour tout nos trashCans, on va manipuler les éléments trouvés et leur ID (index) ! 
+        element.addEventListener('click', event => {                                   // Au click sur l'élément (la trashcan x).
+            let trashCanSelected = `${index}`;                                           // On lui donne son numéro sous la variable trashCanSelected.
+            console.log(`Clicked trash can ${trashCanSelected}`);                        // Vérification de l'index de la trashcan séléctionnée. 
 
             /* ___________________________________________________________ */
             /* Envoie de la demande de suppression.                        */
             /* ___________________________________________________________ */
+            /* > On récupère d'abord le cookie TOKEN !<                    */
+            let tokenSaved = getTokenCookie("loginToken");;
             const pictureTargeted = event.target.dataset.pictureTargeted;
             const headers = { 'Authorization': `Bearer ${tokenSaved}` };
             console.log(tokenSaved)
 
             fetch(`http://localhost:5678/api/works/${trashCanSelected}`, { method: 'DELETE', headers })
-              .then(response => {
-                if (response.ok) {
-                  console.log("It worked !");
-                } else {
-                  console.log("It didn't work...");
-                    /* JE NE SUIS PAS AUTORISE !! Histoire de TOKEN ?? */
-                }
-            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("It worked !");
 
-            });
-          });
-        }
-        
+                        /* PROBLEME RESTANT :
+
+                        Avoir à recharger la page... Contraignant !
+                        Avoir à repasser par la login pour refaire une demande, contraignant ! */
+
+                        
+                    } else {
+                        console.log("It didn't work...");
+                    }
+                })
+
+        });
+    });
+}
+
 
 console.log("The script just ended.")
