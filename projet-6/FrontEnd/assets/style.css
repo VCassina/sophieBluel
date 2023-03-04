@@ -612,9 +612,7 @@ input[type="submit"] {
 }
 
 .fa-xmark:hover {
-	color: rgba(0, 0, 0, 0.25);
-	transform: rotate(45deg);
-	transition: transform 0.1s linear;
+	color: rgba(0, 0, 0, 0.5);
 }
 
 .modalBox_wrapper button {

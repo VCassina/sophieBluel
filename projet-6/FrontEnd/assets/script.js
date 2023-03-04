@@ -1,6 +1,5 @@
 console.log("The script starts.")
 
-
 /* ___________________________________________________________ */
 /* Récupération des données de l'API !                         */
 /* ___________________________________________________________ */
@@ -9,8 +8,8 @@ async function getData() {
         const apiUrl = 'http://localhost:5678/api/works/';
         const resp = await fetch(apiUrl);
         const respContent = await resp.json();
+        console.log(respContent)
         return respContent;
-
     } catch (error) {
         console.error(error);
     }
@@ -93,6 +92,19 @@ function dataShow() {
             InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
         }
         filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
+    }
+}
+
+/* ___________________________________________________________ */
+/* Supprime les éléments (dans le but d'actualiser).           */
+/* ___________________________________________________________ */
+function dataRemove() {
+    let galleryTargeting = document.querySelector(".gallery");
+    if (galleryTargeting != null) {
+        let galleryCards = galleryTargeting.querySelectorAll(".figureCard");
+        galleryCards.forEach((card) => {
+            card.remove();
+        });
     }
 }
 
@@ -275,6 +287,30 @@ function dataShowModal() {
     }
 };
 
+/* ___________________________________________________________        */
+/* Même logique pour supprimer les données, adaptée à la même modale. */
+/* ___________________________________________________________        */
+function removeDataModal() {
+    return new Promise((resolve, reject) => {
+        let galleryTargetingEdit = document.querySelector(".edit_gallery");
+        if (galleryTargetingEdit != null) {
+            galleryTargetingEdit.innerHTML = "";                    // On supprime tous les éléments enfants de la div .edit_gallery (s'ils sont trouvés).
+            resolve();                                              // Attente de retour, n'est pas une fonction mais une instruction reconnu suite à Promise !
+        }
+    });
+}
+
+/* ___________________________________________________________     */
+/* Actualisation du contenu de la modale lors de la suppression.   */
+/* ___________________________________________________________     */
+/* > BETA !!! Pas encore utilisée, tqt. < */
+async function updateDataModal() {
+    await removeDataModal();
+    console.log("Suppression du contenu API dans la modale.");
+    dataShowModal();
+    console.log("Actualisation.");
+}
+
 /* ___________________________________________________________ */
 /* Suppression du DOM généré par dataShowModal !               */
 /* ___________________________________________________________ */
@@ -289,7 +325,7 @@ function modalRemove() {
 /* ___________________________________________________________ */
 /* Ouverture de la modale !                                    */
 /* ___________________________________________________________ */
-const modalLinks = document.querySelectorAll('a[href="#modalBox"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
+const modalLinks = document.querySelectorAll('a[href="#modalBoxContent"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
 modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
     link.addEventListener("click", (event) => {
         event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
@@ -297,8 +333,8 @@ modalLinks.forEach(link => {                                         // Ecoute c
         modalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
         modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
         modalBox.setAttribute("aria-modal", "true");                     // //
-        dataShowModal();
-        removePictureListening();
+        dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
+        removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.       
     });
 });
 
@@ -313,57 +349,45 @@ function closeModal() {
 }
 
 /* ___________________________________________________________ */
-/* Fermeture de la modale possible au click de la croix.       */
+/* Fermeture de la modale possible au click de la croix / ESC. */
 /* ___________________________________________________________ */
 const modalCross = document.querySelector(".fa-xmark");
 if (modalCross != null) {
     modalCross.addEventListener('click', () => {
         closeModal();
     })
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
 }
-
 
 /* ___________________________________________________________ */
 /* Supprimer quelque chose dans la modale.                     */
 /* ___________________________________________________________ */
-function removePictureListening() {
-    const trashCans = Array.from(document.querySelectorAll('.fa-trash-can'));          // Une constante tableau ayant regroupés toutes les trashcans icones.
-    const trashCanId = trashCans.map(trashCan => trashCan.id);                         // Dans ce tableau, je rajoute la colonne "id" et stock ces valeurs dans trashCanIds.
-    console.log(trashCanId);                                                           // trashCans ne contient que les balises en plus de l'ID du tableau et c'est l'ID qui m'intéresse.
+  function removePictureListening() {                               
+    const trashCan = document.querySelectorAll('.fa-trash-can');       // Selection de toutes les trashcans.
+    const trashCanId = [];                                             // Déclaration d'un tableau permettant de lié les Id d'arrayData (des images importées de l'API) et des trashcans index.
+    trashCan.forEach((trashCan, index) => {                            // Pour chaque element contenant .fa-trash-can.
+      trashCanId.push(arrayData[index].id);                            // Dans le tableau trashCansId, on ajoute pour chaque poubelle (car tjrs dans notre forEach), on associe les réfèrences des ID de notre arrayData.
 
-    trashCans.forEach((element, index) => {                                            // Pour tout nos trashCans, on va manipuler les éléments trouvés et leur ID (index) ! 
-        element.addEventListener('click', event => {                                   // Au click sur l'élément (la trashcan x).
-            let trashCanSelected = `${index}`;                                           // On lui donne son numéro sous la variable trashCanSelected.
-            console.log(`Clicked trash can ${trashCanSelected}`);                        // Vérification de l'index de la trashcan séléctionnée. 
 
-            /* ___________________________________________________________ */
-            /* Envoie de la demande de suppression.                        */
-            /* ___________________________________________________________ */
-            /* > On récupère d'abord le cookie TOKEN !<                    */
-            let tokenSaved = getTokenCookie("loginToken");;
-            const pictureTargeted = event.target.dataset.pictureTargeted;
-            const headers = { 'Authorization': `Bearer ${tokenSaved}` };
-            console.log(tokenSaved)
-
-            fetch(`http://localhost:5678/api/works/${trashCanSelected}`, { method: 'DELETE', headers })
-                .then(response => {
-                    if (response.ok) {
-                        console.log("It worked !");
-
-                        /* PROBLEME RESTANT :
-
-                        Avoir à recharger la page... Contraignant !
-                        Avoir à repasser par la login pour refaire une demande, contraignant ! */
-
-                        
-                    } else {
-                        console.log("It didn't work...");
-                    }
-                })
-
-        });
+      trashCan.addEventListener('click', () => {                       // Ajoute un écouteur d'événement de clic sur chaque élément ".fa-trash-can".
+            let idToDelete = trashCanId[index];                        // La variable qui servira de "pointeur" pour désigner l'ID à supprimer. Il s'agit de l'élément trashCan en cours, enfin celui séléctionner.
+            
+            /* Intégration du token et de la demande fetch !*/
+            let tokenSaved = getTokenCookie("loginToken");                  // Récupération du token en cookie.      
+            const headers = { 'Authorization': "Bearer " + tokenSaved };    // Composant de la demande fetch, on y intégre notre token pour réussir la demande DELETE.                                
+            fetch("http://localhost:5678/api/works/" + idToDelete, { method: 'DELETE', headers })       // Notre demande, on vient supprimer l'ID en cours, celui qui a déclanché le click.
+        .then(response => {                                                                             // Ajout d'un .then car la function ne marchait pas en async...
+          if (response.ok) {                                                                            // Si la réponse est bonne :
+          trashCanId.splice(index, 1);                                                                  // Utilisation de splice pour supprimer un élément préçis, ici pour notre index, donc tjrs le trashcan qui a été clické, supprime 1 élément.
+          console.log(trashCanId);}
+        })
+        .catch(error => console.error(`Error deleting picture with ID ${idToDelete}: ${error}`));
+      });
     });
-}
-
-
+  }
+  
 console.log("The script just ended.")
