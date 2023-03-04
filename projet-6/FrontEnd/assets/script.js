@@ -385,9 +385,8 @@ if (modalCross != null) {
           trashCanId.splice(index, 1);                                                                  // Utilisation de splice pour supprimer un élément préçis, ici pour notre index, donc tjrs le trashcan qui a été clické, supprime 1 élément.
           console.log(trashCanId);}
         })
-        .catch(error => console.error(`Error deleting picture with ID ${idToDelete}: ${error}`));
       });
     });
   }
-  
+
 console.log("The script just ended.")
