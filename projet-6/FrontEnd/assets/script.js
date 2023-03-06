@@ -300,17 +300,6 @@ function removeDataModal() {
     });
 }
 
-/* ___________________________________________________________     */
-/* Actualisation du contenu de la modale lors de la suppression.   */
-/* ___________________________________________________________     */
-/* > BETA !!! Pas encore utilisée, tqt. < */
-async function updateDataModal() {
-    await removeDataModal();
-    console.log("Suppression du contenu API dans la modale.");
-    dataShowModal();
-    console.log("Actualisation.");
-}
-
 /* ___________________________________________________________ */
 /* Suppression du DOM généré par dataShowModal !               */
 /* ___________________________________________________________ */
@@ -366,27 +355,102 @@ if (modalCross != null) {
 /* ___________________________________________________________ */
 /* Supprimer quelque chose dans la modale.                     */
 /* ___________________________________________________________ */
-  function removePictureListening() {                               
-    const trashCan = document.querySelectorAll('.fa-trash-can');       // Selection de toutes les trashcans.
-    const trashCanId = [];                                             // Déclaration d'un tableau permettant de lié les Id d'arrayData (des images importées de l'API) et des trashcans index.
-    trashCan.forEach((trashCan, index) => {                            // Pour chaque element contenant .fa-trash-can.
-      trashCanId.push(arrayData[index].id);                            // Dans le tableau trashCansId, on ajoute pour chaque poubelle (car tjrs dans notre forEach), on associe les réfèrences des ID de notre arrayData.
+/* SUPPRESSION FONCTIONNE mais en peux traiter trop de demandes, pourquoi !? => Voir ligne 411 !! */
+let pendingRequests = []; // A ne pas déclarer dans la fonction car le code lu trouve un eventListener avant l'appel de la fonction et une erreur apparait !
+function removePictureListening() {                              
+    let trashCan = document.querySelectorAll('.fa-trash-can');              // Selectionne nos trashcans.     
+    let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
+    trashCan.forEach((trashCan, index) => {                                 // Pour chaque élément trashcans :                           
+      trashCanId.push(arrayData[index].id);                                 
+      // Dans le tableau trashCanId, contenant les liaisons entre trashcans/id des élements de l'API :
+      // Chaque poubelle (via le forEach) vient être associée à l'id de la ligne (index) du tableau importée de l'API.
+      // Ainsi, chaque poubelle se voit attribuée du même id que l'image qu'elle représente.
 
-
-      trashCan.addEventListener('click', () => {                       // Ajoute un écouteur d'événement de clic sur chaque élément ".fa-trash-can".
-            let idToDelete = trashCanId[index];                        // La variable qui servira de "pointeur" pour désigner l'ID à supprimer. Il s'agit de l'élément trashCan en cours, enfin celui séléctionner.
-            
-            /* Intégration du token et de la demande fetch !*/
-            let tokenSaved = getTokenCookie("loginToken");                  // Récupération du token en cookie.      
-            const headers = { 'Authorization': "Bearer " + tokenSaved };    // Composant de la demande fetch, on y intégre notre token pour réussir la demande DELETE.                                
-            fetch("http://localhost:5678/api/works/" + idToDelete, { method: 'DELETE', headers })       // Notre demande, on vient supprimer l'ID en cours, celui qui a déclanché le click.
-        .then(response => {                                                                             // Ajout d'un .then car la function ne marchait pas en async...
-          if (response.ok) {                                                                            // Si la réponse est bonne :
-          trashCanId.splice(index, 1);                                                                  // Utilisation de splice pour supprimer un élément préçis, ici pour notre index, donc tjrs le trashcan qui a été clické, supprime 1 élément.
-          console.log(trashCanId);}
-        })
+      trashCan.addEventListener('click', () => {                            // Lorsqu'on clique sur une icone trashcan.              
+            let idToDelete = trashCanId[index];                             // L'icone exacte sur laquelle est on à cliqué est numérotée et renseignée dans idToDelete.
+            pendingRequests.push({                                          // On ajoute également, en agrandissant le tableau pendingRequests, une requête fetch qu'on enverra plus tard.
+              method: 'DELETE',
+              url: "http://localhost:5678/api/works/" + idToDelete,                     // La demande touche à notre idtoDelete, là où nous avons cliqué.
+              headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
+            });
+            // Ajout de la classe "selectedBeforeDelete" à la balise <img> correspondante au clique, ici sur la modale.
+            const img = document.querySelectorAll('.edit_gallery img')[index];
+            img.classList.add('selectedBeforeDelete');
+            // Puis idem mais hors de la modale - La classe s'applique mais ce n'est pas le même effet car le CSS ne le permet pas pour des raisons d'esthétismes.
+            const imgOutOfModal = document.querySelectorAll('.gallery img')[index];
+            imgOutOfModal.classList.add('selectedBeforeDelete');
+            console.log(trashCanId);
       });
     });
-  }
+}
 
-console.log("The script just ended.")
+/* ___________________________________________________________ */
+/* ACTION - Listeners de "supprimer la galerie".               */
+/* ___________________________________________________________ */
+const galleryDelete = document.querySelector('#gallery_delete'); // Selection de tous nos éléments avec l'id.
+galleryDelete.addEventListener('click', () => {
+  // Supprime les éléments correspondants aux trashcans sélectionnées mais pour la modale.
+  let selectedCards = document.querySelectorAll('.edit_figureCard');                // On vient prendre toutes les classes qui nous intéressent.
+  selectedCards.forEach(card => {                                                   // On les parcour.
+    if (card.querySelector('.selectedBeforeDelete')) {                              // Si un enfant contenant la classe .selectedBeforeDelete est trouvé, on supprime .edit_figureCard.
+      card.parentNode.removeChild(card);                                            // Ainsi, si une image dispose de la classe, toute la card est delete.
+    }
+  });
+    // Supprime les éléments correspondants aux trashcans sélectionnées hors modale, sur le "vrai site".
+  const selectedCardsOutOfModal = document.querySelectorAll('.figureCard');         // Même procédé.
+  selectedCardsOutOfModal.forEach(card => {         
+    if (card.querySelector('.selectedBeforeDelete')) {
+      card.parentNode.removeChild(card);
+    }
+  });
+});
+
+/* ___________________________________________________________ */
+/* ACTION - Listeners de "publier les changements".            */
+/* ___________________________________________________________ */
+/* PARFOIS CERTAINES NE PASSENT PAS ! Quand en grand nombre ? */
+document.getElementById("changementApply").addEventListener("click", () => {
+    // On exécute toutes les requêtes en attente et stockées dans pendingRequests > Méthode de stackOverflow.
+    Promise.all(pendingRequests.map(request => fetch(request.url, { method: request.method, headers: request.headers })))
+      .then(responses => {                                                                                                      // On attend la réponse.
+        if (responses.every(response => response.ok)) {                                                                         // Si elle est correct :
+          setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ?
+            window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
+          }, 1000);
+        }
+      });
+  });
+
+  console.log("The script just ended.");
+
+/* ___________________________________________________________ */
+/* ZONE TEST / STOCKAGE ! */
+/* ___________________________________________________________ */
+
+/* ___________________________________________________________ */
+/* Supprimer dans la modale DES QU'ON CLIQUE sur la poubelle ! */       // /!\ CADUC /!\
+/* ___________________________________________________________ */
+/*> Idée abandonnée pour faire des changements temporaires qu'on valide ENSUITE en cliquant sur "valider les changements" ! <*/
+
+// function removePictureListening() {                               
+    //     const trashCan = document.querySelectorAll('.fa-trash-can');       // Selection de toutes les trashcans.
+    //     const trashCanId = [];                                             // Déclaration d'un tableau permettant de lié les Id d'arrayData (des images importées de l'API) et des trashcans index.
+    //     trashCan.forEach((trashCan, index) => {                            // Pour chaque element contenant .fa-trash-can.
+    //       trashCanId.push(arrayData[index].id);                            // Dans le tableau trashCansId, on ajoute pour chaque poubelle (car tjrs dans notre forEach), on associe les réfèrences des ID de notre arrayData.
+    
+    
+    //       trashCan.addEventListener('click', () => {                       // Ajoute un écouteur d'événement de clic sur chaque élément ".fa-trash-can".
+    //             let idToDelete = trashCanId[index];                        // La variable qui servira de "pointeur" pour désigner l'ID à supprimer. Il s'agit de l'élément trashCan en cours, enfin celui séléctionner.
+                
+    //             /* Intégration du token et de la demande fetch !*/
+    //             let tokenSaved = getTokenCookie("loginToken");                  // Récupération du token en cookie.      
+    //             const headers = { 'Authorization': "Bearer " + tokenSaved };    // Composant de la demande fetch, on y intégre notre token pour réussir la demande DELETE.                                
+    //             fetch("http://localhost:5678/api/works/" + idToDelete, { method: 'DELETE', headers })       // Notre demande, on vient supprimer l'ID en cours, celui qui a déclanché le click.
+    //         .then(response => {                                                                             // Ajout d'un .then car la function ne marchait pas en async...
+    //           if (response.ok) {                                                                            // Si la réponse est bonne :
+    //           trashCanId.splice(index, 1);                                                                  // Utilisation de splice pour supprimer un élément préçis, ici pour notre index, donc tjrs le trashcan qui a été clické, supprime 1 élément.
+    //           console.log(trashCanId);}
+    //         })
+    //       });
+    //     });
+    //   }

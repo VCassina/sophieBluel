@@ -566,6 +566,10 @@ input[type="submit"] {
 	/* Pixel perfect ! */
 }
 
+.edit_gallery i {
+	z-index: 1;
+}
+
 .edit_figureCard {
 	height: 120px;
 	padding: 10px 5px;
@@ -633,7 +637,24 @@ input[type="submit"] {
 	color: #D65353;
 }
 
+#gallery_delete {
+	cursor: pointer;
+}
+
+#gallery_delete:hover {
+	opacity: 0.75;
+	
+}
+
 .errorEmptyField {
 	color: red;
 	padding-top: 10px;
+}
+
+.selectedBeforeDelete {
+	opacity: 0.25;
+}
+
+.gallery .selectedBeforeDelete {	/* Plus joli si cela ne s'applique pas au image dans le fond. */
+	opacity: 1;
 }
