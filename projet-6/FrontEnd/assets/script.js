@@ -150,7 +150,7 @@ function stockTokenCookie(token) {                                // Prendra le 
     let expirationDate = new Date();                              // Représente la date et heure actuelle en fonction de quand on appelle la fonction.
     expirationDate.setDate(expirationDate.getDate() + 7);         // Expiration dans 7 jours (arbitraire).
     document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
-    console.log(document.cookie);                                                                           // Affiche tous les cookies en string - Il est stocké !
+    console.log(document.cookie);                                                                            // Affiche tous les cookies en string - Il est stocké !
 }
 
 /* ___________________________________________________________ */
@@ -165,7 +165,6 @@ function getTokenCookie(tokenWanted) {
             return cookie.substring(tokenWanted.length + 1);    // On le return.
         }
     }                                                           // Else non permit !?
-    return null;
 }
 
 /* ___________________________________________________________ */
@@ -240,6 +239,26 @@ if (form != null) {                                   // Si l'ID "form" correspo
 };
 
 /* ___________________________________________________________ */
+/* Redirection en cas d'absence du TOKEN sur la page EDIT !    */
+/* ___________________________________________________________ */
+if (window.location.href.includes("/index_edit.html")) {            // Si on se trouve sur la page de l'edit. (pathname ne fonctionne que pour les chemins complets !)
+    const cookieArray = document.cookie.split(';');     // Récupération des cookies du navigateurs.
+    let ifLoginTokenFound;                                     // Déclaration du token que nous cherchons.
+    for (let i = 0; i < cookieArray.length; i++) {          // Parcours du tableau.
+    let authTookie = cookieArray[i].trim();                 // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1.
+    if (authTookie.startsWith('loginToken=')) {             // Si notre cookie "loginToken" est trouvé :
+        ifLoginTokenFound = 1;     //
+    }
+    else {
+        ifLoginTokenFound = 0;
+    }}
+    // Redirige l'utilisateur vers le login !
+    if (ifLoginTokenFound == 0) {
+    window.location.href = "./login.html";
+    }
+}
+
+/* ___________________________________________________________ */
 /* PARTIE MODALE !                                             */
 /* ___________________________________________________________ */
 console.log("The 'modal'-part of the script just started.")
@@ -287,19 +306,6 @@ function dataShowModal() {
     }
 };
 
-/* ___________________________________________________________        */
-/* Même logique pour supprimer les données, adaptée à la même modale. */
-/* ___________________________________________________________        */
-function removeDataModal() {
-    return new Promise((resolve, reject) => {
-        let galleryTargetingEdit = document.querySelector(".edit_gallery");
-        if (galleryTargetingEdit != null) {
-            galleryTargetingEdit.innerHTML = "";                    // On supprime tous les éléments enfants de la div .edit_gallery (s'ils sont trouvés).
-            resolve();                                              // Attente de retour, n'est pas une fonction mais une instruction reconnu suite à Promise !
-        }
-    });
-}
-
 /* ___________________________________________________________ */
 /* Suppression du DOM généré par dataShowModal !               */
 /* ___________________________________________________________ */
@@ -311,11 +317,23 @@ function modalRemove() {
     });
 }
 
+/* ___________________________________________________________        */
+/* Même logique pour supprimer les données, adaptée à la même modale. */
+/* ___________________________________________________________        */
+
+function removeDataModal() {
+    /* Déclaration des variables à supprimer ! */
+    let galleryTargetingEdit = document.querySelectorAll(".edit_figureCard");        // Selection de toutes les classes .edit_figureCard.
+    galleryTargetingEdit.forEach(function (e) {                                      // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
+        e.remove();                                                                     // Remove.
+    });
+}
+
 /* ___________________________________________________________ */
 /* Ouverture de la modale !                                    */
 /* ___________________________________________________________ */
-const modalLinks = document.querySelectorAll('a[href="#modalBoxContent"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
-modalLinks.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
+const modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
+modalLink.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
     link.addEventListener("click", (event) => {
         event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
         const modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
@@ -326,6 +344,21 @@ modalLinks.forEach(link => {                                         // Ecoute c
         removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.       
     });
 });
+
+// preventDefault des autres "modifier" > Inutile pour cette V1.
+const pictureProfilLink = document.querySelector("#modalBoxProfil");
+pictureProfilLink.addEventListener("click", function(event) {
+    event.preventDefault();
+});
+
+// preventDefault des autres "modifier" > Inutile pour cette V1.
+const txtProfilLink = document.querySelector("#modalBoxTxt");
+txtProfilLink.addEventListener("click", function(event) {
+    console.log("Clique sur le truc.")
+    event.preventDefault();
+});
+
+
 
 /* ___________________________________________________________ */
 /* Fermeture de la modale !                                    */
@@ -388,6 +421,7 @@ function removePictureListening() {
 /* ACTION - Listeners de "supprimer la galerie".               */
 /* ___________________________________________________________ */
 const galleryDelete = document.querySelector('#gallery_delete'); // Selection de tous nos éléments avec l'id.
+if (galleryDelete) {                                             // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
 galleryDelete.addEventListener('click', () => {
   // Supprime les éléments correspondants aux trashcans sélectionnées mais pour la modale.
   let selectedCards = document.querySelectorAll('.edit_figureCard');                // On vient prendre toutes les classes qui nous intéressent.
@@ -403,26 +437,46 @@ galleryDelete.addEventListener('click', () => {
       card.parentNode.removeChild(card);
     }
   });
-});
+});}
 
 /* ___________________________________________________________ */
 /* ACTION - Listeners de "publier les changements".            */
 /* ___________________________________________________________ */
 /* PARFOIS CERTAINES NE PASSENT PAS ! Quand en grand nombre ? */
+changementApplyButton = document.getElementById("changementApply");
+if (changementApplyButton) {
 document.getElementById("changementApply").addEventListener("click", () => {
     // On exécute toutes les requêtes en attente et stockées dans pendingRequests > Méthode de stackOverflow.
     Promise.all(pendingRequests.map(request => fetch(request.url, { method: request.method, headers: request.headers })))
       .then(responses => {                                                                                                      // On attend la réponse.
         if (responses.every(response => response.ok)) {                                                                         // Si elle est correct :
-          setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ?
+          setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ? - Oui, je pense.
             window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
           }, 1000);
         }
       });
-  });
+  });}
+
+/* ___________________________________________________________ */
+/* Ajouter une PHOTO !                                         */
+/* ___________________________________________________________ */
+
+/* ___________________________________________________________ */
+/* Ouverture de la seconde modale.                             */
+/* ___________________________________________________________ */
+secondModalButton = document.querySelector("#addPictureModalOpener");
+if (secondModalButton) {
+    document.getElementById("addPictureModalOpener").addEventListener("click", () => {
+        let secondModalBox = document.getElementById("modalBoxAddPicture");            // modalBox est notre élément comportement l'ID modalBox.
+        closeModal()
+        secondModalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
+        secondModalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+        secondModalBox.setAttribute("aria-modal", "true");
+    })
+}
 
   console.log("The script just ended.");
-
+  
 /* ___________________________________________________________ */
 /* ZONE TEST / STOCKAGE ! */
 /* ___________________________________________________________ */

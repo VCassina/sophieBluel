@@ -266,7 +266,6 @@ li:hover {
 
 #contact>* {
 	text-align: center;
-
 }
 
 #contact h2 {
@@ -602,21 +601,8 @@ input[type="submit"] {
 
 .fa-up-down-left-right {
 	position: relative;
-	left: -46px; /* Pixel perfect en fonction d'edit_iconeManagement (value:left). */
-}
-
-.fa-xmark {
-	align-self: flex-end;
-	position: relative;
-	left: 50px;
-	/* Pixel perfect ! */
-	cursor: pointer;
-	font-size: x-large;
-	padding: 10px;	/* Plus grosse hit-box ! */
-}
-
-.fa-xmark:hover {
-	color: rgba(0, 0, 0, 0.5);
+	left: -46px;
+	/* Pixel perfect en fonction d'edit_iconeManagement (value:left). */
 }
 
 .modalBox_wrapper button {
@@ -643,7 +629,7 @@ input[type="submit"] {
 
 #gallery_delete:hover {
 	opacity: 0.75;
-	
+
 }
 
 .errorEmptyField {
@@ -655,6 +641,130 @@ input[type="submit"] {
 	opacity: 0.25;
 }
 
-.gallery .selectedBeforeDelete {	/* Plus joli si cela ne s'applique pas au image dans le fond. */
+.gallery .selectedBeforeDelete {
+	/* Plus joli si cela ne s'applique pas au image dans le fond. */
 	opacity: 1;
+}
+
+#modalBoxTxt {
+	position: relative;
+	bottom: 18px;
+}
+
+.icn_management {
+	width: 100%;
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+}
+
+.fa-arrow-left {
+	align-self: flex-start;
+	position: relative;
+	right: 50px;
+	/* Pixel perfect ! */
+	cursor: pointer;
+	font-size: x-large;
+	padding: 10px;
+	/* Plus grosse hit-box ! */
+}
+
+.fa-arrow-left:hover {
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.fa-xmark {
+	align-self: flex-end;
+	position: relative;
+	left: 50px;
+	/* Pixel perfect ! */
+	cursor: pointer;
+	font-size: x-large;
+	padding: 10px;
+	/* Plus grosse hit-box ! */
+}
+
+.fa-xmark:hover {
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.edit_addPicture {
+	width: 420px;
+	background: #E8F1F7;
+	border-radius: 5px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 15px;
+	padding: 20px;
+	/* Pixel perfect ! */
+}
+
+.fa-image {
+	font-size: 6em;
+	/* Pixel perfect ! */
+	color: #B9C5CC;
+	padding: 10px 0 10px;
+}
+
+.edit_addPicture p:first-of-type {
+	background-color: #CBD6DC;
+	color: #306685;
+	width: fit-content;
+	padding: 10px 35px;
+	border-radius: 50px;
+	cursor: pointer;
+	box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
+}
+
+.edit_addPicture p:first-of-type:hover {
+	opacity: 0.9;
+	color: #264e66ef;
+}
+
+.edit_addPicture p:nth-of-type(2) {
+	color: #444444;
+}
+
+#pictureAdd {
+width: 100%;
+}
+
+#pictureAdd > * {
+	text-align: center;
+}
+
+#pictureAdd form {
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 45px; /* Pixel perfect ! */
+	border-bottom: 1px solid #B3B3B3;
+}
+
+#pictureAdd input {
+	height: 50px;
+	font-size: 1.2em;
+	border: none;
+	box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.09);
+}
+
+#pictureAdd label {
+	margin: 2em 0 1em 0;
+}
+
+#pictureAdd select {
+	border: none;
+	height: 50px;
+	font-size: 1.2em;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	background-color: white;
+	background-position: right 10px center;
+	background-repeat: no-repeat;
+	color: #6C6C6C;
+}
+
+#modalBoxAddPicture button{
+	margin-top: 0px;
 }

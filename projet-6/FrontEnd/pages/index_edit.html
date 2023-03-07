@@ -25,7 +25,7 @@
 			</div>
 			<button id="changementApply">publier les changements</button>
 		</div>
-		<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+		<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
 		<nav>
 			<ul>
 				<li><a href="">projets</a></li>
@@ -41,13 +41,17 @@
 			<figure>
 				<img src="../assets/images/sophie-bluel.png" alt="">
 				<div class="edit">
-					<a href="#modalBoxProfil" class="js-modalBox">
+					<a id="modalBoxProfil" href="#modalBoxProfil" class="js-modalBox">
 						<i class="fa-regular fa-pen-to-square"></i>
 						<span>modifier</span>
 					</a>
 				</div>
 			</figure>
 			<article>
+				<a id="modalBoxTxt" href="#modalBoxTxt" class="js-modalBox">
+					<i class="fa-regular fa-pen-to-square"></i>
+					<span>modifier</span>
+				</a>
 				<h2>Designer d'espace</h2>
 				<p>Je raconte votre histoire, je valorise vos idées. Je vous accompagne de la conception à la livraison
 					finale du chantier.</p>
@@ -88,15 +92,50 @@
 				<input type="submit" value="Envoyer">
 			</form>
 		</section>
-		
-		<aside id="modalBox" class="modalBox modalBox-hidden" aria-hidden="true" aria-labelledby="modalBox-title" role="dialog">
+
+		<aside id="modalBox" class="modalBox modalBox-hidden" aria-hidden="true" aria-labelledby="modalBox-Galerie"
+			role="dialog">
 			<div class="modalBox_wrapper">
-				<i class="fa-solid fa-xmark"></i>
+
+				<div class="icn_management">
+					<i class="fa-solid fa-xmark"></i>
+				</div>
 				<h3 id="modalBox-title">Galerie photo</h3>
 				<div class="edit_gallery">
 				</div>
-				<button>Ajouter une photo</button>
+				<button id="addPictureModalOpener">Ajouter une photo</button>
 				<span id="gallery_delete">Supprimer la galerie</span>
+			</div>
+		</aside>
+
+		<aside id="modalBoxAddPicture" class="modalBox modalBox-hidden" aria-hidden="true" aria-labelledby="modalBox-AddPicture"
+			role="dialog">
+			<div class="modalBox_wrapper">
+				<div class="icn_management">
+					<i class="fa-solid fa-xmark"></i>
+					<i class="fa-solid fa-arrow-left"></i>
+				</div>
+				<h3 id="modalBox-title">Ajout photo</h3>
+				<div class="edit_addPicture">
+					<i class="fa-solid fa-image"></i>
+					<p>+ Ajouter photo</p>
+					<p>jpg, png : 4mo max</p>
+				</div>
+				<section id="pictureAdd">
+					<form>
+						<label for="titlePictureAdd">Titre</label>
+						<input type="text" id="titlePictureAdd" name="titlePictureAdd">
+						<br><br>
+						<label for="categoryPictureAdd">Catégorie</label>
+						<select id="categoryPictureAdd" name="categoryPictureAdd">
+							<option value="" hidden></option>
+							<option value="1">Objet</option>
+							<option value="2">Appartements</option>
+							<option value="3">Hôtels & restaurants</option>
+						</select>
+					</form>
+				</section>
+				<button>Valider</button>
 			</div>
 		</aside>
 	</main>
