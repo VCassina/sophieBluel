@@ -332,8 +332,11 @@ function removeDataModal() {
 /* ___________________________________________________________ */
 /* Ouverture de la modale !                                    */
 /* ___________________________________________________________ */
-const modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Tous les liens (a) avec href qui comporte notre ancrage.
-modalLink.forEach(link => {                                         // Ecoute chaque clique sur ces deux lien.
+let isMainModalOpen = false;
+console.log(isMainModalOpen);
+function openModal() {
+let modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Notre lien avec ID #modalBoxContent, utilisation du ALL peut-être inapropriée ? Fonctionnel.
+modalLink.forEach(link => {                                        
     link.addEventListener("click", (event) => {
         event.preventDefault();                                          // On ne veut pas un fonctionnement de l'ancrage.
         const modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
@@ -341,11 +344,38 @@ modalLink.forEach(link => {                                         // Ecoute ch
         modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
         modalBox.setAttribute("aria-modal", "true");                     // //
         dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
-        removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.       
+        removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.
+        isMainModalOpen = true;                                              // Savoir quand la modale est ouverte et fermée (sert plus tard).
+        console.log(isMainModalOpen);
+        /* ___________________________________________________________              */
+        /* Fermeture de la modale possible au click de la croix + hors cadre & ESC. */
+        /* ___________________________________________________________              */
+        // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
+        if (isMainModalOpen === true) {                                       // Si la fenêtre modale est ouverte :
+            let modalCross = document.querySelector(".fa-xmark");       // On identifie la croix.
+            modalCross.addEventListener('click', () => {                // Alors on place notre eventListener sur le clique.
+                closeModal();                                           // Et ça viendra fermer la modale.
+            })
+            document.addEventListener('keydown', (event) => {           // Si on détecte la croix, on écoute également les inputs clavier.
+                if (event.key === 'Escape') {                           // Si l'input est "Echap", on ferme.
+                    closeModal();
+                }
+            });
+        let modalBoxHitBox = document.querySelector('#modalBox');       // On séléctionne la modale.
+        document.addEventListener('click', (event) => {                 // On écoute les clicks qui ont lieu sur TOUTE la page.
+            if (event.target === modalBoxHitBox) {                      // Si cela est exacte, il s'agit de la fenêtre modale MAIS :
+                //
+                // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
+                // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
+                // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
+                closeModal();
+            } else {
+            }
+        });
+        }   
     });
-});
 
-// preventDefault des autres "modifier" > Inutile pour cette V1.
+    // preventDefault des autres "modifier" > Inutile pour cette V1.
 const pictureProfilLink = document.querySelector("#modalBoxProfil");
 pictureProfilLink.addEventListener("click", function(event) {
     event.preventDefault();
@@ -354,35 +384,23 @@ pictureProfilLink.addEventListener("click", function(event) {
 // preventDefault des autres "modifier" > Inutile pour cette V1.
 const txtProfilLink = document.querySelector("#modalBoxTxt");
 txtProfilLink.addEventListener("click", function(event) {
-    console.log("Clique sur le truc.")
     event.preventDefault();
 });
-
-
+});
+}
+openModal();            // Dès l'ouverture de la page, on écoute pour être prêt à ouvrir la box.
 
 /* ___________________________________________________________ */
 /* Fermeture de la modale !                                    */
 /* ___________________________________________________________ */
+// Les conditions de fermeture sont désormais directement présente à la fermeture.
 function closeModal() {
     modalBox.classList.add("modalBox-hidden");                    // On lui remet la modalBox-hidden, ce qui le cache. 
     modalBox.setAttribute("aria-hidden", "true");                 // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
     modalBox.setAttribute("aria-modal", "false");                 // //                                             // La modale n'est plus ouverte.
     modalRemove();                                                // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
-}
-
-/* ___________________________________________________________ */
-/* Fermeture de la modale possible au click de la croix / ESC. */
-/* ___________________________________________________________ */
-const modalCross = document.querySelector(".fa-xmark");
-if (modalCross != null) {
-    modalCross.addEventListener('click', () => {
-        closeModal();
-    })
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
+    isMainModalOpen = false;
+    console.log(isMainModalOpen);
 }
 
 /* ___________________________________________________________ */
@@ -458,36 +476,94 @@ document.getElementById("changementApply").addEventListener("click", () => {
   });}
 
 /* ___________________________________________________________ */
-/* Ajouter une PHOTO !                                         */
+/* Ajouter une PHOTO & GESTION DE LA deuxième MODALE !         */
 /* ___________________________________________________________ */
 
 /* ___________________________________________________________ */
 /* Ouverture de la seconde modale.                             */
 /* ___________________________________________________________ */
-secondModalButton = document.querySelector("#addPictureModalOpener");
-if (secondModalButton) {
-    document.getElementById("addPictureModalOpener").addEventListener("click", () => {
-        let secondModalBox = document.getElementById("modalBoxAddPicture");            // modalBox est notre élément comportement l'ID modalBox.
-        closeModal()
-        secondModalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
+let isSecondModalOpen = false;
+let secondModalButton = document.querySelector("#addPictureModalOpener");                   // On vient selectionner le bouton "Ajouter une photo".
+if (secondModalButton) {                                                                    // Dans le cas où l'on se trouve sur une autre page qu'index_edit.
+    secondModalButton.addEventListener("click", () => {                                     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
+        let secondModalBox = document.getElementById("modalBoxAddPicture");                 // modalBox est notre élément comportement l'ID modalBox.
+        secondModalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place. 
         secondModalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
         secondModalBox.setAttribute("aria-modal", "true");
+        closeModal();
+        
+
+        isSecondModalOpen = true;                                              // Savoir quand la modale est ouverte et fermée (sert plus tard).
+        console.log(isSecondModalOpen + " < SECONDE MODALE !");
+        
+        /* ___________________________________________________________              */
+        /* Fermeture de la modale possible au click de la croix + hors cadre & ESC. */
+        /* ___________________________________________________________              */
+        // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
+
+        if (isSecondModalOpen === true) {                                       // Si la SECONDE fenêtre modale est ouverte :
+            console.log("Sortez moi de là.");                                   // Est appliqué correctement (jusqu'à présent).
+            let modalCross = document.querySelector(".fa-xmarkOfSecondModal");               // On identifie la croix.
+            modalCross.addEventListener('click', () => {                                     // Alors on place notre eventListener sur le clique.
+                console.log("Clique correctement reçu.");
+                closeSecondModal();                                                          // Et ça viendra fermer la modale qui est désormais la seule active.
+
+            })
+            document.addEventListener('keydown', (event) => {           // Si on détecte la croix, on écoute également les inputs clavier.
+                if (event.key === 'Escape') {                           // Si l'input est "Echap", on ferme.
+                    closeSecondModal();
+                }
+            });
+      
+        let modalBoxHitBox = document.querySelector("#modalBoxAddPicture");     // On séléctionne notre deuxieme modale dans le HTML.
+        document.addEventListener('click', (event) => {                         // On écoute les cliques sur toute la page.
+            if (event.target === modalBoxHitBox) {                              
+        //
+        // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
+        // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
+        // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
+                closeSecondModal();
+            } else {
+            }
+        });
+        }
     })
 }
 /* ___________________________________________________________ */
 /* Fermeture de la seconde modale.                             */
 /* ___________________________________________________________ */
 
-/* A FAIRE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+function closeSecondModal () {
+
+    let secondModalBox = document.getElementById("modalBoxAddPicture");                     // modalBox est notre élément comportement l'ID modalBox.
+    secondModalBox.classList.add("modalBox-hidden");                                        // On a rien vu, on remet comme c'était avant l'ouverture.
+    secondModalBox.setAttribute("aria-hidden", "true");                                     // 
+    secondModalBox.removeAttribute("aria-modal");                
+}
 
 /* ___________________________________________________________ */
-/* Revenir à l'ancienne modale   .                             */
+/* Revenir à l'ancienne modale.                                */
 /* ___________________________________________________________ */
+let secondModalBackButton = document.querySelector(".fa-arrow-left");                           // On vient selectionner 
+if (secondModalBackButton) {                                                                    // Dans le cas où l'on se trouve sur une autre page qu'index_edit.
+    secondModalBackButton.addEventListener("click", () => {          // 
+        let secondModalBox = document.getElementById("modalBoxAddPicture");                     // modalBox est notre élément comportement l'ID modalBox.
+        secondModalBox.classList.add("modalBox-hidden");                                        // On a rien vu, on remet comme c'était avant l'ouverture.
+        secondModalBox.setAttribute("aria-hidden", "true");                                     // 
+        secondModalBox.removeAttribute("aria-modal");                                           // 
+        
+        // Importation du code necessaire à la ré-ouverture de la mainModalBox - Que je devrais mettre en fonction !
+                let modalBox = document.getElementById("modalBox");            // modalBox est notre élément comportement l'ID modalBox.
+                modalBox.classList.remove("modalBox-hidden");                    // On lui retire la modalBox-hidden, ce qui le révèle. 
+                modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+                modalBox.setAttribute("aria-modal", "true");                     // //
+                dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
+                removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.
+                isMainModalOpen = true;    
+            })
+        };
 
-/* A FAIRE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-
-
-  console.log("The script just ended.");
+console.log("The script just ended.");
   
 /* ___________________________________________________________ */
 /* ZONE TEST / STOCKAGE ! */
