@@ -637,6 +637,12 @@ input[type="submit"] {
 	padding-top: 10px;
 }
 
+.errorSecondModale {
+	color: red;
+	align-self: center;
+	margin-bottom: 20px;
+}
+
 .selectedBeforeDelete {
 	opacity: 0.25;
 }
@@ -728,10 +734,10 @@ input[type="submit"] {
 }
 
 #pictureAdd {
-width: 100%;
+	width: 100%;
 }
 
-#pictureAdd > * {
+#pictureAdd>* {
 	text-align: center;
 }
 
@@ -739,8 +745,9 @@ width: 100%;
 	text-align: left;
 	display: flex;
 	flex-direction: column;
-	padding-bottom: 45px; /* Pixel perfect ! */
-	border-bottom: 1px solid #B3B3B3;
+	padding-bottom: 45px;
+	/* Pixel perfect ! */
+
 }
 
 #pictureAdd input {
@@ -765,6 +772,25 @@ width: 100%;
 	color: #6C6C6C;
 }
 
-#modalBoxAddPicture button{
+#modalBoxAddPicture button {
 	margin-top: 0px;
+}
+
+#pictureAddConformation {
+	align-self: center;
+}
+
+#borderAddingPicture {
+	padding-bottom: 30px;
+	/* ajoute un espace entre le bouton et le champ de sélection des options */
+	border-top: 1px solid #B3B3B3;
+}
+
+#pictureAddForm select {
+	margin-bottom: 45px;
+}
+
+.clickableButton:hover {
+	background: #A7A7A7;
+	cursor: pointer;
 }

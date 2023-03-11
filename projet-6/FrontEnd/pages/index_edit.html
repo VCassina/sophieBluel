@@ -103,13 +103,13 @@
 				<h3 id="modalBox-title">Galerie photo</h3>
 				<div class="edit_gallery">
 				</div>
-				<button id="addPictureModalOpener">Ajouter une photo</button>
+				<button class="clickableButton" id="addPictureModalOpener">Ajouter une photo</button>
 				<span id="gallery_delete">Supprimer la galerie</span>
 			</div>
 		</aside>
 
-		<aside id="modalBoxAddPicture" class="modalBox modalBox-hidden" aria-hidden="true" aria-labelledby="modalBox-AddPicture"
-			role="dialog">
+		<aside id="modalBoxAddPicture" class="modalBox modalBox-hidden" aria-hidden="true"
+			aria-labelledby="modalBox-AddPicture" role="dialog">
 			<div class="modalBox_wrapper">
 				<div class="icn_management">
 					<i class="fa-solid fa-xmark fa-xmarkOfSecondModal"></i>
@@ -118,11 +118,11 @@
 				<h3 id="modalBox-title">Ajout photo</h3>
 				<div class="edit_addPicture">
 					<i class="fa-solid fa-image"></i>
-					<p>+ Ajouter photo</p>
+					<p id="addPicture">+ Ajouter photo</p>
 					<p>jpg, png : 4mo max</p>
 				</div>
 				<section id="pictureAdd">
-					<form>
+					<form id="pictureAddForm" action="#">
 						<label for="titlePictureAdd">Titre</label>
 						<input type="text" id="titlePictureAdd" name="titlePictureAdd">
 						<br><br>
@@ -133,15 +133,15 @@
 							<option value="2">Appartements</option>
 							<option value="3">Hôtels & restaurants</option>
 						</select>
+						<div id="borderAddingPicture">
+						</div>
+						<button class="clickableButton" id="pictureAddConformation">Valider</button>
 					</form>
 				</section>
-				<button>Valider</button>
+
 			</div>
 		</aside>
 	</main>
-
-
-
 	<footer>
 		<nav>
 			<ul>
