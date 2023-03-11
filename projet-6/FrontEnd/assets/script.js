@@ -575,6 +575,17 @@ if (secondModalBackButton) {                                                    
   "userId": 0
 } 
 */
+
+/* ___________________________________________________________                                      */
+/* Cliquer sur "Ajout photo" va déclancher un click sur l'input pour pouvoir choisir une image : .  */
+/* ___________________________________________________________                                      */
+let addPictureButton = document.getElementById("addPictureButton");
+let inputImage = document.getElementById("addedImage");
+
+addPictureButton.addEventListener("click", () => {                  // En cas de click sur le pictureButton (+ Ajouter photo).
+  inputImage.click();                                               // Un autre click aura lieux sur inputImage.
+});
+
 let addingPictureForm = {                                   // Tableau au format de ce que je vais devoir envoyer en fetch.
     id: 0,
     title: "",

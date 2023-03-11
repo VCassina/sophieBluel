@@ -115,12 +115,18 @@
 					<i class="fa-solid fa-xmark fa-xmarkOfSecondModal"></i>
 					<i class="fa-solid fa-arrow-left"></i>
 				</div>
+
 				<h3 id="modalBox-title">Ajout photo</h3>
 				<div class="edit_addPicture">
-					<i class="fa-solid fa-image"></i>
-					<p id="addPicture">+ Ajouter photo</p>
+					<form id="imageSelection" action="#">
+						<i class="fa-solid fa-image"></i>
+						<input type="file" id="addedImage" accept="image/*">
+						<button type="button" id="addPictureButton">+ Ajouter photo</button>
+						<!-- Ne renvoie pas directement à la séléction d'image, cela se fait en JS. Button va également déclancher un click sur l'input qui le précède. -->
+					  </form>
 					<p>jpg, png : 4mo max</p>
 				</div>
+
 				<section id="pictureAdd">
 					<form id="pictureAddForm" action="#">
 						<label for="titlePictureAdd">Titre</label>
