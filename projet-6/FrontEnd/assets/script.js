@@ -565,17 +565,6 @@ if (secondModalBackButton) {                                                    
 /* ___________________________________________________________ */
 /* Uploade une image.                                          */
 /* ___________________________________________________________ */
-// 1 - Récupérer les données du formulaire avant même de penser à l'envoyer.
-/* Les informations à récupérer sont les suivantes :
-{
-  "id": 0,
-  "title": "string",
-  "imageUrl": "string",
-  "categoryId": "string",
-  "userId": 0
-} 
-*/
-
 /* ___________________________________________________________                                      */
 /* Cliquer sur "Ajout photo" va déclancher un click sur l'input pour pouvoir choisir une image : .  */
 /* ___________________________________________________________                                      */
@@ -586,7 +575,8 @@ addPictureButton.addEventListener("click", () => {                  // En cas de
   inputImage.click();                                               // Un autre click aura lieux sur inputImage.
 });
 
-let addingPictureForm = {                                   // Tableau au format de ce que je vais devoir envoyer en fetch.
+// Tableau au format de ce que je vais devoir envoyer en fetch.
+let addingPictureForm = {                                  
     id: 0,
     title: "",
     imageUrl: "",
@@ -594,7 +584,8 @@ let addingPictureForm = {                                   // Tableau au format
     userId: 0
 };
 
-const pictureList = [];                                     // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
+ // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
+const pictureList = [];                                    
 
 function addPictureListeningToList(title, categoryId) {     // Ajout des informations rentrées dans le tableau pictureList.
     addingPictureForm = {
@@ -670,22 +661,29 @@ addPictureForm.addEventListener("submit", (event) => {                          
           addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
           console.log("Titre :", addingPictureForm.title);
           console.log("Catégorie :", addingPictureForm.categoryId);
-          addPictureListeningToList(addPictureTitle.value, addPictureCategory.value);
+          addPictureListeningToList(addPictureTitle.value, addPictureCategory.value);       // J'appelle la fonction qui va venir enregistrer localement ces informations du formulaire.
+                                                                                            // La fonction est prévue pour permettre l'accumulation de demande.
           break;
         }
     });
   }
 
-/*
-1 - Faire une liste des changements en LOCALE (comme pour le delete).*/
+  /* A FAIRE :
+
+  Rajouter le traitement de l'image : 
+
+  - La récupérer dans le formulaire.
+  - Vérifier si elle fait 4Mo ou moins.
+  - L'envoyer en argument dans addPictureListeningToList.
+  - Vérifier qu'elle s'ajoute bien dans nos objets avec son URL locale, que l'API puissent venir la récupérer et la stocker.
 
 
+  ENSUITE - Trouver comment faire une miniature de l'image à la place de l'icone :
 
-
-/*
-        - Etablir un tableau, le renseigner, lors de chaque renseignement, actualisation locale.
-2 - Envoyer l'upload dans l'API pour confirmer ces changements en ligne.
-*/
+  - Afficher l'image qui vient d'être séléctionné (dans une variable que l'on affiche ensuite avec de l'HTML généré).
+  - Miniaturisée/standardisé les dimensions de cet élément HTML (même dimension que l'icone ?).
+  - L'insérer au dessus/dessous de l'icone et supprimé l'icone.
+  */
 
 
 console.log("The script just ended.");
