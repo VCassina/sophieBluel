@@ -737,6 +737,7 @@ addPictureForm.addEventListener("submit", (event) => {                          
   - Débuger le fait que supprimer des images, valider la suppression avec "Supprimer la galerie" pour revenir sur la modale ne réactualise pas correctement les images car se réfèrent à l'API qui n'est pas encore actualisée.
     Car, à ce stade, seuls les images locales sont actualisées et les demandes sont stockées mais non communiquée à l'API. Mais elles sont bien quelques part, clin d'oeil.
     Conditionnement ? Du style : "S'il y a des requêtes en cours de stockage, affiche les en locale, rajoute les à ce que j'importe de l'API".  
+  - Retirer l'HUD naturel de la séléction d'image qui montre le nom et un petit texte indiquant qu'il faille séléctionner une image...
   */
 
 
