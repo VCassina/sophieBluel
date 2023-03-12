@@ -576,7 +576,7 @@ addPictureButton.addEventListener("click", () => {                  // En cas de
 });
 
 // Tableau au format de ce que je vais devoir envoyer en fetch.
-let addingPictureForm = {                                  
+let addingPictureForm = {                                           // Pourquoi on "const" pose problème ?                        
     id: 0,
     title: "",
     imageUrl: "",
@@ -604,25 +604,38 @@ function addPictureListeningToList(title, categoryId) {     // Ajout des informa
 function addingPictureFormInformation () {
 let addPictureForm = document.querySelector("#pictureAdd");               // Le formulaire (pour écouter sa validation).
 let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd");                 // La valeur titre.
-let addPictureCategory = addPictureForm.querySelector('#categoryPictureAdd');           // La valeur id (catégorie).
-let addPictureImage = addPictureForm.querySelector('');
+let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");           // La valeur id (catégorie).
+
+let addPictureSelectedByUserForm = document.querySelector("#imageSelection");
+let addPictureSelectedByUserImage = addPictureSelectedByUserForm.querySelector("#addedImage");
+let imageSize = 0;                                                                        // Variable qui va être utilisé pour stocker le poids de l'image.
+
 addPictureForm.addEventListener("submit", (event) => {                                    // On écoute le questionnaire en cas de validation.
     event.preventDefault();
+
     let errorInformationModale = document.querySelector(".errorSecondModale");            // Si un message d'erreur est trouvé, est déjà là.
     if (errorInformationModale) {
         errorInformationModale.remove();                                                  // Il est supprimé. Plus simple que pour login.
     }
-    switch (true) {                                                                       // Conditionnement qui se lance de base.
-        case !addPictureTitle.value || !addPictureCategory.value:                         // Dans le cas où il manque l'un ou l'autre.
 
-          let link = document.querySelector("#pictureAddConformation");                   // Affichage du message d'erreur, repris sur le login.
+    if (addPictureSelectedByUserImage.value) {
+        imageSize = addPictureSelectedByUserImage.files[0].size; 
+        console.log(imageSize);
+        // On stock ENSUITE la propriété du poids de notre image récupéré dans le formulaire à part, sinon ça fait n'importe quoi au niveau de la value du poids.
+        // Et on le modifie uniquement s'il y a une valeur dans addPictureSelectedByUserImage.
+    }
+                   
+    switch (true) {                                                                                                               // Conditionnement qui se lance de base.
+        case !addPictureTitle.value || !addPictureCategory.value || !addPictureSelectedByUserImage.value:                         // Dans le cas où il manque un champs.
+
+          let link = document.querySelector("#pictureAddConformation");                                                           // Affichage du message d'erreur, repris sur le login.
           let p = document.createElement("p");
           p.setAttribute("class", "errorSecondModale")
           let textError = document.createTextNode("Veuillez remplir tous les champs.");
           p.appendChild(textError);
           link.parentNode.insertBefore(p, link);
-
           break;
+
         case addPictureTitle.value.length > 180:                                          // Nombre de charactère max pour le titre (arbitraire ici).
 
           let link2 = document.querySelector("#pictureAddConformation");                  // Affichage du message d'erreur, repris sur le login.
@@ -631,22 +644,18 @@ addPictureForm.addEventListener("submit", (event) => {                          
           let textError2 = document.createTextNode("Le titre est trop long (180 chars max).");
           p2.appendChild(textError2);
           link2.parentNode.insertBefore(p2, link2);
-
-
           break;
+
         case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):                           // ASCII art uniquement - StackOverflow.
-
-
           let link3 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
           let p3 = document.createElement("p");
           p3.setAttribute("class", "errorSecondModale")
           let textError3 = document.createTextNode("Un ou plusieurs charactères spéciaux posent problèmes.");
           p3.appendChild(textError3);
           link3.parentNode.insertBefore(p3, link3);
-
           break;
-        case !/^[A-Z]/.test(addPictureTitle.value):                                     // Maj uniquement - StackOverflow.
 
+        case !/^[A-Z]/.test(addPictureTitle.value):                                     // Maj uniquement - StackOverflow.
           let link4 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
           let p4 = document.createElement("p");
           p4.setAttribute("class", "errorSecondModale")
@@ -655,10 +664,46 @@ addPictureForm.addEventListener("submit", (event) => {                          
           link4.parentNode.insertBefore(p4, link4);
           break;
 
+        case imageSize >= 4 * 1024 * 1024:                          // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
+            console.log(addPictureSelectedByUserImage.size);
+            let link5 = document.querySelector("#pictureAddConformation");
+            let p5 = document.createElement("p");
+            p5.setAttribute("class", "errorSecondModale");
+            let textError5 = document.createTextNode("La taille de l'image doit être inférieure à 4Mo.");
+            p5.appendChild(textError5);
+            link5.parentNode.insertBefore(p5, link5);
+            break;
+
         default:
+
+        /* On vient récuperer l'adresse URL locale du fichier image uploadé. */
+        /* -> ! NON !! On vient envoyer les "formData" pour créer un objet qui continuer ses données, exemple trouvé sur gitHub :
+
+            const formData = new FormData();
+            formData.append('image', imageFile.files[0]);
+
+            fetch('http://localhost:3000/upload', {
+            method: 'POST',
+            body: formData
+            })
+
+            Est-ce dans ce form data que je dois renseigner mes éléments précedemments mis en cache ?
+            Non. En fait, le tableau let addingPictureForm que j'ai renseigné devrait être un formData !!! que je mettrais ensuite en body, comme montré en dessus et c'est ça que traitera l'api.
+
+            const addingPictureForm = new FormData();
+            addingPictureForm.append('id', 0);
+            addingPictureForm.append('title', "");
+            addingPictureForm.append('categoryId', "");
+            addingPictureForm.append('userId', "");
+            addingPictureForm.append('imageUrl', "");
+
+            Je vais le remplacer par ça. */
+
+
           console.log("Validation du formulaire.");                                 // Si tout est bon, dans le cas où, en tout cas, on ne trouve pas d'erreur pour le moment :
           addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
           addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
+          //   addingPictureForm.imageUrl = l'URL locale de addPictureSelectedByUserImage.
           console.log("Titre :", addingPictureForm.title);
           console.log("Catégorie :", addingPictureForm.categoryId);
           addPictureListeningToList(addPictureTitle.value, addPictureCategory.value);       // J'appelle la fonction qui va venir enregistrer localement ces informations du formulaire.
@@ -670,52 +715,29 @@ addPictureForm.addEventListener("submit", (event) => {                          
 
   /* A FAIRE :
 
-  Rajouter le traitement de l'image : 
+  Rajouter le traitement de l'image, reste à faire :
 
-  - La récupérer dans le formulaire.
-  - Vérifier si elle fait 4Mo ou moins.
-  - L'envoyer en argument dans addPictureListeningToList.
-  - Vérifier qu'elle s'ajoute bien dans nos objets avec son URL locale, que l'API puissent venir la récupérer et la stocker.
+  > Changer le tableau addingPictureForm en formData, voir ligne 679.
+  > S'assurer que le code tiens toujours le coup après le changement de format du tableau d'objet.
+  > S'assurer que le formData se rempli bien avec les bons éléments.
+  > S'assurer que le formData est bien rempli dans le tableau qui stock les formData (qui sont donc nos requests).
+  > Trouver comment renseigner l'image dans la requete pour que l'API soit contente (URL ou bien l'image via le reader, je pense qu'il s'agira de l'URL et que l'API la traite dérrière).
+  > Envoyer une première requête pour tester la réception.
+  > Envoyer plusieurs requête pour tester la réception. 
 
+  > S'occuper du retour en local pour l'utilisateur.
+  > Afficher l'image avec les dimensions de l'icone quand l'utilisateur en sélectionne une, faire en sorte d'ailleurs que la miniature de l'image remplace l'icone.
+  > Les images doivent s'afficher entre chaque "Valider" en renvoyant un retour à l'ancienne modale mais actualisée avec la dernière image en bout de cours.
+  > Les images doivent s'afficher entre chaque "Valider" en fond, dans l'affichage de la page directement, hors modale.
+  > Est-il possible à ce moment d'en ajouter plusieurs ? (Attention au même soucis qu'avec le fait de supprimer plusieurs).
 
-  ENSUITE - Trouver comment faire une miniature de l'image à la place de l'icone :
+  > BONUS <
 
-  - Afficher l'image qui vient d'être séléctionné (dans une variable que l'on affiche ensuite avec de l'HTML généré).
-  - Miniaturisée/standardisé les dimensions de cet élément HTML (même dimension que l'icone ?).
-  - L'insérer au dessus/dessous de l'icone et supprimé l'icone.
+  - Débuger le fait du supprimer ENORMEMENT d'images car ça ne marche pas tjrs.
+  - Débuger le fait que supprimer des images, valider la suppression avec "Supprimer la galerie" pour revenir sur la modale ne réactualise pas correctement les images car se réfèrent à l'API qui n'est pas encore actualisée.
+    Car, à ce stade, seuls les images locales sont actualisées et les demandes sont stockées mais non communiquée à l'API. Mais elles sont bien quelques part, clin d'oeil.
+    Conditionnement ? Du style : "S'il y a des requêtes en cours de stockage, affiche les en locale, rajoute les à ce que j'importe de l'API".  
   */
 
 
 console.log("The script just ended.");
-  
-/* ___________________________________________________________ */
-/* ZONE TEST / STOCKAGE ! */
-/* ___________________________________________________________ */
-
-/* ___________________________________________________________ */
-/* Supprimer dans la modale DES QU'ON CLIQUE sur la poubelle ! */       // /!\ CADUC /!\
-/* ___________________________________________________________ */
-/*> Idée abandonnée pour faire des changements temporaires qu'on valide ENSUITE en cliquant sur "valider les changements" ! <*/
-
-// function removePictureListening() {                               
-    //     const trashCan = document.querySelectorAll('.fa-trash-can');       // Selection de toutes les trashcans.
-    //     const trashCanId = [];                                             // Déclaration d'un tableau permettant de lié les Id d'arrayData (des images importées de l'API) et des trashcans index.
-    //     trashCan.forEach((trashCan, index) => {                            // Pour chaque element contenant .fa-trash-can.
-    //       trashCanId.push(arrayData[index].id);                            // Dans le tableau trashCansId, on ajoute pour chaque poubelle (car tjrs dans notre forEach), on associe les réfèrences des ID de notre arrayData.
-    
-    
-    //       trashCan.addEventListener('click', () => {                       // Ajoute un écouteur d'événement de clic sur chaque élément ".fa-trash-can".
-    //             let idToDelete = trashCanId[index];                        // La variable qui servira de "pointeur" pour désigner l'ID à supprimer. Il s'agit de l'élément trashCan en cours, enfin celui séléctionner.
-                
-    //             /* Intégration du token et de la demande fetch !*/
-    //             let tokenSaved = getTokenCookie("loginToken");                  // Récupération du token en cookie.      
-    //             const headers = { 'Authorization': "Bearer " + tokenSaved };    // Composant de la demande fetch, on y intégre notre token pour réussir la demande DELETE.                                
-    //             fetch("http://localhost:5678/api/works/" + idToDelete, { method: 'DELETE', headers })       // Notre demande, on vient supprimer l'ID en cours, celui qui a déclanché le click.
-    //         .then(response => {                                                                             // Ajout d'un .then car la function ne marchait pas en async...
-    //           if (response.ok) {                                                                            // Si la réponse est bonne :
-    //           trashCanId.splice(index, 1);                                                                  // Utilisation de splice pour supprimer un élément préçis, ici pour notre index, donc tjrs le trashcan qui a été clické, supprime 1 élément.
-    //           console.log(trashCanId);}
-    //         })
-    //       });
-    //     });
-    //   }
