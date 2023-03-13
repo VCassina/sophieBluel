@@ -111,10 +111,18 @@ function dataRemove() {
 /* ___________________________________________________________ */
 /* ACTION - Stockage de l'API dans un tableau.                 */
 /* ___________________________________________________________ */
+let IdForAddingPictureForm = 0;
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
     dataShow();
+
+    // Attribution du dernier Id importé sous la variable : IdForAddingPictureForm (pour pouvoir ajouter des ID à la suite).
+    let lastIndexOfArrayData = arrayData.length - 1;
+    let lastObjectOfArrayData = arrayData[lastIndexOfArrayData];
+    lastObjectOfArrayData.id++;
+    IdForAddingPictureForm = lastObjectOfArrayData.id;
+    console.log(IdForAddingPictureForm);
 })
 
 /* ___________________________________________________________ */
@@ -465,14 +473,45 @@ changementApplyButton = document.getElementById("changementApply");
 if (changementApplyButton) {
 document.getElementById("changementApply").addEventListener("click", () => {
     // On exécute toutes les requêtes en attente et stockées dans requestToDelete > Méthode de stackOverflow.
-    Promise.all(requestToDelete.map(request => fetch(request.url, { method: request.method, headers: request.headers })))
-      .then(responses => {                                                                                                      // On attend la réponse.
-        if (responses.every(response => response.ok)) {                                                                         // Si elle est correct :
-          setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ? - Oui, je pense.
-            window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
-          }, 1000);
-        }
-      });
+
+
+    /* !!!!!!!!!!!! EN COMMENTAIRE LE TEMPS D'Y INCLURE L'AJOUT D'IMAGE DANS L'API !!!!!!!!!!!! */
+
+    // Promise.all(requestToDelete.map(request => fetch(request.url, { method: request.method, headers: request.headers })))
+    //   .then(responses => {                                                                                                      // On attend la réponse.
+    //     if (responses.every(response => response.ok)) {                                                                         // Si elle est correct :
+    //     //   setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ? - Oui, je pense.
+    //     //     window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
+    //     //   }, 1000);
+    //     }
+    //   });
+
+
+    // On exécute également les requêtes ADD stockées dans le tableau listingOfPictureToSentAtSwagger qu'on va stringifiée d'abord sur les conseils de Thomas.
+    // On strigify notre tableau pour préparer l'envoie à l'API.
+      for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {              
+        // Pour chaque image trouvé dans listingOfPictureToSentAtSwagger, on les stringify dans listingOfPictureToSentAtSwaggerStringified.
+        let pictureStringified = JSON.stringify(listingOfPictureToSentAtSwagger[i]);
+        listingOfPictureToSentAtSwaggerStringified.push(pictureStringified);
+    }
+    console.log(listingOfPictureToSentAtSwaggerStringified);    // C'est tout good.
+        // INTERNAL SERVEUR ERREUR ????? Unexpted... Hmmm... Je sais quoi changer sur ce coup là.
+    
+        fetch('http://localhost:5678/api/works/', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+            },
+            body: listingOfPictureToSentAtSwaggerStringified
+        })
+        .then(response => {
+            if (response.ok) {
+              console.log("C'est GG !");
+            }
+          })
+
+    console.log("Envoie des données à l'API.");
   });}
 
 /* ___________________________________________________________ */
@@ -575,30 +614,43 @@ addPictureButton.addEventListener("click", () => {                  // En cas de
   inputImage.click();                                               // Un autre click aura lieux sur inputImage.
 });
 
+
 // Tableau au format de ce que je vais devoir envoyer en fetch.
 let addingPictureForm = {                                           // Pourquoi on "const" pose problème ?                        
-    id: 0,
+    id: 0,                                     // Prendre le dernier ID du tableau arrayData et faire ++.
     title: "",
     imageUrl: "",
     categoryId: "",
-    userId: 0
+    userId: 1                                                        // Notre parfaite Sophie Bluel.
 };
 
+console.log(addingPictureForm)
+
  // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
-const pictureList = [];                                    
+let listingOfPictureToSentAtSwagger = [];  
+let  listingOfPictureToSentAtSwaggerStringified = [];                   // On va l'envoyer en stringify, plus tard.                  
 
-function addPictureListeningToList(title, categoryId) {     // Ajout des informations rentrées dans le tableau pictureList.
+function updatingTheImageToAddArray(title, categoryId, imageUrl) {     // Ajout des informations rentrées dans le tableau pictureList.
+    console.log("L.632 : ", IdForAddingPictureForm);
     addingPictureForm = {
-    id: arrayData.length + pictureList.length,
-    title: title,
-    imageUrl: "",
-    categoryId: categoryId,
-    userId: 0
-  };
+        id: IdForAddingPictureForm,
+        title: title,
+        imageUrl: imageUrl,
+        categoryId: categoryId,
+        userId: 1
+      };
+      console.log("L.640 : ", IdForAddingPictureForm);
+      console.log("L.641 : ", addingPictureForm);
 
-  pictureList.push(addingPictureForm);
-  console.log("Formulaire ajouté à la liste :", addingPictureForm, ".");
-  console.log("En tout, voila ce que je vais envoyer en fetch : ", pictureList, ".");
+      /* Comment faire pour "verouiller cette instance ?" */
+}
+
+function addingToImageToAddRequest(array) {    
+    console.log(IdForAddingPictureForm);     
+    console.log(listingOfPictureToSentAtSwagger);   
+    listingOfPictureToSentAtSwagger.push(array);
+    console.log("Formulaire ajouté à la liste :", array, ".");
+    console.log("En tout, voila ce que je vais envoyer en fetch : ", listingOfPictureToSentAtSwagger, ".");
 }
 
 function addingPictureFormInformation () {
@@ -609,6 +661,16 @@ let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");   
 let addPictureSelectedByUserForm = document.querySelector("#imageSelection");
 let addPictureSelectedByUserImage = addPictureSelectedByUserForm.querySelector("#addedImage");
 let imageSize = 0;                                                                        // Variable qui va être utilisé pour stocker le poids de l'image.
+
+/* On vient récupérer l'URL de l'image pour plus tard :*/
+// let pickedImageFromUser = document.querySelector("#addedImage");
+// addedImage.addEventListener('change', (event) => {      // En cas de changement, donc de sélection d'une image.
+// const pickedImage = event.target.files[0];      
+// console.log("l'URL de l'image ", pickedImage)   // 
+// const pickedImageUrl = URL.createObjectURL(pickedImage);
+// console.log(URL.createObjectURL(pickedImage));
+// console.log(pickedImageUrl);
+//}
 
 addPictureForm.addEventListener("submit", (event) => {                                    // On écoute le questionnaire en cas de validation.
     event.preventDefault();
@@ -676,51 +738,49 @@ addPictureForm.addEventListener("submit", (event) => {                          
 
         default:
 
-        /* On vient récuperer l'adresse URL locale du fichier image uploadé. */
-        /* -> ! NON !! On vient envoyer les "formData" pour créer un objet qui continuer ses données, exemple trouvé sur gitHub :
-
-            const formData = new FormData();
-            formData.append('image', imageFile.files[0]);
-
-            fetch('http://localhost:3000/upload', {
-            method: 'POST',
-            body: formData
-            })
-
-            Est-ce dans ce form data que je dois renseigner mes éléments précedemments mis en cache ?
-            Non. En fait, le tableau let addingPictureForm que j'ai renseigné devrait être un formData !!! que je mettrais ensuite en body, comme montré en dessus et c'est ça que traitera l'api.
-
-            const addingPictureForm = new FormData();
-            addingPictureForm.append('id', 0);
-            addingPictureForm.append('title', "");
-            addingPictureForm.append('categoryId', "");
-            addingPictureForm.append('userId', "");
-            addingPictureForm.append('imageUrl', "");
-
-            Je vais le remplacer par ça. */
-
 
           console.log("Validation du formulaire.");                                 // Si tout est bon, dans le cas où, en tout cas, on ne trouve pas d'erreur pour le moment :
           addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
           addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
-          //   addingPictureForm.imageUrl = l'URL locale de addPictureSelectedByUserImage.
+
+          // Pour l'instant URL est une URL bateau d'un tableau blanc...
+          let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
+          addingPictureForm.imageUrl = addPictureUrl;                               // Notre URL qu'on viendra stocker ici plus tard...
+          console.log(addingPictureForm.imageUrl);
+
           console.log("Titre :", addingPictureForm.title);
           console.log("Catégorie :", addingPictureForm.categoryId);
-          addPictureListeningToList(addPictureTitle.value, addPictureCategory.value);       // J'appelle la fonction qui va venir enregistrer localement ces informations du formulaire.
-                                                                                            // La fonction est prévue pour permettre l'accumulation de demande.
-          break;
-        }
-    });
-  }
+          console.log("URL de l'image :", addingPictureForm.imageUrl);
+
+          updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl);     
+          addingToImageToAddRequest(addingPictureForm);
+          updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); 
+          IdForAddingPictureForm++;    
+
+          // On actualise APRES aussi car sinon il créé deux fois le même.
+          // 1 - J'ajoute un clone.
+          // 2 - Que j'actualise.
+
+          // 0 ? J'actualise une premiere fois au début pour avoir mon id (car on a reçu les données d'arrayData entre temps).
+          // > Puis on ajoute le clone qu'on actualise.
+          // Puis incrémentation de l'id à chaque fois, après vérification, les données envoyés via fetch sont correctes.
+
+
+
+        // Stringifiage du tableau avec toutes les requêtes :
+        break;
+    }
+})
+}
 
   /* A FAIRE :
 
   Rajouter le traitement de l'image, reste à faire :
 
-  > Changer le tableau addingPictureForm en formData, voir ligne 679.
-  > S'assurer que le code tiens toujours le coup après le changement de format du tableau d'objet.
-  > S'assurer que le formData se rempli bien avec les bons éléments.
-  > S'assurer que le formData est bien rempli dans le tableau qui stock les formData (qui sont donc nos requests).
+  > Récupérer l'URL de l'image.                                 > En 613. Mais j'ignore comment faire... Voir avec Adrien, je n'y arrive pas, je veux le chemin absolu mais j'imagine que ce n'est pas possible... Dans ce cas, qu'attend l'API ?
+  > Stringifier les tableaux addingPictureForm du tableau listingOfPictureToSentAtSwagger (ou stringifier directement listingOfPictureToSentAtSwagger) voir ligne 679.    > !
+  > S'assurer que le stringify se rempli bien avec les bons éléments.
+  > S'assurer que le stringify est bien rempli dans le tableau qui stock les stringify (qui sont donc nos requests).
   > Trouver comment renseigner l'image dans la requete pour que l'API soit contente (URL ou bien l'image via le reader, je pense qu'il s'agira de l'URL et que l'API la traite dérrière).
   > Envoyer une première requête pour tester la réception.
   > Envoyer plusieurs requête pour tester la réception. 
@@ -739,6 +799,5 @@ addPictureForm.addEventListener("submit", (event) => {                          
     Conditionnement ? Du style : "S'il y a des requêtes en cours de stockage, affiche les en locale, rajoute les à ce que j'importe de l'API".  
   - Retirer l'HUD naturel de la séléction d'image qui montre le nom et un petit texte indiquant qu'il faille séléctionner une image...
   */
-
 
 console.log("The script just ended.");
