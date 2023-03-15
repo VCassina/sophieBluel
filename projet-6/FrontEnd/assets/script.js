@@ -115,6 +115,7 @@ let IdForAddingPictureForm = 0;
 let arrayData;                      // Mise en place des data de l'API dans un tableau.
 getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
     arrayData = result;             // Et donne la au tableau arrayData (le JSON).
+    console.log("Première importation ever d'arrayData : ", arrayData);
     dataShow();
 
     // Attribution du dernier Id importé sous la variable : IdForAddingPictureForm (pour pouvoir ajouter des ID à la suite).
@@ -187,8 +188,8 @@ async function postData(url = "", data = {}) {                  // Function asyn
         body: JSON.stringify(data),                        // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
     });
     const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
-    tokenToSave = responseJSON.token;                       // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
-    stockTokenCookie(tokenToSave);                              // Stockage du token dans le navigateur sous forme de cookie.
+    tokenToSave = responseJSON.token;                      // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
+    stockTokenCookie(tokenToSave);                         // Stockage du token dans le navigateur sous forme de cookie.
     return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
 
@@ -414,13 +415,15 @@ function closeModal() {
 /* ___________________________________________________________ */
 /* Supprimer quelque chose dans la modale.                     */
 /* ___________________________________________________________ */
-/* SUPPRESSION FONCTIONNE mais en peux traiter trop de demandes, pourquoi !? => Voir ligne 411 !! */
+/* SUPPRESSION FONCTIONNE mais pas sur la DERNIERE image, pourquoi ? */
 let requestToDelete = []; // A ne pas déclarer dans la fonction car le code lu trouve un eventListener avant l'appel de la fonction et une erreur apparait !
 function removePictureListening() {                              
     let trashCan = document.querySelectorAll('.fa-trash-can');              // Selectionne nos trashcans.     
     let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
     trashCan.forEach((trashCan, index) => {                                 // Pour chaque élément trashcans :                           
-      trashCanId.push(arrayData[index].id);                                 
+      trashCanId.push(arrayData[index].id);    
+      console.log(trashCanId);                             
+
       // Dans le tableau trashCanId, contenant les liaisons entre trashcans/id des élements de l'API :
       // Chaque poubelle (via le forEach) vient être associée à l'id de la ligne (index) du tableau importée de l'API.
       // Ainsi, chaque poubelle se voit attribuée du même id que l'image qu'elle représente.
@@ -432,13 +435,17 @@ function removePictureListening() {
               url: "http://localhost:5678/api/works/" + idToDelete,                     // La demande touche à notre idtoDelete, là où nous avons cliqué.
               headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
             });
+
             // Ajout de la classe "selectedBeforeDelete" à la balise <img> correspondante au clique, ici sur la modale.
             const img = document.querySelectorAll('.edit_gallery img')[index];
             img.classList.add('selectedBeforeDelete');
+
             // Puis idem mais hors de la modale - La classe s'applique mais ce n'est pas le même effet car le CSS ne le permet pas pour des raisons d'esthétismes.
             const imgOutOfModal = document.querySelectorAll('.gallery img')[index];
             imgOutOfModal.classList.add('selectedBeforeDelete');
             console.log(trashCanId);
+            console.log(idToDelete);
+            console.log(arrayData);
       });
     });
 }
@@ -449,6 +456,7 @@ function removePictureListening() {
 const galleryDelete = document.querySelector('#gallery_delete'); // Selection de tous nos éléments avec l'id.
 if (galleryDelete) {                                             // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
 galleryDelete.addEventListener('click', () => {
+
   // Supprime les éléments correspondants aux trashcans sélectionnées mais pour la modale.
   let selectedCards = document.querySelectorAll('.edit_figureCard');                // On vient prendre toutes les classes qui nous intéressent.
   selectedCards.forEach(card => {                                                   // On les parcour.
@@ -472,44 +480,119 @@ galleryDelete.addEventListener('click', () => {
 changementApplyButton = document.getElementById("changementApply");
 if (changementApplyButton) {
 document.getElementById("changementApply").addEventListener("click", () => {
-    // On exécute toutes les requêtes en attente et stockées dans requestToDelete > Méthode de stackOverflow.
-
-
-    /* !!!!!!!!!!!! EN COMMENTAIRE LE TEMPS D'Y INCLURE L'AJOUT D'IMAGE DANS L'API !!!!!!!!!!!! */
-
-    // Promise.all(requestToDelete.map(request => fetch(request.url, { method: request.method, headers: request.headers })))
-    //   .then(responses => {                                                                                                      // On attend la réponse.
-    //     if (responses.every(response => response.ok)) {                                                                         // Si elle est correct :
-    //     //   setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ? - Oui, je pense.
-    //     //     window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
-    //     //   }, 1000);
-    //     }
-    //   });
-
-
-    // On exécute également les requêtes ADD stockées dans le tableau listingOfPictureToSentAtSwagger qu'on va stringifiée d'abord sur les conseils de Thomas.
-    // On strigify notre tableau pour préparer l'envoie à l'API.
-      for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {              
-        // Pour chaque image trouvé dans listingOfPictureToSentAtSwagger, on les stringify dans listingOfPictureToSentAtSwaggerStringified.
-        let pictureStringified = JSON.stringify(listingOfPictureToSentAtSwagger[i]);
-        listingOfPictureToSentAtSwaggerStringified.push(pictureStringified);
-    }
-    console.log(listingOfPictureToSentAtSwaggerStringified);    // C'est tout good.
-        // INTERNAL SERVEUR ERREUR ????? Unexpted... Hmmm... Je sais quoi changer sur ce coup là.
     
-        fetch('http://localhost:5678/api/works/', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-            },
-            body: listingOfPictureToSentAtSwaggerStringified
-        })
-        .then(response => {
-            if (response.ok) {
-              console.log("C'est GG !");
-            }
-          })
+// On exécute toutes les requêtes en attente et stockées dans requestToDelete > Méthode de stackOverflow
+    Promise.all(requestToDelete.map(request => fetch(request.url, { method: request.method, headers: request.headers })))   
+    // Promise.all prend un tableau et renvoie une promesse en cas de résolution de tous les éléments du tableau.
+      .then(responses => {                                                                                                      // On attend la réponse.
+    if (responses.every(response => response.ok)) {                                                                                // Si elle est correct :
+        //    setTimeout(() => {                                                                                                    // Pour laisser le temps aux demandes, inutile ? - Oui, je pense.
+        //      window.location.href = '../pages/index_edit.html';                                                                  // Puis actualise la page.
+        //    }, 1000);                                                                                                             // Utile mais en com' le temps de réussir à ajouter une image.
+        console.log("Requête acceptée !");
+    }
+      });
+
+
+/* Passage en FormData simple ! */
+    // On exécute également les requêtes ADD stockées dans le tableau listingOfPictureToSentAtSwagger mais que l'on ne pas stringifier ! On le passe en formData :
+    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare un tableau de ce type.
+    // listingOfPictureToSentAtSwagger.forEach((image) => {                // Pour chaque image (objet) qui constituent mon tableau.
+    //     listingOfPictureToSentAtSwaggerFormDated.append("title", image.title);                  // On l'ajoute dans le tableau formDated.
+    //     listingOfPictureToSentAtSwaggerFormDated.append("imageUrl", image.imageUrl);            // //
+    //     listingOfPictureToSentAtSwaggerFormDated.append("categoryId", image.categoryId);        // //
+    // })
+    // console.log(listingOfPictureToSentAtSwagger);
+    // console.log(listingOfPictureToSentAtSwaggerFormDated);
+    // let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
+    // fetch('http://localhost:5678/api/works/', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+    //       'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+    //     },
+    //     body: listingOfPictureToSentAtSwaggerFormDated
+    //   })
+    //     .then(response => {     
+    //         if (response.ok) {
+    //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
+    //         }
+    //       })
+
+
+
+
+
+    /* Nouveau FormData() ! Cette fois ci on stringify les données que l'on met directement dans FormData() pour pouvoir joindre les objets en entier ! */
+    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
+    // let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
+    // listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
+    //   actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
+    //   actualImageObject.imageUrl = el.imageUrl;                           //
+    //   actualImageObject.categoryId = el.categoryId;                       //
+    //   listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
+    //   // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
+    //   actualImageObject = {};                                                             // On le vide pour la prochaine.
+    // });
+    // console.log(listingOfPictureToSentAtSwaggerFormDated);
+    // // // Ca a l'air correct, envoyons :
+    //     let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
+    //     fetch('http://localhost:5678/api/works/', {
+    //         method: 'POST',
+    //         headers: {
+    //           'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+    //           'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+    //         },
+    //         body: listingOfPictureToSentAtSwaggerFormDated
+    //       })
+    //     .then(response => {     
+    //         if (response.ok) {
+    //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
+    //         }
+    //       })
+
+
+
+
+
+
+
+    /* Idem que la façon d'au dessus en essayant, via le boundary, d'envoyer un objet en une seule fois ! */
+    let actualImageObject = {};                                             
+    let boundaryRand = Math.random().toString().substr(2);
+    // Via le controle de la chaine de séparation, il est possible d'envoyer un objet entierement !!
+    let listingOfPictureToSentAtSwaggerFormDated = '';
+    listingOfPictureToSentAtSwagger.forEach((el) => {               
+        listingOfPictureToSentAtSwaggerFormDated += `--${boundaryRand}\r\n`;
+        listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="title"\r\n\r\n${el.title}\r\n`;
+        listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="imageUrl"\r\n\r\n${el.imageUrl}\r\n`;
+        listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="categoryId"\r\n\r\n${el.categoryId}\r\n`;
+    });
+    listingOfPictureToSentAtSwaggerFormDated += `--${boundaryRand}--`;
+
+    fetch('http://localhost:5678/api/works/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+        'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+      },
+      body: listingOfPictureToSentAtSwaggerFormDated
+    })
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     console.log("Envoie des données à l'API.");
   });}
@@ -617,34 +700,28 @@ addPictureButton.addEventListener("click", () => {                  // En cas de
 
 // Tableau au format de ce que je vais devoir envoyer en fetch.
 let addingPictureForm = {                                           // Pourquoi on "const" pose problème ?                        
-    id: 0,                                     // Prendre le dernier ID du tableau arrayData et faire ++.
+                                     // Prendre le dernier ID du tableau arrayData et faire ++.
     title: "",
     imageUrl: "",
-    categoryId: "",
-    userId: 1                                                        // Notre parfaite Sophie Bluel.
+    categoryId: 0,                                                       // Notre parfaite Sophie Bluel.
 };
 
 console.log(addingPictureForm)
 
  // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
 let listingOfPictureToSentAtSwagger = [];  
-let  listingOfPictureToSentAtSwaggerStringified = [];                   // On va l'envoyer en stringify, plus tard.                  
+// let  listingOfPictureToSentAtSwaggerStringified = [];                   // On va l'envoyer en stringify, plus tard.                  
 
 function updatingTheImageToAddArray(title, categoryId, imageUrl) {     // Ajout des informations rentrées dans le tableau pictureList.
     console.log("L.632 : ", IdForAddingPictureForm);
     addingPictureForm = {
-        id: IdForAddingPictureForm,
         title: title,
         imageUrl: imageUrl,
         categoryId: categoryId,
-        userId: 1
       };
       console.log("L.640 : ", IdForAddingPictureForm);
       console.log("L.641 : ", addingPictureForm);
-
-      /* Comment faire pour "verouiller cette instance ?" */
 }
-
 function addingToImageToAddRequest(array) {    
     console.log(IdForAddingPictureForm);     
     console.log(listingOfPictureToSentAtSwagger);   
@@ -738,13 +815,13 @@ addPictureForm.addEventListener("submit", (event) => {                          
 
         default:
 
-
           console.log("Validation du formulaire.");                                 // Si tout est bon, dans le cas où, en tout cas, on ne trouve pas d'erreur pour le moment :
           addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
           addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
 
           // Pour l'instant URL est une URL bateau d'un tableau blanc...
           let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
+
           addingPictureForm.imageUrl = addPictureUrl;                               // Notre URL qu'on viendra stocker ici plus tard...
           console.log(addingPictureForm.imageUrl);
 
