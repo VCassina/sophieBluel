@@ -430,58 +430,58 @@ document.getElementById("changementApply").addEventListener("click", () => {
 
 /* Passage en FormData simple ! */
     // On exécute également les requêtes ADD stockées dans le tableau listingOfPictureToSentAtSwagger mais que l'on ne pas stringifier ! On le passe en formData :
-    let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare un tableau de ce type.
-    listingOfPictureToSentAtSwagger.forEach((image) => {                // Pour chaque image (objet) qui constituent mon tableau.
-        listingOfPictureToSentAtSwaggerFormDated.append("title", image.title);                  // On l'ajoute dans le tableau formDated.
-        listingOfPictureToSentAtSwaggerFormDated.append("imageUrl", image.imageUrl);            // //
-        listingOfPictureToSentAtSwaggerFormDated.append("categoryId", image.categoryId);        // //
-    })
-    console.log(listingOfPictureToSentAtSwagger);
-    console.log(listingOfPictureToSentAtSwaggerFormDated);
-    let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
-    fetch('http://localhost:5678/api/works/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-          'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-        },
-        body: listingOfPictureToSentAtSwaggerFormDated
-      })
-        .then(response => {     
-            if (response.ok) {
-              console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
-            }
-          })
-
-
-
-    /* Nouveau FormData() ! Cette fois ci on stringify les données que l'on met directement dans FormData() pour pouvoir joindre les objets en entier ! */
-    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
-    // let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
-    // listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
-    //   actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
-    //   actualImageObject.imageUrl = el.imageUrl;                           //
-    //   actualImageObject.categoryId = el.categoryId;                       //
-    //   listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
-    //   // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
-    //   actualImageObject = {};                                                             // On le vide pour la prochaine.
-    // });
+    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare un tableau de ce type.
+    // listingOfPictureToSentAtSwagger.forEach((image) => {                // Pour chaque image (objet) qui constituent mon tableau.
+    //     listingOfPictureToSentAtSwaggerFormDated.append("title", image.title);                  // On l'ajoute dans le tableau formDated.
+    //     listingOfPictureToSentAtSwaggerFormDated.append("imageUrl", image.imageUrl);            // //
+    //     listingOfPictureToSentAtSwaggerFormDated.append("categoryId", image.categoryId);        // //
+    // })
+    // console.log(listingOfPictureToSentAtSwagger);
     // console.log(listingOfPictureToSentAtSwaggerFormDated);
-    // // // Ca a l'air correct, envoyons :
-    //     let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
-    //     fetch('http://localhost:5678/api/works/', {
-    //         method: 'POST',
-    //         headers: {
-    //           'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-    //           'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-    //         },
-    //         body: listingOfPictureToSentAtSwaggerFormDated
-    //       })
+    // let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
+    // fetch('http://localhost:5678/api/works/', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+    //       'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+    //     },
+    //     body: listingOfPictureToSentAtSwaggerFormDated
+    //   })
     //     .then(response => {     
     //         if (response.ok) {
     //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
     //         }
     //       })
+
+
+
+    /* Nouveau FormData() ! Cette fois ci on stringify les données que l'on met directement dans FormData() pour pouvoir joindre les objets en entier ! */
+    let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
+    let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
+    listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
+      actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
+      actualImageObject.image = el.imageUrl;                              // Tout en étant raccord à ce qu'attend la requête, ici "image" et non "imageUrl", "imageUrl", c'est ce qui est renvoyé en REPONSE !
+      actualImageObject.category = el.categoryId;                         //
+      listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
+      // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
+      actualImageObject = {};                                                             // On le vide pour la prochaine.
+    });
+    console.log(listingOfPictureToSentAtSwaggerFormDated);
+    // // Ca a l'air correct, envoyons :
+        let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
+        fetch('http://localhost:5678/api/works/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+              'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+            },
+            body: listingOfPictureToSentAtSwaggerFormDated
+          })
+        .then(response => {     
+            if (response.ok) {
+              console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
+            }
+          })
 
 
 
