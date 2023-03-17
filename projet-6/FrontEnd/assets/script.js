@@ -351,30 +351,82 @@ openModal();
 let requestToDelete = [];
 
 // Enregistre les actions de remove sous une ou plusieurs requêtes fetch.
+// OLD !
+// function removePictureListening() {                              
+//     let trashCan = document.querySelectorAll('.fa-trash-can');              // Selectionne nos trashcans.     
+//     let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
+//     trashCan.forEach((trashCan, index) => {                                 // Pour chaque élément trashcans :                           
+//       trashCanId.push(arrayData[index].id);                                
+//       // Dans le tableau trashCanId, contenant les liaisons entre trashcans/id des élements de l'API :
+//       // Chaque poubelle (via le forEach) vient être associée à l'id de la ligne (index) du tableau importée de l'API.
+//       // Ainsi, chaque poubelle se voit attribuée du même id que l'image qu'elle représente.
+//       trashCan.addEventListener('click', () => {                            // Lorsqu'on clique sur une icone trashcan.              
+//             let idToDelete = trashCanId[index];                             // L'icone exacte sur laquelle est on à cliqué est numérotée et renseignée dans idToDelete.
+//             requestToDelete.push({                                          // On ajoute également, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
+//               method: 'DELETE',
+//               url: "http://localhost:5678/api/works/" + idToDelete,                     // La demande touche à notre idtoDelete, là où nous avons cliqué.
+//               headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
+//             });
+//             // Ajout de la classe "selectedBeforeDelete" à la balise <img> correspondante au clique, ici sur la modale.
+//             const img = document.querySelectorAll('.edit_gallery img')[index];
+//             img.classList.add('selectedBeforeDelete');
+//             // Puis idem mais hors de la modale - La classe s'applique mais ce n'est pas le même effet car le CSS ne le permet pas pour des raisons d'esthétismes.
+//             const imgOutOfModal = document.querySelectorAll('.gallery img')[index];
+//             imgOutOfModal.classList.add('selectedBeforeDelete');
+//             console.log("La trashCan séléctionnée est la numéro : ", idToDelete, "- Cela correspond au numéro de l'ID de l'objet importé.");
+//       });
+//     });
+// }
+
+// En cours ! > A ETUDIER & COMMENTER < !!
 function removePictureListening() {                              
-    let trashCan = document.querySelectorAll('.fa-trash-can');              // Selectionne nos trashcans.     
-    let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
-    trashCan.forEach((trashCan, index) => {                                 // Pour chaque élément trashcans :                           
-      trashCanId.push(arrayData[index].id);                                
-      // Dans le tableau trashCanId, contenant les liaisons entre trashcans/id des élements de l'API :
-      // Chaque poubelle (via le forEach) vient être associée à l'id de la ligne (index) du tableau importée de l'API.
-      // Ainsi, chaque poubelle se voit attribuée du même id que l'image qu'elle représente.
-      trashCan.addEventListener('click', () => {                            // Lorsqu'on clique sur une icone trashcan.              
-            let idToDelete = trashCanId[index];                             // L'icone exacte sur laquelle est on à cliqué est numérotée et renseignée dans idToDelete.
-            requestToDelete.push({                                          // On ajoute également, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
+    let trashCans = document.querySelectorAll('.fa-trash-can');             // Selectionne nos trashcans. 
+    let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.                                                   
+    trashCans.forEach((trashCan, index) => {                                // Pour chaque élément trashcans :     
+      trashCanId.push(arrayData[index].id);                                 // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.                            
+      let isTheTrashCanSelected = false;                                    // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
+      trashCan.addEventListener('click', () => {                            // Quand on clique sur une icone trashcan :                            
+        let idToDelete = trashCanId[index];                                 // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.                                
+        isTheTrashCanSelected = !isTheTrashCanSelected;                     // Inverse l'état, superbe façon de faire, j'aurais faire ça bien avant déjà.
+        if (isTheTrashCanSelected) {                                        // Si l'état est en true, que l'élément est séléctionné :
+            requestToDelete.push({                                          // On ajoute, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
               method: 'DELETE',
               url: "http://localhost:5678/api/works/" + idToDelete,                     // La demande touche à notre idtoDelete, là où nous avons cliqué.
               headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
             });
-            // Ajout de la classe "selectedBeforeDelete" à la balise <img> correspondante au clique, ici sur la modale.
-            const img = document.querySelectorAll('.edit_gallery img')[index];
-            img.classList.add('selectedBeforeDelete');
-            // Puis idem mais hors de la modale - La classe s'applique mais ce n'est pas le même effet car le CSS ne le permet pas pour des raisons d'esthétismes.
-            const imgOutOfModal = document.querySelectorAll('.gallery img')[index];
-            imgOutOfModal.classList.add('selectedBeforeDelete');
-            console.log("La trashCan séléctionnée est la numéro : ", idToDelete, "- Cela correspond au numéro de l'ID de l'objet importé.");
-      });
+        } else {                                                                        // Si l'état n'est pas true, c'est que la trashCan n'a pas été ou bien ou a été désélectionnée.
+          let indexLookedFor = requestToDelete.findIndex(                               
+            // La variable indexLookedFor représente l'index de la requête que l'on cherche à effacer DANS requestToDelete (via l'instruction findIndex).
+            // findIndex va retourner la valeur (de l'index) quand le conditionnement qui va suivre est trouvé.
+            req => req.url === "http://localhost:5678/api/works/" + idToDelete          
+            // Ici, on cherche donc une requête qui va vers notre API avec l'idToDelete, 
+            );
+            // Si cela est trouvé (toujours en forEach donc tout cela sera scanné pour voir si, oui ou non, il y aura un élément de trouvé) :
+          if (indexLookedFor >= 0) {
+            // On vient alors retirer la requete dans le tableau :) !
+            requestToDelete.splice(indexLookedFor, 1);
+          }
+        }
+      // Ajoutez ou supprimez la classe MAIS, cette fois ci, nouvelle feature : En fonction de si la trashCan est selected ou pas !
+      // Cela participe principalement à la gestion de l'affichage retour local pour l'utilisateur.
+      const image = document.querySelectorAll(".edit_gallery img")[index];
+      if (isTheTrashCanSelected) {                          // Si isTheTrashCanSelected est true, si c'est le cas.
+        image.classList.add("selectedBeforeDelete");        // On ajoute la classe.
+      }
+      else {
+        image.classList.remove("selectedBeforeDelete");     // Sinon, on l'enlève, si ca a été décoché, c'est ce qu'on voulait faire et si ca n'a jamais été le cas, ça ne fera rien, ca revient au même.
+      }
+    // Même logique pour le retour outOfModal.
+    const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
+    if (isTheTrashCanSelected) {                      
+        imageOutOfModal.classList.add("selectedBeforeDelete");
+      }
+      else {
+        imageOutOfModal.classList.remove("selectedBeforeDelete");
+      }
+      console.log("La trashCan sélectionnée est la numéro : ", idToDelete, "- Cela correspond au numéro de l'ID de l'objet importé.");
     });
+  });
 }
 
 /* ___________________________________________________________ */
@@ -733,7 +785,6 @@ console.log("The script just ended.");
 
     PUIS : 
 
-  - Débuger le fait que supprimer la DERNIERE image est tout simplement impossible > Probleme d'ID à mon avis, la dernière image ne renseigne pas le bon ID.
   - Débuger le fait que supprimer des images, valider la suppression avec "Supprimer la galerie" pour revenir sur la modale ne réactualise pas correctement les images car se réfèrent à l'API qui n'est pas encore actualisée.
     Car, à ce stade, seuls les images locales sont actualisées et les demandes sont stockées mais non communiquée à l'API. Mais elles sont bien quelques part, clin d'oeil.
     Conditionnement ? Du style : "S'il y a des requêtes en cours de stockage, affiche les en locale, rajoute les à ce que j'importe de l'API".  
