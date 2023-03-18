@@ -344,41 +344,8 @@ openModal();
 /* FONCTION(S) - Features de suppression d'image(s) !          */
 /* ___________________________________________________________ */
 
-/* /!\ BUG ! /!\ */
-/* SUPPRESSION FONCTIONNE mais pas sur la DERNIERE image, pourquoi ? */
-/* /!\ BUG ! /!\ */
-
 let requestToDelete = [];
 
-// Enregistre les actions de remove sous une ou plusieurs requêtes fetch.
-// OLD !
-// function removePictureListening() {                              
-//     let trashCan = document.querySelectorAll('.fa-trash-can');              // Selectionne nos trashcans.     
-//     let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
-//     trashCan.forEach((trashCan, index) => {                                 // Pour chaque élément trashcans :                           
-//       trashCanId.push(arrayData[index].id);                                
-//       // Dans le tableau trashCanId, contenant les liaisons entre trashcans/id des élements de l'API :
-//       // Chaque poubelle (via le forEach) vient être associée à l'id de la ligne (index) du tableau importée de l'API.
-//       // Ainsi, chaque poubelle se voit attribuée du même id que l'image qu'elle représente.
-//       trashCan.addEventListener('click', () => {                            // Lorsqu'on clique sur une icone trashcan.              
-//             let idToDelete = trashCanId[index];                             // L'icone exacte sur laquelle est on à cliqué est numérotée et renseignée dans idToDelete.
-//             requestToDelete.push({                                          // On ajoute également, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
-//               method: 'DELETE',
-//               url: "http://localhost:5678/api/works/" + idToDelete,                     // La demande touche à notre idtoDelete, là où nous avons cliqué.
-//               headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
-//             });
-//             // Ajout de la classe "selectedBeforeDelete" à la balise <img> correspondante au clique, ici sur la modale.
-//             const img = document.querySelectorAll('.edit_gallery img')[index];
-//             img.classList.add('selectedBeforeDelete');
-//             // Puis idem mais hors de la modale - La classe s'applique mais ce n'est pas le même effet car le CSS ne le permet pas pour des raisons d'esthétismes.
-//             const imgOutOfModal = document.querySelectorAll('.gallery img')[index];
-//             imgOutOfModal.classList.add('selectedBeforeDelete');
-//             console.log("La trashCan séléctionnée est la numéro : ", idToDelete, "- Cela correspond au numéro de l'ID de l'objet importé.");
-//       });
-//     });
-// }
-
-// En cours ! > A ETUDIER & COMMENTER < !!
 function removePictureListening() {                              
     let trashCans = document.querySelectorAll('.fa-trash-can');             // Selectionne nos trashcans. 
     let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.                                                   
@@ -414,10 +381,10 @@ function removePictureListening() {
         image.classList.add("selectedBeforeDelete");        // On ajoute la classe.
       }
       else {
-        image.classList.remove("selectedBeforeDelete");     // Sinon, on l'enlève, si ca a été décoché, c'est ce qu'on voulait faire et si ca n'a jamais été le cas, ça ne fera rien, ca revient au même.
+        image.classList.remove("selectedBeforeDelete");     
+        // Sinon, on l'enlève, si ca a été décoché, c'est ce qu'on voulait faire et si ca n'a jamais été le cas, ça ne fera rien, ca revient au même.
       }
-    // Même logique pour le retour outOfModal.
-    const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
+    const imageOutOfModal = document.querySelectorAll(".gallery img")[index]; // Même logique.
     if (isTheTrashCanSelected) {                      
         imageOutOfModal.classList.add("selectedBeforeDelete");
       }
