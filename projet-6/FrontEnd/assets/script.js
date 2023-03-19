@@ -85,6 +85,14 @@ function dataShow() {
     }
 }
 
+// Clear du code généré dans le DOM par la fonction de dessus, sert d'actualisation.
+function dataClear() {
+    const galleryTargeting = document.querySelector(".gallery");
+    if (galleryTargeting != null) {
+      galleryTargeting.innerHTML = "";
+    }
+  }
+
 /* ___________________________________________________________                      */
 /* ACTION(S) - Gestion des images importées dynamiquement sur l'accueil.            */
 /* ___________________________________________________________                      */
@@ -291,11 +299,12 @@ modalLink.forEach(link => {
         modalBox.setAttribute("aria-modal", "true");                     // //
         dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
         removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.
+        console.log(trashCanId)
         isMainModalOpen = true;                                          // Savoir quand la modale est ouverte et fermée (sert plus tard).
         console.log("Première modale : ", isMainModalOpen);
         // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
         // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-        if (isMainModalOpen === true) {                                       // Si la fenêtre modale est ouverte :
+        if (isMainModalOpen === true) {                                 // Si la fenêtre modale est ouverte :
             let modalCross = document.querySelector(".fa-xmark");       // On identifie la croix.
             modalCross.addEventListener('click', () => {                // Alors on place notre eventListener sur le clique.
                 closeModal();                                           // Et ça viendra fermer la modale.
@@ -344,16 +353,18 @@ openModal();
 /* FONCTION(S) - Features de suppression d'image(s) !          */
 /* ___________________________________________________________ */
 
-let requestToDelete = [];
+let requestToDelete = [];                                                   // Stockage des fetchs en attendant leur envoie.
+let trashCanId = [];                                                        // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
+let idToRemoveFromArrayData = [];                                           // Venir supprimer les ID dans arrayData plus tard.                                                      
 
 function removePictureListening() {                              
-    let trashCans = document.querySelectorAll('.fa-trash-can');             // Selectionne nos trashcans. 
-    let trashCanId = [];                                                    // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.                                                   
+    let trashCans = document.querySelectorAll('.fa-trash-can');             // Selectionne nos trashcans.                                               
     trashCans.forEach((trashCan, index) => {                                // Pour chaque élément trashcans :     
       trashCanId.push(arrayData[index].id);                                 // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.                            
       let isTheTrashCanSelected = false;                                    // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
       trashCan.addEventListener('click', () => {                            // Quand on clique sur une icone trashcan :                            
         let idToDelete = trashCanId[index];                                 // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.                                
+        idToRemoveFromArrayData.push(idToDelete);                           // Pour éviter les doublons par la suite en cas de ré-ouverture du code voir L.430.
         isTheTrashCanSelected = !isTheTrashCanSelected;                     // Inverse l'état, superbe façon de faire, j'aurais faire ça bien avant déjà.
         if (isTheTrashCanSelected) {                                        // Si l'état est en true, que l'élément est séléctionné :
             requestToDelete.push({                                          // On ajoute, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
@@ -362,22 +373,26 @@ function removePictureListening() {
               headers: { 'Authorization': "Bearer " + getTokenCookie("loginToken") }    // Ne pas oublier le token pour se faire accepter par la demande.
             });
         } else {                                                                        // Si l'état n'est pas true, c'est que la trashCan n'a pas été ou bien ou a été désélectionnée.
-          let indexLookedFor = requestToDelete.findIndex(                               
+            // Methode de Thomas :
+            let indexLookedFor = requestToDelete.findIndex(                       
             // La variable indexLookedFor représente l'index de la requête que l'on cherche à effacer DANS requestToDelete (via l'instruction findIndex).
-            // findIndex va retourner la valeur (de l'index) quand le conditionnement qui va suivre est trouvé.
+            // findIndex va retourner la valeur (de l'index) quand le conditionnement qui va suivre est trouvé :
+            
             req => req.url === "http://localhost:5678/api/works/" + idToDelete          
-            // Ici, on cherche donc une requête qui va vers notre API avec l'idToDelete, 
+            // Ici, on cherche donc une requête qui irai (potentiellement existante) vers notre API avec l'idToDelete.
             );
             // Si cela est trouvé (toujours en forEach donc tout cela sera scanné pour voir si, oui ou non, il y aura un élément de trouvé) :
           if (indexLookedFor >= 0) {
             // On vient alors retirer la requete dans le tableau :) !
             requestToDelete.splice(indexLookedFor, 1);
           }
+          // En d'autre terme : "L'index à supprimer est le résultat de la recherche d'une requête hypotétique sur l'idToDelete dans le tableau requestToDelete.
+          // Si indexLookedFor renvoie qq chose, cela existe donc bel et bien, alors supprime cette requête dans le tableau requestToDelete parce que je viens de recliquer.
         }
       // Ajoutez ou supprimez la classe MAIS, cette fois ci, nouvelle feature : En fonction de si la trashCan est selected ou pas !
-      // Cela participe principalement à la gestion de l'affichage retour local pour l'utilisateur.
+      // Cela participe uniquement à la gestion de l'affichage retour local pour l'utilisateur.
       const image = document.querySelectorAll(".edit_gallery img")[index];
-      if (isTheTrashCanSelected) {                          // Si isTheTrashCanSelected est true, si c'est le cas.
+      if (isTheTrashCanSelected) {                          // Si isTheTrashCanSelected est true :
         image.classList.add("selectedBeforeDelete");        // On ajoute la classe.
       }
       else {
@@ -399,6 +414,7 @@ function removePictureListening() {
 /* ___________________________________________________________ */
 /* ACTION(S) - Features de suppression d'image(s) !            */
 /* ___________________________________________________________ */
+
 // Suppression LOCAL du contenu.
 const galleryDelete = document.querySelector('#gallery_delete'); // Selection de tous nos éléments avec l'id.
 if (galleryDelete) {                                             // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
@@ -406,20 +422,31 @@ galleryDelete.addEventListener('click', () => {
 
   // Supprime les éléments correspondants aux trashcans sélectionnées mais pour la modale.
   let selectedCards = document.querySelectorAll('.edit_figureCard');                // On vient prendre toutes les classes qui nous intéressent.
-  selectedCards.forEach(card => {                                                   // On les parcour.
+  selectedCards.forEach(card => {                                                   // Il les parcourt.
     if (card.querySelector('.selectedBeforeDelete')) {                              // Si un enfant contenant la classe .selectedBeforeDelete est trouvé, on supprime .edit_figureCard.
       card.parentNode.removeChild(card);                                            // Ainsi, si une image dispose de la classe, toute la card est delete.
     }
   });
-    // Supprime les éléments correspondants aux trashcans sélectionnées hors modale, sur le "vrai site".
+  // Supprime les éléments correspondants aux trashcans sélectionnées hors modale, sur le "vrai site".
   const selectedCardsOutOfModal = document.querySelectorAll('.figureCard');         // Même procédé.
   selectedCardsOutOfModal.forEach(card => {         
     if (card.querySelector('.selectedBeforeDelete')) {
       card.parentNode.removeChild(card);
     }
   });
-});}
 
+// Modification d'arrayData pour permettre de ré-ouvrir et continuer à supprimer des choses.
+// Si l'utilisateur veut revenir en arrière, il n'a qu'à réactualiser pour ne pas publiquer les changements.
+for (let i = 0; i < arrayData.length; i++) {                        // On parcours arrayData, notre tableau "cible", finalement.
+    if (idToRemoveFromArrayData.includes(arrayData[i].id)) {        
+        // !! Nouvelle instruction, includes (même si déjà utilisée pour rediriger une page, cela marche également pour vérifier des éléments inter-tableaux). 
+        // Includes prend comme argument l'élément que l'on cherche et renvoie une valeur booléenne, d'où le fait que le condition se suffit à lui même.
+        // Ici : idToRemoveFromArrayData inclut-il la valeur "i" d'arrayData.id ?
+        // Si oui > Retire le d'arrayData !
+      arrayData.splice(i, 1);
+    }
+}
+});}
 
 // Envoie des fetchs pour suppression définitive.
 changementApplyButton = document.getElementById("changementApply");
@@ -434,7 +461,7 @@ document.getElementById("changementApply").addEventListener("click", () => {
         //      window.location.href = '../pages/index_edit.html';                                                              // Puis actualise la page.
         console.log("Requête acceptée !");
     }
-      });
+});
 
 /* ___________________________________________________________ */
 /* ACTION(S) - Features d'ajout d'image 1/2 !                  */
@@ -475,32 +502,32 @@ document.getElementById("changementApply").addEventListener("click", () => {
 
 
     /* Nouveau FormData() ! Cette fois ci on stringify les données que l'on met directement dans FormData() pour pouvoir joindre les objets en entier ! */
-    let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
-    let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
-    listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
-      actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
-      actualImageObject.image = el.imageUrl;                              // Tout en étant raccord à ce qu'attend la requête, ici "image" et non "imageUrl", "imageUrl", c'est ce qui est renvoyé en REPONSE !
-      actualImageObject.category = el.categoryId;                         //
-      listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
-      // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
-      actualImageObject = {};                                                             // On le vide pour la prochaine.
-    });
-    console.log(listingOfPictureToSentAtSwaggerFormDated);
-    // // Ca a l'air correct, envoyons :
-        let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
-        fetch('http://localhost:5678/api/works/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-              'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-            },
-            body: listingOfPictureToSentAtSwaggerFormDated
-          })
-        .then(response => {     
-            if (response.ok) {
-              console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
-            }
-          })
+    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
+    // let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
+    // listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
+    //   actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
+    //   actualImageObject.image = el.imageUrl;                              // Tout en étant raccord à ce qu'attend la requête, ici "image" et non "imageUrl", "imageUrl", c'est ce qui est renvoyé en REPONSE !
+    //   actualImageObject.category = el.categoryId;                         //
+    //   listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
+    //   // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
+    //   actualImageObject = {};                                                             // On le vide pour la prochaine.
+    // });
+    // console.log(listingOfPictureToSentAtSwaggerFormDated);
+    // // // Ca a l'air correct, envoyons :
+    //     let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
+    //     fetch('http://localhost:5678/api/works/', {
+    //         method: 'POST',
+    //         headers: {
+    //           'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
+    //           'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+    //         },
+    //         body: listingOfPictureToSentAtSwaggerFormDated
+    //       })
+    //     .then(response => {     
+    //         if (response.ok) {
+    //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
+    //         }
+    //       })
 
 
 
@@ -527,6 +554,26 @@ document.getElementById("changementApply").addEventListener("click", () => {
     
 
 
+    // Très simple et manuelle !
+    const informations = new FormData();
+
+    // FICHIER BINAIRE !! Plus d'URL !!
+    informations.append('image', addPictureSelectedByUserImageAsBinaryFile);
+    informations.append('title', 'Titre random');
+    informations.append('category', '2');
+
+    fetch('http://localhost:5678/api/works/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+      },
+      body: informations
+    })
+    // Requête trop longue, elle est tronquée !
+
+
+    
     console.log("Envoie des données à l'API.");
   });}
 
@@ -539,8 +586,11 @@ function closeSecondModal () {
     let secondModalBox = document.getElementById("modalBoxAddPicture");                     // modalBox est notre élément comportement l'ID modalBox.
     secondModalBox.classList.add("modalBox-hidden");                                        // On a rien vu, on remet comme c'était avant l'ouverture.
     secondModalBox.setAttribute("aria-hidden", "true");                                     // 
-    secondModalBox.removeAttribute("aria-modal");                
-}
+    secondModalBox.removeAttribute("aria-modal");      
+    isSecondModalOpen = false;
+    isValidationListenerOn = false;
+    console.log ("La seconde modale est : ", isSecondModalOpen);
+  }
 
 /* ___________________________________________________________ */
 /* ACTION(S) - Comportement de la seconde modale.              */
@@ -561,7 +611,7 @@ if (secondModalButton) {                                                        
         isSecondModalOpen = true;                                              // Savoir quand la modale est ouverte et fermée (sert plus tard).
         // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
         // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-        if (isSecondModalOpen === true) {                                       // Si la SECONDE fenêtre modale est ouverte :
+        if (isSecondModalOpen = true) {                                       // Si la SECONDE fenêtre modale est ouverte :
             let modalCross = document.querySelector(".fa-xmarkOfSecondModal");               // On identifie la croix.
             modalCross.addEventListener('click', () => {                                     // Alors on place notre eventListener sur le clique.
                 closeSecondModal();                                                          // Et ça viendra fermer la modale qui est désormais la seule active.
@@ -575,9 +625,9 @@ if (secondModalButton) {                                                        
             let modalBoxHitBox = document.querySelector("#modalBoxAddPicture");     // On séléctionne notre deuxieme modale dans le HTML.
             document.addEventListener('click', (event) => {                         // On écoute les cliques sur toute la page.
             if (event.target === modalBoxHitBox) {                              
-        // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
-        // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
-        // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
+            // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
+            // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
+            // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
                 closeSecondModal();
             } else {
             }
@@ -611,7 +661,6 @@ if (secondModalBackButton) {                                                    
 
 /* A noter : Tout va y est renseigné SAUF l'envoie des fetchs, placée volontairement dans le if d'envoie de la suppression afin d'y envoyer plus simplement les deux requêtes d'un coup. */  
 
-
 // Actualisation des informations EN COURS concernant l'objet de la requête d'ajout.
 function updatingTheImageToAddArray(title, categoryId, imageUrl) {     // Ajout des informations rentrées dans le tableau pictureList.
     addingPictureForm = {
@@ -627,6 +676,9 @@ function addingToImageToAddRequest(array) {
     console.log("Voici les infos récotlés par listingOfPictureToSentAtSwagger : ", listingOfPictureToSentAtSwagger, ".");
 }
 
+let addPictureSelectedByUserImageAsBinaryFile; // Stockage de l'image séléctionnée par l'user dans le formulaire en binaire !
+let isValidationListenerOn = true;             // Pour savoir si l'eventListener de "valider" est up ou non (on veut éviter la double/triple/[...] écoute en cas d'ouverture fermeture de la seconde modale.)
+
 // Récupération des données du formulaire AINSI QUE SON COMPORTEMENT.
 function addingPictureFormInformation () {
 let addPictureForm = document.querySelector("#pictureAdd");                               // Le formulaire (pour écouter sa validation).
@@ -636,6 +688,11 @@ let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");   
 let addPictureSelectedByUserForm = document.querySelector("#imageSelection");
 let addPictureSelectedByUserImage = addPictureSelectedByUserForm.querySelector("#addedImage");
 let imageSize = 0;                                                                        // Variable qui va être utilisé pour stocker le poids de l'image.
+const secondModalClose = new Event("secondModalClose");                                 
+// Déclaration d'un événement car la boucle while fait planter le code... C'est un "while" plus moderne/plus propre.
+// On va lui définir un comportement et il va pouvoir, en cas d'activation, supprimer une instruction dans la fonction comme l'eventListener.
+
+if (isValidationListenerOn) {
 addPictureForm.addEventListener("submit", (event) => {                                    // On écoute le questionnaire en cas de validation.
     event.preventDefault();
 
@@ -650,38 +707,38 @@ addPictureForm.addEventListener("submit", (event) => {                          
     }
     switch (true) {                                                                                                               // Conditionnement qui se lance de base.
         case !addPictureTitle.value || !addPictureCategory.value || !addPictureSelectedByUserImage.value:                         // Dans le cas où il manque un champs.
-          let link = document.querySelector("#pictureAddConformation");                                                           // Affichage du message d'erreur, repris sur le login.
-          let p = document.createElement("p");
-          p.setAttribute("class", "errorSecondModale")
-          let textError = document.createTextNode("Veuillez remplir tous les champs.");
-          p.appendChild(textError);
-          link.parentNode.insertBefore(p, link);
-          break;
-        case addPictureTitle.value.length > 180:                                          // Nombre de charactère max pour le titre (arbitraire ici).
-          let link2 = document.querySelector("#pictureAddConformation");                  // Affichage du message d'erreur, repris sur le login.
-          let p2 = document.createElement("p");
-          p2.setAttribute("class", "errorSecondModale")
-          let textError2 = document.createTextNode("Le titre est trop long (180 chars max).");
-          p2.appendChild(textError2);
-          link2.parentNode.insertBefore(p2, link2);
-          break;
-        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):                           // ASCII art uniquement - StackOverflow.
-          let link3 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
-          let p3 = document.createElement("p");
-          p3.setAttribute("class", "errorSecondModale")
-          let textError3 = document.createTextNode("Un ou plusieurs charactères spéciaux posent problèmes.");
-          p3.appendChild(textError3);
-          link3.parentNode.insertBefore(p3, link3);
-          break;
-        case !/^[A-Z]/.test(addPictureTitle.value):                                     // Maj uniquement - StackOverflow.
-          let link4 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
-          let p4 = document.createElement("p");
-          p4.setAttribute("class", "errorSecondModale")
-          let textError4 = document.createTextNode("Veuillez commencez votre titre par une lettre majuscule.");
-          p4.appendChild(textError4);
-          link4.parentNode.insertBefore(p4, link4);
-          break;
-        case imageSize >= 4 * 1024 * 1024:                          // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
+            let link = document.querySelector("#pictureAddConformation");                                                           // Affichage du message d'erreur, repris sur le login.
+            let p = document.createElement("p");
+            p.setAttribute("class", "errorSecondModale")
+            let textError = document.createTextNode("Veuillez remplir tous les champs.");
+            p.appendChild(textError);
+            link.parentNode.insertBefore(p, link);
+            break;
+        case addPictureTitle.value.length > 180:                                            // Nombre de charactère max pour le titre (arbitraire ici).
+            let link2 = document.querySelector("#pictureAddConformation");                  // Affichage du message d'erreur, repris sur le login.
+            let p2 = document.createElement("p");
+            p2.setAttribute("class", "errorSecondModale")
+            let textError2 = document.createTextNode("Le titre est trop long (180 chars max).");
+            p2.appendChild(textError2);
+            link2.parentNode.insertBefore(p2, link2);
+            break;
+        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):                             // ASCII art uniquement - StackOverflow.
+            let link3 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
+            let p3 = document.createElement("p");
+            p3.setAttribute("class", "errorSecondModale")
+            let textError3 = document.createTextNode("Un ou plusieurs charactères spéciaux posent problèmes.");
+            p3.appendChild(textError3);
+            link3.parentNode.insertBefore(p3, link3);
+            break;
+        case !/^[A-Z]/.test(addPictureTitle.value):                                       // Maj uniquement - StackOverflow.
+            let link4 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
+            let p4 = document.createElement("p");
+            p4.setAttribute("class", "errorSecondModale")
+            let textError4 = document.createTextNode("Veuillez commencez votre titre par une lettre majuscule.");
+            p4.appendChild(textError4);
+            link4.parentNode.insertBefore(p4, link4);
+            break;
+        case imageSize >= 4 * 1024 * 1024:                                                // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
             console.log(addPictureSelectedByUserImage.size);
             let link5 = document.querySelector("#pictureAddConformation");
             let p5 = document.createElement("p");
@@ -691,24 +748,57 @@ addPictureForm.addEventListener("submit", (event) => {                          
             link5.parentNode.insertBefore(p5, link5);
             break;
         default:
-          addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
-          addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
+            addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
+            addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
 
-          // Pour l'instant URL est une URL bateau d'un tableau blanc... On verra ensuite comment récuperer la bonne URL, ce qu'attend vraiment l'API.
-          let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
+            // /!\ TEMPORAIRE /!\
+            // Pour l'instant URL est une URL bateau d'un tableau blanc... On verra ensuite comment récuperer la bonne URL, ce qu'attend vraiment l'API.
+            let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
+            // Convertir addPictureSelectedByUserImage en FICHIER BINAIRE (pour la requête fetch, je crois que c'est ça qui bloque.)
+            let readerJavaScript = new FileReader();                            
+            // Nouvelle fonctionnalité FileReader ! Diverses manipulation sur les fichiers (VIM).
+            // On doit stocker cette fonctionnalité dans une variable, ici readerJavaScript, qui a comme mission de lire le fichier.
+            readerJavaScript.onload = function() {                    
+            // Lancement de la fonctionnalité a travers une fonction d'usage :
+            addPictureSelectedByUserImageAsBinaryFile = new Uint8Array(readerJavaScript.result);
+            // Attribution à notre variable de stockage des données binaires de l'image d'une valeur résultant de la lecture sous Uint8Array d'un contenu.
+            console.log("Voici le résultat de la binarisation de l'image : ", addPictureSelectedByUserImageAsBinaryFile);
+            };
+            readerJavaScript.readAsArrayBuffer(addPictureSelectedByUserImage.files[0]);
+            // readAsArrayBuffer permet de lire les données dans un tableau spécial, prévu pour stocker les octets.
+            // Cette manipulation du "reader" permet de lire addPictureSelectedByUserImage, l'image séléctionné par le formulaire sous le jout de la fonction d'usage précédente.
+            // A ce stade, les données passées sous reader d'addPicturesSelectedByUserImage ont été transmises à addPictureSelectedByUserImageAsBinaryFile.
 
-          addingPictureForm.imageUrl = addPictureUrl;                               // Notre URL qu'on viendra stocker ici plus tard...
-          updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Ayant reçu un premier objet témoin, je l'actualise.  
-          addingToImageToAddRequest(addingPictureForm);                                                            // Je le remplace par son clone. 
-          updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Que j'actualise.
-          // On actualise APRES aussi car sinon il créé deux fois le même, le raisonnement n'est peut-être pas le meilleur, à revoir !
-          /* /!\ ERREUR DE CODE /!\ */
-          /*        A REVOIR !      */
-          /* /!\ ERREUR DE CODE /!\ */
-        break;
+            addingPictureForm.imageUrl = addPictureUrl;                               // Notre URL qu'on viendra stocker ici plus tard...
+            updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Ayant reçu un premier objet témoin, je l'actualise.  
+            addingToImageToAddRequest(addingPictureForm);                                                            // Je le remplace par son clone. 
+            updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Que j'actualise.
+            
+            // On actualise APRES aussi car sinon il créé deux fois le même, le raisonnement n'est peut-être pas le meilleur, à revoir !
+            /* /!\ ERREUR DE CODE /!\ */
+            /*        A REVOIR !      */
+            /* /!\ ERREUR DE CODE /!\ */
+
+
+            //   Ajout LOCAL des fichiers à dataArray.
+            for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {            // On parcourt le tableau des requêtes qu'on à ajouté.
+                let pictureInformation = listingOfPictureToSentAtSwagger[i];                // Stockage des infos de l'élément de la requête à ajouté en cours (sinon le push ne peut pas s'effectuer correctement).
+                let title = pictureInformation.title;                                       // Ajout du titre.
+                let imageUrl = pictureInformation.imageUrl;                                 // De l'image URL, etc...
+                let categoryId = pictureInformation.categoryId;                             // //
+                arrayData.push({ title, imageUrl, categoryId });                            // On les ajoute dans arrayData.
+                listingOfPictureToSentAtSwagger.splice(i, 1);           
+                // On retire ce qu'on vient d'ajouter pour eviter l'accumulation des demandes, que ça commence à ajouter X puis X ET Y alors que l'on a ajouté que Y, etc...
+            }
+            dataClear();                                                                  // Refresh des images locales en supprimant les éléments générés du DOM.
+            dataShow();                                                                   // Puis en les
+            console.log("Après ajout de l'image, voici l'état d'arrayData : ", arrayData);
+            break;
     }
-})
+})}
 }
+
+
 
 /* ___________________________________________________________ */
 /* ACTION(S) - Feature d'ajout d'image 2/2 !                   */
@@ -752,9 +842,6 @@ console.log("The script just ended.");
 
     PUIS : 
 
-  - Débuger le fait que supprimer des images, valider la suppression avec "Supprimer la galerie" pour revenir sur la modale ne réactualise pas correctement les images car se réfèrent à l'API qui n'est pas encore actualisée.
-    Car, à ce stade, seuls les images locales sont actualisées et les demandes sont stockées mais non communiquée à l'API. Mais elles sont bien quelques part, clin d'oeil.
-    Conditionnement ? Du style : "S'il y a des requêtes en cours de stockage, affiche les en locale, rajoute les à ce que j'importe de l'API".  
   - Retirer l'HUD naturel de la séléction d'image qui montre le nom et un petit texte indiquant qu'il faille séléctionner une image...
   - Vérifier que l'ajout d'image se fait correctement si je 'reviens' en ajouter une ou deux juste avant d'envoyer mais je pense que oui.
   - Vérifier si je parviens bien à supprimer les images importées, si l'API lui attribue les bons complétements d'objet.
