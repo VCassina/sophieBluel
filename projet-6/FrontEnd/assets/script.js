@@ -836,6 +836,7 @@ console.log("The script just ended.");
 
   /* A FAIRE :
 
+  > Réussir à afficher les vraies images en locale, c'est peut-être comme ça que je vais me débloquer sur l'envoie en fetch (non).
   > Faire passer la requête fetch de POST des images via FormData.
   > Trouver sous quel format récupérer l'URL de l'image afin de transmettre les véritables images à l'API.
   > Appliquer les changements en local (avant d'envoyer les fetchs).
@@ -843,7 +844,6 @@ console.log("The script just ended.");
     PUIS : 
 
   - Retirer l'HUD naturel de la séléction d'image qui montre le nom et un petit texte indiquant qu'il faille séléctionner une image...
-  - Vérifier que l'ajout d'image se fait correctement si je 'reviens' en ajouter une ou deux juste avant d'envoyer mais je pense que oui.
-  - Vérifier si je parviens bien à supprimer les images importées, si l'API lui attribue les bons complétements d'objet.
+  - Vérifier si je parviens bien à supprimer les images importées, si l'API lui attribue les bons complétements d'objet en back-end.
 
   */
