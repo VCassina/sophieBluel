@@ -587,7 +587,7 @@ function closeSecondModal () {
     secondModalBox.classList.add("modalBox-hidden");                                        // On a rien vu, on remet comme c'était avant l'ouverture.
     secondModalBox.setAttribute("aria-hidden", "true");                                     // 
     secondModalBox.removeAttribute("aria-modal");      
-    isSecondModalOpen = false;
+    isSecondModalOpen = false;                                                              // Désactive le fonctionnement de l'eventListener précédent dans l'écoute du formulaire.
     isValidationListenerOn = false;
     console.log ("La seconde modale est : ", isSecondModalOpen);
   }
