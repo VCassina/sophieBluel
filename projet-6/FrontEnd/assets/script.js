@@ -448,6 +448,34 @@ for (let i = 0; i < arrayData.length; i++) {                        // On parcou
 }
 });}
 
+// Envoie du contenu de listingOfPictureToSentAtSwagger.
+function sendPictureToSwagger() {
+    const url = "http://localhost:5678/api/works/"; // Remplacer avec l'URL appropriée
+    const listingOfPictureToSentAtSwaggerFormDated = new FormData();
+    for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {
+        let pictureAtTheMoment = listingOfPictureToSentAtSwagger[i];
+        listingOfPictureToSentAtSwaggerFormDated.append("image", pictureAtTheMoment.imageUrl);
+        listingOfPictureToSentAtSwaggerFormDated.append("title", pictureAtTheMoment.title);
+        listingOfPictureToSentAtSwaggerFormDated.append("category", parseInt(pictureAtTheMoment.categoryId));  // Convertir au format INT et pas STRING pour s'assurer de la réponse de l'API.
+      }
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+        },
+        body: listingOfPictureToSentAtSwaggerFormDated
+      })
+    .then(response => {
+      if (response.ok) {
+        console.log("Envoie réussi ! L'enfer se termine.")
+        return response.json();
+      }
+      else {
+        console.log("Envoie échoué...")
+      }
+    })
+  }
+
 // Envoie des fetchs pour suppression définitive.
 changementApplyButton = document.getElementById("changementApply");
 if (changementApplyButton) {
@@ -473,105 +501,7 @@ document.getElementById("changementApply").addEventListener("click", () => {
 /* Différentes façons d'envoyer les fetchs d'ajout :           */
 
 
-
-/* Passage en FormData simple ! */
-    // On exécute également les requêtes ADD stockées dans le tableau listingOfPictureToSentAtSwagger mais que l'on ne pas stringifier ! On le passe en formData :
-    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare un tableau de ce type.
-    // listingOfPictureToSentAtSwagger.forEach((image) => {                // Pour chaque image (objet) qui constituent mon tableau.
-    //     listingOfPictureToSentAtSwaggerFormDated.append("title", image.title);                  // On l'ajoute dans le tableau formDated.
-    //     listingOfPictureToSentAtSwaggerFormDated.append("imageUrl", image.imageUrl);            // //
-    //     listingOfPictureToSentAtSwaggerFormDated.append("categoryId", image.categoryId);        // //
-    // })
-    // console.log(listingOfPictureToSentAtSwagger);
-    // console.log(listingOfPictureToSentAtSwaggerFormDated);
-    // let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
-    // fetch('http://localhost:5678/api/works/', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-    //       'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-    //     },
-    //     body: listingOfPictureToSentAtSwaggerFormDated
-    //   })
-    //     .then(response => {     
-    //         if (response.ok) {
-    //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
-    //         }
-    //       })
-
-
-
-    /* Nouveau FormData() ! Cette fois ci on stringify les données que l'on met directement dans FormData() pour pouvoir joindre les objets en entier ! */
-    // let listingOfPictureToSentAtSwaggerFormDated = new FormData();      // On déclare toujours notre tableau en FormData.
-    // let actualImageObject = {};                                               // Créer un nouvel objet pour stocker les objets de listingOfPictureToSentAtSwagger avant de les intégrer au FormData.
-    // listingOfPictureToSentAtSwagger.forEach((el) => {                // Pour toutes les éléments.
-    //   actualImageObject.title = el.title;                                 // On ajoute à titre le titre, etc...
-    //   actualImageObject.image = el.imageUrl;                              // Tout en étant raccord à ce qu'attend la requête, ici "image" et non "imageUrl", "imageUrl", c'est ce qui est renvoyé en REPONSE !
-    //   actualImageObject.category = el.categoryId;                         //
-    //   listingOfPictureToSentAtSwaggerFormDated.append("Object", JSON.stringify(actualImageObject));     // Puis on envoie les données dans le FormData, tjrs dans le forEach.
-    //   // l'instruction attendait que j'entre un nom d'objet mais j'ignore s'il a une importance...
-    //   actualImageObject = {};                                                             // On le vide pour la prochaine.
-    // });
-    // console.log(listingOfPictureToSentAtSwaggerFormDated);
-    // // // Ca a l'air correct, envoyons :
-    //     let boundaryRand = Math.random().toString().substr(2);          // Générer une chaine de charactère random (boundary) (??? Besoin d'explication sur ce point) !
-    //     fetch('http://localhost:5678/api/works/', {
-    //         method: 'POST',
-    //         headers: {
-    //           'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-    //           'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-    //         },
-    //         body: listingOfPictureToSentAtSwaggerFormDated
-    //       })
-    //     .then(response => {     
-    //         if (response.ok) {
-    //           console.log("Les images sont ajoutées, bravo, l'enfer est dérrière toi (mais il faut encore gérer l'affichage local).");
-    //         }
-    //       })
-
-
-
-    /* Idem que la façon d'au dessus en essayant, via le boundary, d'envoyer un objet en une seule fois ! */
-    // let actualImageObject = {};                                             
-    // let boundaryRand = Math.random().toString().substr(2);
-    // // Via le controle de la chaine de séparation, il est possible d'envoyer un objet entierement !!
-    // let listingOfPictureToSentAtSwaggerFormDated = '';
-    // listingOfPictureToSentAtSwagger.forEach((el) => {               
-    //     listingOfPictureToSentAtSwaggerFormDated += `--${boundaryRand}\r\n`;
-    //     listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="title"\r\n\r\n${el.title}\r\n`;
-    //     listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="imageUrl"\r\n\r\n${el.imageUrl}\r\n`;
-    //     listingOfPictureToSentAtSwaggerFormDated += `Content-Disposition: form-data; name="categoryId"\r\n\r\n${el.categoryId}\r\n`;
-    // });
-    // listingOfPictureToSentAtSwaggerFormDated += `--${boundaryRand}--`;
-    // fetch('http://localhost:5678/api/works/', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': `multipart/form-data; boundary=${boundaryRand}`,
-    //     'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-    //   },
-    //   body: listingOfPictureToSentAtSwaggerFormDated
-    // })
-    
-
-
-    // Très simple et manuelle !
-    const informations = new FormData();
-
-    // FICHIER BINAIRE !! Plus d'URL !!
-    informations.append('image', addPictureSelectedByUserImageAsBinaryFile);
-    informations.append('title', 'Titre random');
-    informations.append('category', '2');
-
-    fetch('http://localhost:5678/api/works/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': 'Bearer ' + getTokenCookie('loginToken')
-      },
-      body: informations
-    })
-    // Requête trop longue, elle est tronquée !
-
+    sendPictureToSwagger(); // Envoie des données POST.
 
     
     console.log("Envoie des données à l'API.");
@@ -666,17 +596,24 @@ function updatingTheImageToAddArray(title, categoryId, imageUrl) {     // Ajout 
     addingPictureForm = {
         title: title,
         imageUrl: imageUrl,
-        categoryId: categoryId,
+        categoryId: categoryId                           
       };
 }
 
 // Ajout de l'objet dans le tableau de stockage des requêtes.
-function addingToImageToAddRequest(array) {           
+function addingToImageToAddRequest(array) {         
     listingOfPictureToSentAtSwagger.push(array);
-    console.log("Voici les infos récotlés par listingOfPictureToSentAtSwagger : ", listingOfPictureToSentAtSwagger, ".");
 }
 
-let addPictureSelectedByUserImageAsBinaryFile; // Stockage de l'image séléctionnée par l'user dans le formulaire en binaire !
+// Ajout local de l'image, non-enregistrée.
+function addLastImageToArrayData() {
+    let lastImage = listingOfPictureToSentAtSwagger[listingOfPictureToSentAtSwagger.length - 1];
+    let categoryId = lastImage.categoryId;
+    let title = lastImage.title;
+    let imageUrl = lastImage.imageUrl;
+    arrayData.push({ categoryId, title, imageUrl });
+  }
+
 let isValidationListenerOn = true;             // Pour savoir si l'eventListener de "valider" est up ou non (on veut éviter la double/triple/[...] écoute en cas d'ouverture fermeture de la seconde modale.)
 
 // Récupération des données du formulaire AINSI QUE SON COMPORTEMENT.
@@ -684,9 +621,6 @@ function addingPictureFormInformation () {
 let addPictureForm = document.querySelector("#pictureAdd");                               // Le formulaire (pour écouter sa validation).
 let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd");                   // La valeur titre.
 let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");             // La valeur id (catégorie).
-
-let addPictureSelectedByUserForm = document.querySelector("#imageSelection");
-let addPictureSelectedByUserImage = addPictureSelectedByUserForm.querySelector("#addedImage");
 let imageSize = 0;                                                                        // Variable qui va être utilisé pour stocker le poids de l'image.
 const secondModalClose = new Event("secondModalClose");                                 
 // Déclaration d'un événement car la boucle while fait planter le code... C'est un "while" plus moderne/plus propre.
@@ -695,7 +629,7 @@ const secondModalClose = new Event("secondModalClose");
 if (isValidationListenerOn) {
 addPictureForm.addEventListener("submit", (event) => {                                    // On écoute le questionnaire en cas de validation.
     event.preventDefault();
-
+    let addPictureSelectedByUserImage = document.querySelector("#addedImage");
     let errorInformationModale = document.querySelector(".errorSecondModale");            // Si un message d'erreur est trouvé, est déjà là.
     if (errorInformationModale) {
         errorInformationModale.remove();                                                  // Il est supprimé. Plus simple que pour login.
@@ -722,7 +656,7 @@ addPictureForm.addEventListener("submit", (event) => {                          
             p2.appendChild(textError2);
             link2.parentNode.insertBefore(p2, link2);
             break;
-        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):                             // ASCII art uniquement - StackOverflow.
+        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):                               // ASCII art uniquement - StackOverflow.
             let link3 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
             let p3 = document.createElement("p");
             p3.setAttribute("class", "errorSecondModale")
@@ -730,7 +664,7 @@ addPictureForm.addEventListener("submit", (event) => {                          
             p3.appendChild(textError3);
             link3.parentNode.insertBefore(p3, link3);
             break;
-        case !/^[A-Z]/.test(addPictureTitle.value):                                       // Maj uniquement - StackOverflow.
+        case !/^[A-Z]/.test(addPictureTitle.value):                                         // Maj uniquement - StackOverflow.
             let link4 = document.querySelector("#pictureAddConformation");                // Affichage du message d'erreur, repris sur le login.
             let p4 = document.createElement("p");
             p4.setAttribute("class", "errorSecondModale")
@@ -738,7 +672,7 @@ addPictureForm.addEventListener("submit", (event) => {                          
             p4.appendChild(textError4);
             link4.parentNode.insertBefore(p4, link4);
             break;
-        case imageSize >= 4 * 1024 * 1024:                                                // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
+        case imageSize >= 4 * 1024 * 1024:                                                  // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
             console.log(addPictureSelectedByUserImage.size);
             let link5 = document.querySelector("#pictureAddConformation");
             let p5 = document.createElement("p");
@@ -748,28 +682,14 @@ addPictureForm.addEventListener("submit", (event) => {                          
             link5.parentNode.insertBefore(p5, link5);
             break;
         default:
-            addingPictureForm.title = addPictureTitle.value;                          // On fait correspondre les valeurs renseignées dans le formulaire avec le tableau qui va servir,
-            addingPictureForm.categoryId = addPictureCategory.value;                  // pour renseigner à l'API nos informations.
+            // // /!\ TEMPORAIRE /!\
+            // // Pour l'instant URL est une URL bateau d'un tableau blanc... On verra ensuite comment récuperer la bonne URL, ce qu'attend vraiment l'API.
+            // let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
+    
 
-            // /!\ TEMPORAIRE /!\
-            // Pour l'instant URL est une URL bateau d'un tableau blanc... On verra ensuite comment récuperer la bonne URL, ce qu'attend vraiment l'API.
-            let addPictureUrl = "https://previews.123rf.com/images/detailfoto/detailfoto1702/detailfoto170200097/71490950-fond-d-%C3%A9cran-blanc.jpg";
-            // Convertir addPictureSelectedByUserImage en FICHIER BINAIRE (pour la requête fetch, je crois que c'est ça qui bloque.)
-            let readerJavaScript = new FileReader();                            
-            // Nouvelle fonctionnalité FileReader ! Diverses manipulation sur les fichiers (VIM).
-            // On doit stocker cette fonctionnalité dans une variable, ici readerJavaScript, qui a comme mission de lire le fichier.
-            readerJavaScript.onload = function() {                    
-            // Lancement de la fonctionnalité a travers une fonction d'usage :
-            addPictureSelectedByUserImageAsBinaryFile = new Uint8Array(readerJavaScript.result);
-            // Attribution à notre variable de stockage des données binaires de l'image d'une valeur résultant de la lecture sous Uint8Array d'un contenu.
-            console.log("Voici le résultat de la binarisation de l'image : ", addPictureSelectedByUserImageAsBinaryFile);
-            };
-            readerJavaScript.readAsArrayBuffer(addPictureSelectedByUserImage.files[0]);
-            // readAsArrayBuffer permet de lire les données dans un tableau spécial, prévu pour stocker les octets.
-            // Cette manipulation du "reader" permet de lire addPictureSelectedByUserImage, l'image séléctionné par le formulaire sous le jout de la fonction d'usage précédente.
-            // A ce stade, les données passées sous reader d'addPicturesSelectedByUserImage ont été transmises à addPictureSelectedByUserImageAsBinaryFile.
-
-            addingPictureForm.imageUrl = addPictureUrl;                               // Notre URL qu'on viendra stocker ici plus tard...
+            // Ce qui manquait ici, c'était l'attribution d'une URL pour afficher l'image, c'est obligatoire...
+            // Et ça vient créer un truc un peu "bateau" par défaut qui s'appelle : blob:xxxxxx[...].
+            addingPictureForm.imageUrl = URL.createObjectURL(addPictureSelectedByUserImage.files[0]);                // Notre image récupérée sous addingPictureForm.imageUrl.
             updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Ayant reçu un premier objet témoin, je l'actualise.  
             addingToImageToAddRequest(addingPictureForm);                                                            // Je le remplace par son clone. 
             updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Que j'actualise.
@@ -779,26 +699,15 @@ addPictureForm.addEventListener("submit", (event) => {                          
             /*        A REVOIR !      */
             /* /!\ ERREUR DE CODE /!\ */
 
-
-            //   Ajout LOCAL des fichiers à dataArray.
-            for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {            // On parcourt le tableau des requêtes qu'on à ajouté.
-                let pictureInformation = listingOfPictureToSentAtSwagger[i];                // Stockage des infos de l'élément de la requête à ajouté en cours (sinon le push ne peut pas s'effectuer correctement).
-                let title = pictureInformation.title;                                       // Ajout du titre.
-                let imageUrl = pictureInformation.imageUrl;                                 // De l'image URL, etc...
-                let categoryId = pictureInformation.categoryId;                             // //
-                arrayData.push({ title, imageUrl, categoryId });                            // On les ajoute dans arrayData.
-                listingOfPictureToSentAtSwagger.splice(i, 1);           
-                // On retire ce qu'on vient d'ajouter pour eviter l'accumulation des demandes, que ça commence à ajouter X puis X ET Y alors que l'on a ajouté que Y, etc...
-            }
+            addLastImageToArrayData()       // On ajoute le dernier élément de listingOfPictureToSentAtSwagger (et donc, notre nouvelle image SEULEMENT) à arrayData.
             dataClear();                                                                  // Refresh des images locales en supprimant les éléments générés du DOM.
-            dataShow();                                                                   // Puis en les
+            dataShow();                                                                   // Puis les affiche, on actualise.
             console.log("Après ajout de l'image, voici l'état d'arrayData : ", arrayData);
+            console.log("On chercher donc à ajouter à la base de données : ", listingOfPictureToSentAtSwagger);
             break;
     }
 })}
 }
-
-
 
 /* ___________________________________________________________ */
 /* ACTION(S) - Feature d'ajout d'image 2/2 !                   */
@@ -845,5 +754,5 @@ console.log("The script just ended.");
 
   - Retirer l'HUD naturel de la séléction d'image qui montre le nom et un petit texte indiquant qu'il faille séléctionner une image...
   - Vérifier si je parviens bien à supprimer les images importées, si l'API lui attribue les bons complétements d'objet en back-end.
-
+  - Vérifier l'absence d'erreur dans le code sur TOUTES les pages une fois terminé.
   */
