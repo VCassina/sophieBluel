@@ -506,8 +506,6 @@ document.getElementById("changementApply").addEventListener("click", () => {
 
 /* ZONE DE TRAVAUX !                                           */
 /* Différentes façons d'envoyer les fetchs d'ajout :           */
-
-
     sendPictureToSwagger(); // Envoie des données POST.
     console.log("Envoie des données à l'API.");
   });}
