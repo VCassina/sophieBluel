@@ -94,7 +94,8 @@ function disableUselessModifiers() {
   });
 }
 
-function closeModalContent() {
+/* FONCTION - Ferme contenu de la modale principal ! */
+function closeMainModalContent() {
   modalBox.classList.add("modalBox-hidden"); // On lui remet la modalBox-hidden, ce qui le cache.
   modalBox.setAttribute("aria-hidden", "true"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
   modalBox.setAttribute("aria-modal", "false"); // //                                             // La modale n'est plus ouverte.
@@ -106,17 +107,18 @@ function closeModalContent() {
   }); // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
 }
 
-function closingModalBehavior() {
+/* FONCTION - Conditionne les motifs de fermeture de la modale principale ! */
+function closingMainModalBehavior() {
   let modalCross = document.querySelector(".fa-xmark"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
-    closeModalContent();
+    closeMainModalContent();
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
     if (event.key === "Escape") {
       // Si l'input est "Echap", on ferme.
-      closeModalContent();
+      closeMainModalContent();
     }
   });
   let modalBoxHitBox = document.querySelector("#modalBox"); // On séléctionne la modale.
@@ -127,9 +129,77 @@ function closingModalBehavior() {
       // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
       // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
       // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
-      closeModalContent();
+      closeMainModalContent();
     }
   });
+}
+
+/* FONCTION - Ferme contenu de la seconde principal ! */
+function closeSecondModalContent() {
+  let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
+  secondModalBox.classList.add("modalBox-hidden"); // On a rien vu, on remet comme c'était avant l'ouverture.
+  secondModalBox.setAttribute("aria-hidden", "true"); //
+  secondModalBox.removeAttribute("aria-modal");
+}
+
+/* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
+function closingSecondModalBehavior() {
+  let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
+  modalCross.addEventListener("click", () => {
+    // Alors on place notre eventListener sur le clique.
+    closeSecondModalContent(); // Et ça viendra fermer la modale qui est désormais la seule active.
+  });
+  let secondModalBackButton = document.querySelector(".fa-arrow-left"); // On identifie la croix.
+  secondModalBackButton.addEventListener("click", () => {
+    // Alors on place notre eventListener sur le clique.
+    closeSecondModalContent();
+    openingMainModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    // Si on détecte la croix, on écoute également les inputs clavier.
+    if (event.key === "Escape") {
+      // Si l'input est "Echap", on ferme.
+      closeSecondModalContent();
+    }
+  });
+  // addingPictureFormInformation();
+  let modalBoxHitBox = document.querySelector("#modalBoxAddPicture"); // On séléctionne notre deuxieme modale dans le HTML.
+  document.addEventListener("click", (event) => {
+    // On écoute les cliques sur toute la page.
+    if (event.target === modalBoxHitBox) {
+      // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
+      // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
+      // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
+      closeSecondModalContent();
+    }
+  });                                                                       // Dans le cas où l'on se trouve sur une autre page qu'index_edit.     secondModalBackButton.addEventListener("click", () => {          closeSecondModalContent();         dataShowMainModal();     })}
+}
+
+/* FONCTION - Listener d'ouverture de la seconde modale ! */
+function openSecondModalListener() {
+  let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
+  secondModalButton.addEventListener("click", () => {
+    // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
+    let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
+    secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
+    secondModalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+    secondModalBox.setAttribute("aria-modal", "true");
+    closeMainModalContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
+    // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
+    // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
+    closingSecondModalBehavior();
+  });
+}
+
+/* FONCTION - L'action d'ouverture de la première modale ! */
+function openingMainModal() {
+          const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
+          modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
+          modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+          modalBox.setAttribute("aria-modal", "true");
+          dataShowMainModal(); // Vient afficher les images dynamiquement importée dans arrayData.
+          closingMainModalBehavior(); // Conditionne le comportement de fermeture de la modale.
+        openSecondModalListener();
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
@@ -137,50 +207,58 @@ function openModalListener() {
   let modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Notre lien avec ID #modalBoxContent, utilisation du ALL peut-être inapropriée ? Fonctionnel.
   modalLink.forEach((link) => {
     link.addEventListener("click", (event) => {
-      event.preventDefault(); // On ne veut pas un fonctionnement de l'ancrage.
-      const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
-      modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
-      modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
-      modalBox.setAttribute("aria-modal", "true");
-      dataShowModal(); // Vient afficher les images dynamiquement importée dans arrayData.
-      closingModalBehavior(); // Conditionne le comportement de fermeture de la modale.
-    });
-  });
+        event.preventDefault(); // On ne veut pas un fonctionnement de l'ancrage.
+        openingMainModal();
+    });})
 }
 
 /* FONCTION - Affichage dynamique de la modale principale ! */
-function dataShowModal() {
-  for (let i = arrayData.length - 1; i >= 0; i--) {
-    // Boucle qui affichera les images dans le sens inverse.
-    /* Déclaration des variables ! */
-    let galleryTargetingEdit = document.querySelector(".edit_gallery"); // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
-    let galleryCardEdit = document.createElement("figure");
-    let galleryTxtEdit = document.createElement("a");
-    let galleryIconeEdit = document.createElement("div");
-    let galleryIconeTrashEdit = document.createElement("i");
-    let galleryIconeMoveEdit = document.createElement("i");
-    let galleryImageEdit = document.createElement("img");
-    /* Gestion des attributs ! */
-    galleryImageEdit.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via les données importées de l'API.
-    galleryImageEdit.setAttribute("alt", arrayData[i].title);
-    galleryTxtEdit.innerText = "éditer"; // Ne renvoie à rien mais pourrait à l'avenir.
-    galleryIconeTrashEdit.setAttribute("class", "fa-solid fa-trash-can");
-    galleryIconeMoveEdit.setAttribute(
-      "class",
-      "fa-solid fa-up-down-left-right"
-    );
-    /* Ajout des balises-parents ! */
-    galleryCardEdit.setAttribute("class", "edit_figureCard"); // Attribution d'une class aux balises <figure>.
-    galleryTargetingEdit.prepend(galleryCardEdit); // Ajout des cards (balises <figure>).
-    /* Ajout des balises-enfants ! */
-    let insideCardTargetingEdit = document.querySelector(".edit_figureCard"); // On se replace au niveau de notre balise fraichement ajoutée :
-    insideCardTargetingEdit.prepend(galleryImageEdit, galleryTxtEdit); // Ajout des composants précedemment définis.
-    /* Gestion des icones ! */
-    galleryIconeEdit.setAttribute("class", "edit_iconeManagement");
-    insideCardTargetingEdit.prepend(galleryIconeEdit);
-    let insideGalleryIconeEdit = document.querySelector(
-      ".edit_iconeManagement"
-    ); // Je me place au niveau de cette nouvelle balise enfants, qui va devenir parent.
+function dataShowMainModal() {
+    for (let i = arrayData.length - 1; i >= 0; i--) {
+
+      // Vérification si l'image est déjà présente dans le DOM POUR EVITER LES DOUBLONS !!
+      let isImageAlreadyPresent = false;                                                        // Variable booléenne classique pour tester le conditionnement de doublon.
+      for (const figureCard of document.querySelectorAll('.edit_figureCard')) {                 // "Test" de toutes les figureCard dans le code.
+        if (figureCard.querySelector('img').getAttribute('src') == arrayData[i].imageUrl) {     // S'il y a une correspondance avec un élément présent dans arrayData.
+            isImageAlreadyPresent = true;                                                       // Si c'est bon, l'image est donc déjà présente.
+          break;                                                                                // Alors on s'arrête là, et on passe à la prochaine.
+        }
+      }
+      if (isImageAlreadyPresent == true) {                                           // On va tester l'image, si c'est true, on passe à la prochaine.
+        continue;                                                                   // Et ce via continue. Si c'est false, on va passer à la suite des instructions de la boucle for et afficher.
+      }
+      
+      // Reste du code pour ajouter l'image dans le DOM
+      /* Déclaration des variables ! */
+      let galleryTargetingEdit = document.querySelector(".edit_gallery"); // On vient, cette fois ci, se placer dans .edit_gallery, une div dans la modale !
+      let galleryCardEdit = document.createElement("figure");
+      let galleryTxtEdit = document.createElement("a");
+      let galleryIconeEdit = document.createElement("div");
+      let galleryIconeTrashEdit = document.createElement("i");
+      let galleryIconeMoveEdit = document.createElement("i");
+      let galleryImageEdit = document.createElement("img");
+      /* Gestion des attributs ! */
+      galleryImageEdit.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via les données importées de l'API.
+      galleryImageEdit.setAttribute("alt", arrayData[i].title);
+      galleryTxtEdit.innerText = "éditer"; // Ne renvoie à rien mais pourrait à l'avenir.
+      galleryIconeTrashEdit.setAttribute("class", "fa-solid fa-trash-can");
+      galleryIconeMoveEdit.setAttribute(
+        "class",
+        "fa-solid fa-up-down-left-right"
+      );
+      /* Ajout des balises-parents ! */
+      galleryCardEdit.setAttribute("class", "edit_figureCard"); // Attribution d'une class aux balises <figure>.
+      galleryTargetingEdit.prepend(galleryCardEdit); // Ajout des cards (balises <figure>).
+      /* Ajout des balises-enfants ! */
+      let insideCardTargetingEdit = document.querySelector(".edit_figureCard"); // On se replace au niveau de notre balise fraichement ajoutée :
+      insideCardTargetingEdit.prepend(galleryImageEdit, galleryTxtEdit); // Ajout des composants précedemment définis.
+      /* Gestion des icones ! */
+      galleryIconeEdit.setAttribute("class", "edit_iconeManagement");
+      insideCardTargetingEdit.prepend(galleryIconeEdit);
+      let insideGalleryIconeEdit = document.querySelector(
+        ".edit_iconeManagement"
+      ); // Je me place au niveau de cette nouvelle balise.
+  
     if (i == 0) {
       insideGalleryIconeEdit.prepend(
         galleryIconeMoveEdit,
