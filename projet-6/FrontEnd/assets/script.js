@@ -1,12 +1,10 @@
 /* ___________________________________________________________ */
-/* DEBUT DU SCRIPT !                                             */
+/* DEBUT DU SCRIPT !                                           */
 /* ___________________________________________________________ */
 
 console.log("The script starts.")
 
-/* ___________________________________________________________ */
-/* FONCTION(S) - Récupération des données de l'API !           */
-/* ___________________________________________________________ */
+/* FONCTION - Récuparation des données de l'API !                */
 async function getData() {
     try {
         const apiUrl = 'http://localhost:5678/api/works/';
@@ -19,51 +17,42 @@ async function getData() {
     }
 }
 
-/* ___________________________________________________________               */
-/* FONCTION(S) - Gestion des filtres et affichage sur index_edit !           */
-/* ___________________________________________________________               */
-
-let arrayClassFilters;
-let arrayFiltersComponent;
-
-// Affichage des éléments voulus !
-function showClass(element, name) {
-    arrayClassFilters = element.className.split(" ");                           // Split permet de "séparer" les éléments dans un tableau.
-    arrayFiltersComponent = name.split(" ");                                    // Espacement d'un espace dans le tableau.
-    for (let i = 0; i < arrayFiltersComponent.length; i++) {                    // Parcours le contenu du tableau contenant les objets renseignés.
-        if (arrayClassFilters.indexOf(arrayFiltersComponent[i]) == -1) {        // indexOf renvoi au positionnement de l'objet dans le tableau.
-            element.className += " " + arrayFiltersComponent[i];                // Alors update le className avec un espacement et la classe à rajouter.
-        }
+/* FONCTION - Gestion des filtres et affichage sur index_edit !  */
+function applyingClass(element, name, add) {            // Prend en compte l'élément séléctionné, le nom de la classe à ajouter et si oui ou non il faut appliquer ce nom.
+    let classFilters = element.className.split(" ");    // On prend toutes les classes du nom de l'élement transmis (ici "figureCard", on va pas se mentir ça ne sert qu'à ça).
+    let filterElements = name.split(" ");               // On récupére tous les "show" transmis également et on les espaces, pareil.
+    for (let i = 0; i < filterElements.length; i++) {   // Lecture de toutes les classes récupérées.
+      let filter = filterElements[i];                   // On a un filtre et un index à "comparer", on les récupère.
+      let index = classFilters.indexOf(filter);         // (Récupération de la variable par rapport au nombre d'itération - Tjrs pour les comparer).
+      if (add && index == -1) {                         // Si add est true (sinon c'est !add) ET que index -1 (donc qu'il n'existe pas dans le tableau) cela signifie qu'il n'y figure pas alors qu'il devrait :
+        classFilters.push(filter);                      // Donc on l'ajoute.
+      }
+      if (!add && index > -1) {                         // Alors que si c'est FALSE MAIS qu'il y figure, il faut le retirer.
+        classFilters.splice(index, 1);                  // Via splice.
+      }
     }
+    element.className = classFilters.join(" ");         // Ensuite, via JOIN, on réassemble classFilters avec ce qui a été filtré !
+    // console.log(classFilters);                       // Ainsi, la fonction permet de regrouper les deux demandes d'avant, puisque filtrer deux fois de la même façon est inutile...
+                                                        // Les cas où il faut supprimer (masquer) et ceux où il faut permettre l'affichage/réaffichage.
 }
 
-// Masquage des éléments non voulus !
-function hideClass(element, classe) {
-    arrayClassFilters = element.className.split(" ");                                          // Nos deux tableaux sont de retour.
-    arrayFiltersComponent = classe.split(" ");                                                 // Espacement d'un espace dans le tableau.
-    for (let i = 0; i < arrayFiltersComponent.length; i++) {                                   // Même boucle.
-        while (arrayClassFilters.indexOf(arrayFiltersComponent[i]) > -1) {                     // On vient selectionner l'inverse, les autres composants du tableau via le changement if => while.
-            arrayClassFilters.splice(arrayClassFilters.indexOf(arrayFiltersComponent[i]), 1);  // Splice permet de supprimer les éléments précis du tableau, ici les classes CSS.
-        }
+/* FONCTION - Modification des filtres selon leur séléction !    */
+function filterSelection(choose) {                                          // Prend l'argument qu'il reçoit, pour l'instant que "all" mais ce comportement aussi va faire parti de la refactorisation.
+    let figureCardArray = document.getElementsByClassName("figureCard");    // On séléctionne toutes les figureCards (les images importées).
+    if (choose == "all") {                                                  // Si on a reçu le fameux "all" :
+      choose = "";                                                          // Alors choose n'est égal à rien (pas de filtre).
     }
-    element.className = arrayClassFilters.join(" ");                                           // Toutes les classes ayant été delete. On lance une actualisation avec join(" ").
-}
-
-// Gère le voulu/non-voulu en appliquant un filtre de selection !
-function filterSelection(choose) {                                                  // L'argument va être le button sélectionné.
-    let figureCardArray = document.getElementsByClassName("figureCard");            // Séléction des filterDiv.
-    if (choose == "all") {                                                          // Si le button "tout" est selectionné.
-        choose = "";                                                                // Il n'y a plus de filtrage (suite de la function).                                                                                            
-    }
-    for (let i = 0; i < figureCardArray.length; i++) {                  // Parcours toutes les images importées.
-        hideClass(figureCardArray[i], "show");                          //
-        if (figureCardArray[i].className.indexOf(choose) > -1) {
-            showClass(figureCardArray[i], "show");
-        }
+    for (let i = 0; i < figureCardArray.length; i++) {                      // On parcourt le tableau contenu les figureCards.
+      let figureCard = figureCardArray[i];                                  // L'élément en cours correspond au nombre itération, normal.
+      if (figureCard.className.indexOf(choose) > -1) {                      // Si la classe choose est présente pour notre élément (toujours en train de parcourirs notre tableau) :
+        applyingClass(figureCard, "show", true);                            // Appelle la classe de gestion de la variable et applique "show" (sous tous cas de figure, voir la fonction directement).
+      }                                                                     // D'où l'intêret de notre "all" = "", ici tout sera au vert car "si "" est présent" sera toujours correct, pour chaque élément.
+      else {                                                                // Sinon :
+        applyingClass(figureCard, "show", false);                           // On appliquera d'autre argument, correspondant à l'action de ne pas afficher la class "show" :) !
+      }
     }
 }
-
-// Affiche les éléments dynamiquement, prend en compte la fonction du dessus.
+/* FONCTION - Affiche les éléments dynamiquement.                */
 function dataShow() {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
         let galleryTargeting = document.querySelector(".gallery");
@@ -71,7 +60,6 @@ function dataShow() {
             let galleryCard = document.createElement("figure");
             let galleryImage = document.createElement("img");
             let galleryTxt = document.createElement("figcaption");
-            //console.log(arrayData[i].categoryId);
             galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
             galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
             galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
@@ -81,11 +69,12 @@ function dataShow() {
             let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
             InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
         }
-        filterSelection("all");             // Attend l'importation pour lancer le premier filtre : "all".
     }
+    filterSelection("all");                                                 // Attend l'importation pour lancer le premier filtre : "all".
+    filterListening();
 }
 
-// Clear du code généré dans le DOM par la fonction de dessus, sert d'actualisation.
+/* FONCTION -  Clear du code généré DOM via dataShow() !         */
 function dataClear() {
     const galleryTargeting = document.querySelector(".gallery");
     if (galleryTargeting != null) {
@@ -93,60 +82,47 @@ function dataClear() {
     }
   }
 
-/* ___________________________________________________________                      */
-/* ACTION(S) - Gestion des images importées dynamiquement sur l'accueil.            */
-/* ___________________________________________________________                      */
-// Stockage de l'API dans un tableau PUIS affiche les images.
-let arrayData;                      // Mise en place des data de l'API dans un tableau.
-getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
-    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    dataShow();
-})
-
-// Ecoute des filtres et comportements adaptés.
-let buttonContainer = document.getElementById("sortingButton");                 // Récupération de la <div> contenant les filtres.
-if (buttonContainer != null) {                                                  // S'il y a un "sortingButton" de trouvé, alors :
-    let buttonItem = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
-    for (let i = 0; i < buttonItem.length; i++) {                               // Parcours le tableau contenant les buttons filtres un par un.
-        buttonItem[i].addEventListener("click", function () {                   // Pour chaque bouton filtres, un EventListener par clique est initié.
-            let activeElement = document.getElementsByClassName("active");      // Ce clique déclanche la récupération éléments avec classe "active" et le stock.
-            if (activeElement.length == 0) {                                    // Reviens à dire : "Si rien n'est séléctionné" (aucun filtre) alors :
-                this.className += " active";                                    // En cas d'action, du click, la classe "active" est ajoutée.
-            }
-            else {
-                activeElement[0].className = activeElement[0].className.replace(" active", ""); // Mais si quelque chose était déjà séléctionné, retire le via replace dans le tableau listant les classes.
-                this.className += " active";                                                    // Puis ajoute active sur le "bouton" cliqué.
-            }
-        });
+/* FONCTION - Ecoute et modification du filtre en cours !        */
+function filterListening() {
+    let buttonContainer = document.getElementById("sortingButton");                 // Récupération de la <div> contenant les filtres.
+    if (buttonContainer != null) {                                                  // S'il y a un "sortingButton" de trouvé, alors :
+        let filterList = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
+        for (let i = 0; i < filterList.length; i++) {                               // On parcourt la liste des filtres.
+            filterList[i].addEventListener("click", function (event) {              // Pour y placer un eventListener de ce qui va être cliqué (sur chaque button filtre).
+            // Ici, on a ce qu'on appelle une fonction "de rappel" c'est à dire que le click déclanchera la suite du code :
+                let clickedButton = event.target;                                                   // On récupère cette valeur, ce sur quoi il a cliqué (le button).
+                let activeElement = document.getElementsByClassName("active");                      // On récupère également tous les buttons avec "active".
+                activeElement[0].className = activeElement[0].className.replace(" active", "");     // Les classes du "premier" élément d'activeElement sont selectionnées puis on supprime "active".
+                // Car on en change, donc on supprime d'abord.
+                clickedButton.classList.add("active");                                              // Puis on ajoute en className "active" seulement au boutton clické ! Et voila.
+            });
+        }
     }
 }
 
-/* ___________________________________________________________ */
-/* FONCTION(S) - Relatives au formulaire de connexion.         */
-/* ___________________________________________________________ */
-
-
-// Stockage du token reçu vers un cookie.
-let tokenToSave = "";
+/* FONCTION - Stock le Token dans le navigateur !                */
 function stockTokenCookie(token) {                                // Prendra le tokenSaved en argument pour le sauvegarder.
     let expirationDate = new Date();                              // Représente la date et heure actuelle en fonction de quand on appelle la fonction.
     expirationDate.setDate(expirationDate.getDate() + 7);         // Expiration dans 7 jours (arbitraire).
-    document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.                                                                            // Affiche tous les cookies en string - Il est stocké !
+    document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`;  // Utilisation de document.cookie avec précision qu'il expirera dans une semaine. 
+    /* NE FONCTIONNE PAS SOUS CHROME car changement de politique de certificat des cookies !! */
+    /* Je ne trouve pas de solution à ce jour, SSL requis ! */
+    /* Possibilité de passer en "force" via le stockage en storage local apparement... */
 }
 
-// Récupérer le token stocké précedemment ci dessus.
+/* FONCTION - essaye de récupérer le TOKEN d'Authentification depuis la navigateur !  */
 function getTokenCookie(tokenWanted) {
-    let cookieData = document.cookie;                  // Parmis tous les cookies du domaine stockés //
+    let cookieData = document.cookie;                  // Parmis tous les cookies du domaine stockés.
     let cookieArray = cookieData.split(';');           // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, on connait.
     for (let i = 0; i < cookieArray.length; i++) {     // Tableau qu'on va mtn parcourir.
         let cookie = cookieArray[i].trim();                     // A chaque cookie parcouru, on les trims par sécurité.
         if (cookie.startsWith(tokenWanted + '=')) {             // Quand on a trouvé le cookie que nous recherchons via l'argument fournis dans la function.
             return cookie.substring(tokenWanted.length + 1);    // On le return.
         }
-    }                                                           // Else non permit !?
+    }                                                           
 }
 
-// Envoie des données du formulaire et attente de réponse.
+/* FONCTION - Question le formulaire de connexion pour savoir si c'est good !         */
 async function postData(url = "", data = {}) {                  // Function async ayant besoin d'une URL et de données. 
     const response = await fetch(url, {                         // une réponse sous forme de constante est attendue.
         method: "POST",                                         // Le fetch initié est en méthode POST.
@@ -156,14 +132,14 @@ async function postData(url = "", data = {}) {                  // Function asyn
         body: JSON.stringify(data),                        // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
     });
     const responseJSON = await response.json();            // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
+    let tokenToSave = "";
     tokenToSave = responseJSON.token;                      // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
+    console.log("Voici ce que postData veut stocker en cache : ", responseJSON.token);
     stockTokenCookie(tokenToSave);                         // Stockage du token dans le navigateur sous forme de cookie.
     return responseJSON;                                   // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
 
-/* ___________________________________________________________ */
-/* ACTION(S) - Comportement du formulaire.                     */
-/* ___________________________________________________________ */
+/* FONCTION - Comportement du formulaire de connexion !          */
 function loginFormBehavior () {
     let form = document.getElementById('login_form');     // Selection de notre formulaire.
     if (form != null) {                                   // Si l'ID "form" correspond à qq chose, alors :
@@ -181,10 +157,10 @@ function loginFormBehavior () {
             if (user.email.trim() !== '' && user.password.trim() !== '') {                // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
                 postData('http://127.0.0.1:5678/api/users/login', user).then(data => {    // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
                     console.log(data);                                                    // Vérification du bon contenu de "data".
-                    console.log(tokenToSave);                                             // Vérification du bon contenu du token !
                     // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
                     // Dans le cas où l'API ne retourne pas d'erreur :             */
-                    if (data.userId == 1) {
+                    if (data.userId == 1) {                                                 
+                        // En fait, si data.userID == 1, c'est que la réponse de l'API est 1 et donc qu'on est connecté à 1 qui est SophieBluel, pour être préçis.
                         window.location.href = '../pages/index_edit.html';
                     }
                     // Dans le cas où l'API retourne une erreur :                  */
@@ -209,7 +185,9 @@ function loginFormBehavior () {
     };
 }
 
-// Interdiction d'accès à l'edit en cas d'absence du token d'identification.   
+/* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification.         */   
+/* !! NE MARCHE PLUS SOUS CHROME depuis AVRIL !!          */
+/* Voir explication dans la fonction : "stockTokenCookie" */
 function authorizationAccesToEdit () {
     if (window.location.href.includes("/index_edit.html")) {            // Si on se trouve sur la page de l'edit. (pathname ne fonctionne que pour les chemins complets !)
         const cookieArray = document.cookie.split(';');                 // Récupération des cookies du navigateurs.
@@ -217,25 +195,14 @@ function authorizationAccesToEdit () {
         for (let i = 0; i < cookieArray.length; i++) {                  // Parcours du tableau.
         let authTookie = cookieArray[i].trim();                         // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1.
         if (authTookie.startsWith('loginToken=')) {                     // Si notre cookie "loginToken" est trouvé :
-            ifLoginTokenFound = 1;                                      
+            ifLoginTokenFound = 1;                                    
         }
         else {
-            ifLoginTokenFound = 0;
+            window.location.href = "./login.html";                          // Redirige l'utilisateur vers le login !
         }}
-        if (ifLoginTokenFound == 0) {
-        window.location.href = "./login.html";                          // Redirige l'utilisateur vers le login !
-        }
     }}
-    
 
-loginFormBehavior ();
-authorizationAccesToEdit ();
-
-/* ___________________________________________________________ */
-/* FONCTION(S) - Relative à la première modale.                */
-/* ___________________________________________________________ */
-
-// Affichage dynamique des éléments dans la modale (inspiré de dataShow()).
+/* FONCTION - Affichage dynamique de la première modale !        */
 function dataShowModal() {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
         /* Déclaration des variables ! */
@@ -271,7 +238,8 @@ function dataShowModal() {
     }
 }
 
-// Suppression de la modale entière dans le DOM (que l'on retrouvera dans la fonction de fermeture pour éviter qu'elle ne se cumule si on la ré-ouvre).
+
+/* FONCTION - Suppression DOM de la première modale !            */
 function modalRemove() {
     // Déclaration des variables à supprimer !
     let figureCardsToDeleteEdit = document.querySelectorAll(".edit_figureCard");        // Selection de toutes les classes .edit_figureCard.
@@ -280,20 +248,15 @@ function modalRemove() {
     });
 }
 
-// Fermeture de la modale !
-// Les conditions de fermeture sont désormais directement présente à la fermeture.
-function closeModal() {
+/* FONCTION - Comportement de fermeture de la première modale !  */
+function closeModal(id) {
     modalBox.classList.add("modalBox-hidden");                    // On lui remet la modalBox-hidden, ce qui le cache. 
     modalBox.setAttribute("aria-hidden", "true");                 // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
     modalBox.setAttribute("aria-modal", "false");                 // //                                             // La modale n'est plus ouverte.
     modalRemove();                                                // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
-    isMainModalOpen = false;
-    console.log("Première modale : ", isMainModalOpen);
 }
 
 // Ouverture de la modale AVEC SON COMPORTEMENT.
-let isMainModalOpen = false;
-console.log("Première modale : ", isMainModalOpen);
 
 function openModal() {
 let modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Notre lien avec ID #modalBoxContent, utilisation du ALL peut-être inapropriée ? Fonctionnel.
@@ -307,28 +270,33 @@ modalLink.forEach(link => {
         dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
         removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.
         console.log(trashCanId)
-        isMainModalOpen = true;                                          // Savoir quand la modale est ouverte et fermée (sert plus tard).
+        let isMainModalOpen = true;                                          // Savoir quand la modale est ouverte et fermée (sert plus tard).
         console.log("Première modale : ", isMainModalOpen);
         // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
         // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
         if (isMainModalOpen === true) {                                 // Si la fenêtre modale est ouverte :
             let modalCross = document.querySelector(".fa-xmark");       // On identifie la croix.
             modalCross.addEventListener('click', () => {                // Alors on place notre eventListener sur le clique.
-                closeModal();                                           // Et ça viendra fermer la modale.
+                closeModal(trashCanId);
+                isMainModalOpen = false;
+                console.log("Première modale : ", isMainModalOpen);
             })
             document.addEventListener('keydown', (event) => {           // Si on détecte la croix, on écoute également les inputs clavier.
                 if (event.key === 'Escape') {                           // Si l'input est "Echap", on ferme.
                     closeModal();
+                    isMainModalOpen = false;
+                    console.log("Première modale : ", isMainModalOpen); 
                 }
             });
         let modalBoxHitBox = document.querySelector('#modalBox');       // On séléctionne la modale.
         document.addEventListener('click', (event) => {                 // On écoute les clicks qui ont lieu sur TOUTE la page / BODY est couvert par la modal ? Body ne marche pas.
             if (event.target === modalBoxHitBox) {                      // Si cela est exacte, il s'agit de la fenêtre modale MAIS :
-                //
                 // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
                 // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
                 // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
                 closeModal();
+                isMainModalOpen = false;
+                console.log("Première modale : ", isMainModalOpen);
             } else {
             }
         });
@@ -353,8 +321,7 @@ txtProfilLink.addEventListener("click", function(event) {
 });
 }
 
-// Dès l'ouverture de la page, on écoute pour être prêt à ouvrir la box.
-openModal();            
+           
 
 /* ___________________________________________________________ */
 /* FONCTION(S) - Features de suppression d'image(s) !          */
@@ -468,7 +435,7 @@ function sendPictureToSwagger() {
       fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + getTokenCookie('loginToken')
+          'Authorization': 'Bearer ' + getTokenCookie("loginToken")
         },
         body: listingOfPictureToSentAtSwaggerFormDated
       })
@@ -585,8 +552,7 @@ if (secondModalBackButton) {                                                    
         modalBox.removeAttribute("aria-hidden");                         // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
         modalBox.setAttribute("aria-modal", "true");                     // //
         dataShowModal();                                                 // Affiche le contenu de l'API dans la modale.
-        removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.
-        isMainModalOpen = true;    
+        removePictureListening();                                        // Applique une mise en écoute des corbeilles pour suppression.  
         })
 };
 
@@ -738,7 +704,27 @@ let addingPictureForm = {                                                // Pour
 };
 
 // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
-let listingOfPictureToSentAtSwagger = [];              
+let listingOfPictureToSentAtSwagger = [];  
+
+
+
+/* COMPORTEMENT DU FORMULAIRE + LogIN authentification ! */
+loginFormBehavior ();
+authorizationAccesToEdit ();
+
+
+
+/* COMPORTEMENT DE LA PAGE EDIT ! */
+let arrayData;                      // Mise en place des data de l'API dans un tableau.
+
+getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
+    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
+    dataShow();                     // On appelle dataShow pour montrer ce que l'on a importé.
+    console.log("J'ai importé dataShow()");
+})
+openModal(); 
+
+
 
 console.log("The script just ended.");
 
