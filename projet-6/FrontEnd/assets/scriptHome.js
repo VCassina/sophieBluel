@@ -22,7 +22,7 @@ console.log("The script just ended.");
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 
-/* FONCTION - Récuparation des données de l'API !                */
+/* FONCTION - Récuparation des données de l'API ! */
 async function getData() {
     try {
         const apiUrl = 'http://localhost:5678/api/works/';
@@ -35,7 +35,7 @@ async function getData() {
     }
 }
 
-/* FONCTION - Gestion des filtres et affichage sur index_edit !  */
+/* FONCTION - Gestion des filtres et affichage sur index_edit ! */
 function applyingClass(element, name, add) {            // Prend en compte l'élément séléctionné, le nom de la classe à ajouter et si oui ou non il faut appliquer ce nom.
     let classFilters = element.className.split(" ");    // On prend toutes les classes du nom de l'élement transmis (ici "figureCard", on va pas se mentir ça ne sert qu'à ça).
     let filterElements = name.split(" ");               // On récupére tous les "show" transmis également et on les espaces, pareil.
@@ -54,7 +54,7 @@ function applyingClass(element, name, add) {            // Prend en compte l'él
                                                         // Les cas où il faut supprimer (masquer) et ceux où il faut permettre l'affichage/réaffichage.
 }
 
-/* FONCTION - Modification des filtres selon leur séléction !    */
+/* FONCTION - Modification des filtres selon leur séléction ! */
 function filterSelection(choose) {                                          // Prend l'argument qu'il reçoit, pour l'instant que "all" mais ce comportement aussi va faire parti de la refactorisation.
     let figureCardArray = document.getElementsByClassName("figureCard");    // On séléctionne toutes les figureCards (les images importées).
     if (choose == "all") {                                                  // Si on a reçu le fameux "all" :
@@ -71,29 +71,32 @@ function filterSelection(choose) {                                          // P
     }
 }
 
-/* FONCTION - Affiche les éléments dynamiquement.                */
+/* FONCTION - Affiche les éléments dynamiquement. */
 function dataShow() {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
         let galleryTargeting = document.querySelector(".gallery");
         if (galleryTargeting != null) {
-            let galleryCard = document.createElement("figure");
-            let galleryImage = document.createElement("img");
-            let galleryTxt = document.createElement("figcaption");
-            galleryCard.setAttribute("class", "figureCard " + arrayData[i].categoryId);     // Attribution d'une class aux arrayData.length cards (balises <figure>).         
-            galleryTargeting.prepend(galleryCard);                                          // Ajout des cards (balises <figure>).
-            galleryImage.setAttribute("src", arrayData[i].imageUrl);            // Modification de l'attribut de la source img via l'API.
-            galleryImage.setAttribute("alt", arrayData[i].title);
-            galleryTxt.innerText = arrayData[i].title;                          // Modification de le la description de l'img via l'API.
-            galleryTxt.setAttribute("class", "img_title");
-            let InsideCardTargeting = document.querySelector(".figureCard");    // Préparation d'un placement dans les cards via la classe des balises <figure>.
-            InsideCardTargeting.prepend(galleryImage, galleryTxt);              // L'incorporation des deux sous-balises.
+          let galleryCard = document.createElement("figure");
+          let galleryImage = document.createElement("img");
+          let galleryTxt = document.createElement("figcaption");
+          galleryCard.setAttribute(
+            "class",
+            "figureCard " + arrayData[i].categoryId
+          ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
+          galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
+          galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
+          galleryImage.setAttribute("alt", arrayData[i].title);
+          galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
+          galleryTxt.setAttribute("class", "img_title");
+          let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
+          InsideCardTargeting.prepend(galleryImage, galleryTxt);           // L'incorporation des deux sous-balises.
         }
     }
     filterSelection("all");                                                 // Attend l'importation pour lancer le premier filtre : "all".
     filterListening();
 }
 
-/* FONCTION -  Clear du code généré DOM via dataShow() !         */
+/* FONCTION -  Clear du code généré DOM via dataShow() ! */
 function dataClear() {
     const galleryTargeting = document.querySelector(".gallery");
     if (galleryTargeting != null) {
