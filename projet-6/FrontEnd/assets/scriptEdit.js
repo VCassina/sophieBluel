@@ -6,7 +6,6 @@
 /* ACTIONS ! */
 /* ACTIONS ! */
 
-console.log("The script starts.");
 
 authorizationAccesToEdit();
 disableUselessModifiers();
@@ -18,7 +17,7 @@ getData().then((result) => {
 });
 mainModalOpenListener(); // Ouverture de la modale principale pour interraction avec les features demandées.
 
-console.log("The script just ended.");
+
 
 /* FONCTIONS ! */
 /* FONCTIONS ! */
