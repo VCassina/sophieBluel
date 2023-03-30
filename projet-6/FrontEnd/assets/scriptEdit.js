@@ -625,92 +625,102 @@ function addingImageApi (array, title, category, imageValue, arrayRequest) {
       category: parseInt(category),
       imageUrl: imageValue
     };
+    console.log(arrayRequest)
     arrayRequest.push(array);
     console.log(array);
     console.log(arrayRequest);
 
-    let allImageToSend = new FormData();
     let url = "http://localhost:5678/api/works/";
 
-    for (let i = 0; i < arrayRequest.length; i++) {
-      let imageRequest = arrayRequest[i];
-      allImageToSend.append('title', imageRequest.title);
-      allImageToSend.append('category', imageRequest.category);
-      allImageToSend.append('image', imageRequest.imageUrl);
-    }
+    // console.log(arrayRequest);
+    // console.log(allImageToSend);
+    // console.log(formData);
 
-    console.log(arrayRequest);
-    console.log(allImageToSend);
+    for (let i = 0; i <= arrayRequest.length-1; i++) {
+      const imageToSend = new FormData();
 
+      const imageRequest = arrayRequest[i];
+      imageToSend.append('title', imageRequest.title);
+      imageToSend.append('category', imageRequest.category);
+      imageToSend.append('image', imageRequest.imageUrl);
+      console.log("L.646 - imageToSend-", imageToSend);
+      console.log("L.647 - ArrayRequest -", arrayRequest);
+  
+      fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + getTokenCookie("loginToken"),
+        },
+        body: imageToSend,
+      }).then((response) => {
+        if (response.ok) {
+          console.log("Envoie d'image réussi !");
+        } else {
+          console.log("Envoie d'image échoué...");
+        }
+      })
+      arrayRequest = [];
     
-  changementApplyButton = document.getElementById("changementApply");
-  document.getElementById("changementApply").addEventListener("click", () => {
-  fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + getTokenCookie("loginToken"),
-    },
-    body: allImageToSend,
-  }).then((response) => {
-    if (response.ok) {
-      console.log("Envoie d'image réussi !");
-    } else {
-      console.log("Envoie d'image échoué...");
     }
 
-  })})
 
-}
+    // const formData = new FormData();
+    // applyingEventListener();
+  }
 
+  function applyingEventListener(arrayAdd, amIDeleting, arrayRemove, amIAdding) {
+    /* ENVOYER LES FETCHS DE SUPRESSION ET D'AJOUT ! */
+    /*
+    switch >
+    1 > Le duex sont nuls > "pas de changement".
+    2 > l'un des deux est pas nul ET renvoie pas d'erreur > recharge.
+    2 > ??????
+    */
+  }
 
-// /* Ajout de la nouvelle image aux images locales ! */
-// function adddingImageLocal(array, imageValue) {
-//   let imageLocalFormat = URL.createObjectURL(imageValue.files[0]);
-//   array.imageUrl = imageLocalFormat;
-//   console.log(array)
-//   arrayData.push(array);
-//   apiDataClear();
-//   apiDataShow();
-// }
+  /* changementApplyButton = document.getElementById("changementApply");
+    document.getElementById("changementApply").addEventListener("click", () => {
 
-// // /* Ajout de la nouvelle image aux images à envoyer en fetch. */
-// function addingImageFetch(array, arrayToRequest, imageValue, allRequest) {
-//   let imageToSend = new FormData();
-//   let url = "http://localhost:5678/api/works/";
+      
+  for (let i = 0; i < arrayRequest.length; i++) {
 
+    console.log(arrayRequest)
+    let imageRequest = arrayRequest[i];
+    imageToSend.append('title', imageRequest.title);
+    imageToSend.append('category', imageRequest.category);
+    imageToSend.append('image', imageRequest.imageUrl);
 
-//   /////////* !!! TOUCHE MYSTERIEUSEMENT A L'AJOUT LOCAL ?????????? ///////////
-//     let picture = arrayToRequest[0];
-//     picture.imageUrl = imageValue.files[0];
-//     imageToSend.append("image", picture.imageUrl);
-//     imageToSend.append("title", picture.title);
-//     imageToSend.append("category", parseInt(picture.categoryId)); // Convertir au format INT et pas STRING pour s'assurer de la réponse de l'API.
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + getTokenCookie("loginToken"),
+      },
+      body: imageToSend,
+    }).then((response) => {
+      if (response.ok) {
+        console.log("Envoie d'image réussi !");
+      } else {
+        console.log("Envoie d'image échoué...");
+      }
+    })
+  }*/
+   
+  
+    
 
-//   allRequest.push(imageToSend);
-//   console.log("Voici TOUTES les requêtes qui vont être envoyé par fetch : ", allRequest)
+  // fetch(url, {
+  //   method: "POST",
+  //   headers: {
+  //     Authorization: "Bearer " + getTokenCookie("loginToken"),
+  //   },
+  //   body: arrayRequest,
+  // }).then((response) => {
+  //   if (response.ok) {
+  //     console.log("Envoie d'image réussi !");
+  //   } else {
+  //     console.log("Envoie d'image échoué...");
+  //   }
 
-//   changementApplyButton = document.getElementById("changementApply");
-//   document.getElementById("changementApply").addEventListener("click", () => {
-//   fetch(url, {
-//     method: "POST",
-//     headers: {
-//       Authorization: "Bearer " + getTokenCookie("loginToken"),
-//     },
-//     body: allRequest,
-//   }).then((response) => {
-//     if (response.ok) {
-//       console.log("Envoie d'image réussi !");
-//       console.log(arrayData)
-//         // Puis actualisation !
-//       adddingImageLocal(array, imageValue);
-//     } else {
-//       console.log("Envoie d'image échoué...");
-//     }
-//     for (var key of imageToSend.keys()) {
-//       imageToSend.delete(key);
-//     }
-//   })})
-// }
 
 
 /* ___________________________________________________________ */
@@ -719,17 +729,13 @@ function addingImageApi (array, title, category, imageValue, arrayRequest) {
 
 /* A FAIRE :
 
-- Ajouter un troisieme listener sur "publier les changements" qui viendra attendre la résolution des requêtes avant d'actualiser s'il n'y a pas d'erreur (on va s'amuser à ce momnet là).
-    > Idée : Envoyer à chaque "publier" (Ajout comme supression) une valeur dans la fonction d'actualisation de la page, elle attendrait d'avoir soit (switch) :
-            - Les valeurs définies et confirmées (ajout ET supression).
-            - Une valeur définies et confirmée (ajout OU supression).
-            - Aucune valeur définie > "Pas de changement à publier".
-            - S'il détecte des messages d'erreur > "L'actualisation n'est pas possible en raison d'une erreur, veillez contactez l'administrateur".
+- Envoyer les fetchs POST (image ADD) > fonction avec un seul eventListener sur publier.
+- Envoyer les fetchs POST (iamge DELETE) > la même fonction au dessus.
+- Gérer cette fonctionne pour gérer les envoies. Elle reçoit toutes les requêtes fetchs, les manipule, les envoies, s'assurent du truc.
 
-            Ainsi, s'il n'y a pas d'erreur, on tombe dans un conditionnement classique avant d'actualiser ou non si ce n'est pas nécéssaire.
-            Cas en default ? Aucun ? Si c'est possible de ne pas en mettre.
-
-- Debugger les doublons d'ajout dans des doublons de tableaux quand on AJOUTE une image.
-- Faire en sorte de pouvoir scroller dans le CSS dans le contenant des images quand il y en a trop...
+- Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
+- Faire en sorte de pouvoir scroller dans le CSS dans le contenant des images quand il y en a trop... MAIS SEULEMENT DANS LA BOITE !!
+- Faire en sorte que les images ajoutées par l'user se dimentionnent comme les autres.
+- Rendre possible l'envoie de plusieurs requêtes fetch POST d'un seul coup via publier (atm qu'une seule n'est permise) !
 
 */
