@@ -457,7 +457,7 @@ for (let i = 0; i < arrayData.length; i++) {                        // On parcou
 
 // Envoie du contenu de listingOfPictureToSentAtSwagger.
 function sendPictureToSwagger() {
-    const url = "http://localhost:5678/api/works/"; // Remplacer avec l'URL appropriée
+    const url = "http://localhost:5678/api/works/";
     const listingOfPictureToSentAtSwaggerFormDated = new FormData();
     for (let i = 0; i < listingOfPictureToSentAtSwagger.length; i++) {
         let pictureAtTheMoment = listingOfPictureToSentAtSwagger[i];
