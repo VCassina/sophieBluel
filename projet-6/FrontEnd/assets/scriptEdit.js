@@ -6,25 +6,23 @@
 /* ACTIONS ! */
 /* ACTIONS ! */
 
-
-authorizationAccesToEdit();
+authorizationAcces();
 disableUselessModifiers();
 let arrayData; // Mise en place des data de l'API dans un tableau (l'asynchrone rend difficile la mise en fonction de la variable).
-getData().then((result) => {
+apiDataGet().then((result) => {
   // Une fois que la function aura été executée, prend sa valeur de retour.
   arrayData = result; // Et donne la au tableau arrayData (le JSON).
-  dataShow(); // On appelle dataShow pour montrer ce que l'on a importé.
+  apiDataShow(); // On appelle apiDataShow pour montrer ce que l'on a importé.
 });
-mainModalOpenListener(); // Ouverture de la modale principale pour interraction avec les features demandées.
-
-
+let arrayRequest = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite.
+mainModalOpeningListener(arrayRequest); // Ouverture de la modale principale pour interraction avec les features demandées.
 
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
-function authorizationAccesToEdit() {
+function authorizationAcces() {
   if (window.location.href.includes("/index_edit.html")) {
     // Si on se trouve sur la page de l'edit. (pathname ne fonctionne que pour les chemins complets !)
     const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
@@ -60,7 +58,7 @@ function getTokenCookie(tokenWanted) {
 }
 
 /* FONCTION - Récuparation des données de l'API ! */
-async function getData() {
+async function apiDataGet() {
   try {
     const apiUrl = "http://localhost:5678/api/works/";
     const resp = await fetch(apiUrl);
@@ -73,7 +71,7 @@ async function getData() {
 }
 
 /* FONCTION - Affiche les éléments dynamiquement ! */
-function dataShow() {
+function apiDataShow() {
   for (let i = arrayData.length - 1; i >= 0; i--) {
     // Boucle qui affichera les images dans le sens inverse.
     let galleryTargeting = document.querySelector(".gallery");
@@ -96,7 +94,7 @@ function dataShow() {
   }
 }
 
-function dataClear() {
+function apiDataClear() {
   const galleryTargeting = document.querySelector(".gallery");
   if (galleryTargeting != null) {
     galleryTargeting.innerHTML = "";
@@ -116,7 +114,7 @@ function disableUselessModifiers() {
 }
 
 /* FONCTION - Ferme contenu de la modale principal ! */
-function mainModalCloseContent() {
+function mainModalClosingContent() {
   modalBox.classList.add("modalBox-hidden"); // On lui remet la modalBox-hidden, ce qui le cache.
   modalBox.setAttribute("aria-hidden", "true"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
   modalBox.setAttribute("aria-modal", "false"); // //                                             // La modale n'est plus ouverte.
@@ -126,6 +124,7 @@ function mainModalCloseContent() {
     // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
     e.remove(); // Remove.
   }); // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
+  document.body.classList.remove('modalOpened');
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la modale principale ! */
@@ -133,13 +132,13 @@ function mainModalClosingBehavior() {
   let modalCross = document.querySelector(".fa-xmark"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
-    mainModalCloseContent();
+    mainModalClosingContent();
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
     if (event.key === "Escape") {
       // Si l'input est "Echap", on ferme.
-      mainModalCloseContent();
+      mainModalClosingContent();
     }
   });
   let modalBoxHitBox = document.querySelector("#modalBox"); // On séléctionne la modale.
@@ -150,30 +149,31 @@ function mainModalClosingBehavior() {
       // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
       // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
       // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
-      mainModalCloseContent();
+      mainModalClosingContent();
     }
   });
 }
 
 /* FONCTION - L'action d'ouverture de la première modale ! */
-function mainModalOpening() {
+function mainModalOpening(arrayRequest) {
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
   modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
   modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
   modalBox.setAttribute("aria-modal", "true");
   mainModalShowData(); // Vient afficher les images dynamiquement importée dans arrayData.
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
-  secondModalOpenListener();
+  secondModalOpenListener(arrayRequest);
   trashCanListener();
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
-function mainModalOpenListener() {
+function mainModalOpeningListener(arrayRequest) {
   let modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Notre lien avec ID #modalBoxContent, utilisation du ALL peut-être inapropriée ? Fonctionnel.
   modalLink.forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault(); // On ne veut pas un fonctionnement de l'ancrage.
-      mainModalOpening();
+      mainModalOpening(arrayRequest);
+      document.body.classList.add('modalOpened');
     });
   });
 }
@@ -385,7 +385,7 @@ function trashCanFetchApplying(array) {
         // On attend la réponse.
         if (responses.every((response) => response.ok)) {
           // Si elle est correct :
-          //      window.location.href = '../pages/index_edit.html';                                                              // Puis actualise la page.
+          window.location.href = '../pages/index_edit.html';                                                              // Puis actualise la page.
           console.log("Requête acceptée !");
         }
       });
@@ -398,10 +398,11 @@ function secondModalCloseContent() {
   secondModalBox.classList.add("modalBox-hidden"); // On a rien vu, on remet comme c'était avant l'ouverture.
   secondModalBox.setAttribute("aria-hidden", "true"); //
   secondModalBox.removeAttribute("aria-modal");
+  document.body.classList.remove('modalOpened');
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
-function secondModalClosingBehavior() {
+function secondModalClosingBehavior(arrayRequest) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
@@ -411,7 +412,7 @@ function secondModalClosingBehavior() {
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-    mainModalOpening();
+    mainModalOpening(arrayRequest);
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -434,7 +435,7 @@ function secondModalClosingBehavior() {
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-function secondModalOpenListener() {
+function secondModalOpenListener(arrayRequest) {
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   secondModalButton.addEventListener("click", () => {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
@@ -442,20 +443,21 @@ function secondModalOpenListener() {
     secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
     secondModalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
     secondModalBox.setAttribute("aria-modal", "true");
-    mainModalCloseContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
+    mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
     // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
     // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-    secondModalClosingBehavior();
-    addingImageFormBehavior();
+    secondModalClosingBehavior(arrayRequest);
+    addingImageFormBehavior(arrayRequest);
   });
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
-function addingImageFormBehavior() {
+function addingImageFormBehavior(arrayRequest) {
   let inputImage = document.getElementById("addedImage");
   addPictureButton.addEventListener("click", () => {
     // En cas de click sur le pictureButton (+ Ajouter photo).
     inputImage.click(); // Un autre click aura lieux sur inputImage.
+    document.body.classList.add('modalOpened');
   });
   // Tableau au format de ce que je vais devoir envoyer en fetch.
   let addingPictureForm = {
@@ -470,7 +472,8 @@ function addingImageFormBehavior() {
   // Censé supprimer un eventListener si détecté mais ne fonctionne pas...
   // addingImageFormDeleteEventListener();
 
-  addingImageformCondition(addingPictureForm);
+
+  addingImageformCondition(addingPictureForm, arrayRequest);
 }
 
 /* FONCTION - Supprimer l'eventListener de addingImageFormCondition ! */
@@ -481,7 +484,7 @@ function addingImageFormBehavior() {
 // }
 
 /* FONCTION - Conditionne le fonctionnement du formulaire d'ajout d'image ! */
-function addingImageformCondition(array) {
+function addingImageformCondition(array, arrayRequest) {
   let requestToAdd = []; // Stockage des fetchs en attendant leur envoie.
   let addPictureForm = document.querySelector("#pictureAdd"); // Le formulaire (pour écouter sa validation).
   let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd"); // La valeur titre.
@@ -561,20 +564,23 @@ function addingImageformCondition(array) {
         let newImageUrl = URL.createObjectURL(
           addPictureSelectedByUserImage.files[0]
         );
+        console.log(newImageUrl);
+
         addingImageFormNewImageToAdd(
           array,
           addPictureTitle.value,
           addPictureCategory.value,
           newImageUrl,
-          requestToAdd
+          requestToAdd,
+          addPictureSelectedByUserImage.files[0],
+          arrayRequest
         );
 
         // Réinitialisation des données pour pouvoir en ajouter une nouvelle. Une DIFFERENTE notamment.
         array = {
-          // Pourquoi on "const" pose problème ?
           title: "",
           imageUrl: "",
-          categoryId: 0, // Notre parfaite Sophie Bluel.
+          categoryId: 0,
         };
     }
   });
@@ -585,31 +591,127 @@ function addingImageFormNewImageToAdd(
   title,
   category,
   url,
-  arrayToRequest
+  arrayToRequest,
+  imageValue,
+  arrayRequest
 ) {
-  array.title = title;
-  array.imageUrl = url;
-  array.categoryId = parseInt(category);
-  console.log("Voici les données de l'image à ajouter : ", array);
-  // A ce stade, c'est good, le tableau de l'image à ajouter est parfait.
-  // Il faut maintenant l'ajouter au tableau requestToAdd, ici "arrayToRequest".
-  arrayToRequest.push(array);
-  console.log(
-    "Et voici au TOTAL les images qui vont être ajoutées : ",
-    arrayToRequest
-  );
-  adddingImageLocalContent(array);
+  console.log(array);       // Le tableau de l'image ! Contenant title, categoryId et imageUrl LOCALE !!
+  console.log(title);       // Titre, commun au local et à l'API.
+  console.log(category);    // Categorie, //
+  console.log(url);         // URL LOCALE de l'image !!
+  console.log(arrayToRequest);  // Tableau pour stocker les requêtes fetchs ! TOUTES ! Vide à ce stade.
+  console.log(imageValue);      // Le files[0] à transmettre directement à l'API.
+
+  addingImageLocale(array, title, category, url);
+  addingImageApi(array, title, category, imageValue, arrayRequest);
 }
 
-function adddingImageLocalContent(array) {
-  // Ajout de l'image dans arrayData.
+function addingImageLocale(array, title, category, url) {
+  array = {
+    title: title,
+    category: category,
+    imageUrl: url
+  };
+  console.log(array);
   arrayData.push(array);
-  // Puis actualisation.
-  mainModalCloseContent();
-  // mainModalShowData();
-  dataClear();
-  dataShow();
+  console.log("J'ai push : ", array, " dans : ", arrayData);
+  apiDataClear();
+  apiDataShow();
 }
+
+function addingImageApi (array, title, category, imageValue, arrayRequest) {
+    array = {
+      title: title,
+      category: parseInt(category),
+      imageUrl: imageValue
+    };
+    arrayRequest.push(array);
+    console.log(array);
+    console.log(arrayRequest);
+
+    let allImageToSend = new FormData();
+    let url = "http://localhost:5678/api/works/";
+
+    for (let i = 0; i < arrayRequest.length; i++) {
+      let imageRequest = arrayRequest[i];
+      allImageToSend.append('title', imageRequest.title);
+      allImageToSend.append('category', imageRequest.category);
+      allImageToSend.append('image', imageRequest.imageUrl);
+    }
+
+    console.log(arrayRequest);
+    console.log(allImageToSend);
+
+    
+  changementApplyButton = document.getElementById("changementApply");
+  document.getElementById("changementApply").addEventListener("click", () => {
+  fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + getTokenCookie("loginToken"),
+    },
+    body: allImageToSend,
+  }).then((response) => {
+    if (response.ok) {
+      console.log("Envoie d'image réussi !");
+    } else {
+      console.log("Envoie d'image échoué...");
+    }
+
+  })})
+
+}
+
+
+// /* Ajout de la nouvelle image aux images locales ! */
+// function adddingImageLocal(array, imageValue) {
+//   let imageLocalFormat = URL.createObjectURL(imageValue.files[0]);
+//   array.imageUrl = imageLocalFormat;
+//   console.log(array)
+//   arrayData.push(array);
+//   apiDataClear();
+//   apiDataShow();
+// }
+
+// // /* Ajout de la nouvelle image aux images à envoyer en fetch. */
+// function addingImageFetch(array, arrayToRequest, imageValue, allRequest) {
+//   let imageToSend = new FormData();
+//   let url = "http://localhost:5678/api/works/";
+
+
+//   /////////* !!! TOUCHE MYSTERIEUSEMENT A L'AJOUT LOCAL ?????????? ///////////
+//     let picture = arrayToRequest[0];
+//     picture.imageUrl = imageValue.files[0];
+//     imageToSend.append("image", picture.imageUrl);
+//     imageToSend.append("title", picture.title);
+//     imageToSend.append("category", parseInt(picture.categoryId)); // Convertir au format INT et pas STRING pour s'assurer de la réponse de l'API.
+
+//   allRequest.push(imageToSend);
+//   console.log("Voici TOUTES les requêtes qui vont être envoyé par fetch : ", allRequest)
+
+//   changementApplyButton = document.getElementById("changementApply");
+//   document.getElementById("changementApply").addEventListener("click", () => {
+//   fetch(url, {
+//     method: "POST",
+//     headers: {
+//       Authorization: "Bearer " + getTokenCookie("loginToken"),
+//     },
+//     body: allRequest,
+//   }).then((response) => {
+//     if (response.ok) {
+//       console.log("Envoie d'image réussi !");
+//       console.log(arrayData)
+//         // Puis actualisation !
+//       adddingImageLocal(array, imageValue);
+//     } else {
+//       console.log("Envoie d'image échoué...");
+//     }
+//     for (var key of imageToSend.keys()) {
+//       imageToSend.delete(key);
+//     }
+//   })})
+// }
+
 
 /* ___________________________________________________________ */
 /* FIN DU SCRIPT !                                             */
@@ -617,8 +719,6 @@ function adddingImageLocalContent(array) {
 
 /* A FAIRE :
 
-- CREATION des fonctions relatives à l'AJOUT d'image dans L'API et imporations de ces dernières dans le code.
-- ENVOIE DES REQUETES d'ajout sur publier.
 - Ajouter un troisieme listener sur "publier les changements" qui viendra attendre la résolution des requêtes avant d'actualiser s'il n'y a pas d'erreur (on va s'amuser à ce momnet là).
     > Idée : Envoyer à chaque "publier" (Ajout comme supression) une valeur dans la fonction d'actualisation de la page, elle attendrait d'avoir soit (switch) :
             - Les valeurs définies et confirmées (ajout ET supression).
@@ -630,5 +730,6 @@ function adddingImageLocalContent(array) {
             Cas en default ? Aucun ? Si c'est possible de ne pas en mettre.
 
 - Debugger les doublons d'ajout dans des doublons de tableaux quand on AJOUTE une image.
+- Faire en sorte de pouvoir scroller dans le CSS dans le contenant des images quand il y en a trop...
 
 */

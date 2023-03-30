@@ -508,6 +508,8 @@ input[type="submit"] {
 /* _______________________________ */
 
 .modalBox {
+	overflow: auto;
+	max-height: 100vh;
 	position: fixed;
 	display: flex;
 	top: 0;
@@ -526,9 +528,8 @@ input[type="submit"] {
 }
 
 .modalBox_wrapper {
-	overflow: auto;
+
 	width: fit-content;
-	height: fit-content;
 	background: white;
 	border-radius: 10px;
 
@@ -539,6 +540,10 @@ input[type="submit"] {
 	text-align: center;
 	align-items: center;
 }
+
+body.modalOpened {
+	overflow: hidden;
+  }
 
 #modalBox-title {
 	font-family: 'Work Sans';
