@@ -615,6 +615,7 @@ function addLastImageToArrayData() {
     let title = lastImage.title;
     let imageUrl = lastImage.imageUrl;
     arrayData.push({ categoryId, title, imageUrl });
+    console.log("J'affiche l'URL de l'image LOCALEMENT récupérée", imageUrl);
   }
 
 let isValidationListenerOn = true;             // Pour savoir si l'eventListener de "valider" est up ou non (on veut éviter la double/triple/[...] écoute en cas d'ouverture fermeture de la seconde modale.)
@@ -637,6 +638,7 @@ addPictureForm.addEventListener("submit", (event) => {                          
     if (errorInformationModale) {
         errorInformationModale.remove();                                                  // Il est supprimé. Plus simple que pour login.
     }
+    console.log("Ici la .value !!!!", addPictureSelectedByUserImage.files[0]);
     if (addPictureSelectedByUserImage.value) {
         imageSize = addPictureSelectedByUserImage.files[0].size; 
         // On stock ENSUITE la propriété du poids de notre image récupéré dans le formulaire à part, sinon ça fait n'importe quoi au niveau de la value du poids.
@@ -692,7 +694,16 @@ addPictureForm.addEventListener("submit", (event) => {                          
 
             // Ce qui manquait ici, c'était l'attribution d'une URL pour afficher l'image, c'est obligatoire...
             // Et ça vient créer un truc un peu "bateau" par défaut qui s'appelle : blob:xxxxxx[...].
-            addingPictureForm.imageUrl = URL.createObjectURL(addPictureSelectedByUserImage.files[0]);                // Notre image récupérée sous addingPictureForm.imageUrl.
+            //Pour du local.
+            // Pour du pas-local, faut le files sans creatObject qui prend que le blob.
+
+
+            addingPictureForm.imageUrl = addPictureSelectedByUserImage.files[0];                // Notre image récupérée sous addingPictureForm.imageUrl.
+
+            /* RECUPERATION DU VALUE de l'image (Pour l'envoyer à l'API plus tard) */
+            let addingPictureFormForApiAfter = (addPictureSelectedByUserImage.value);
+            console.log("IMAGE POUR API nouveau format : ",addingPictureFormForApiAfter);
+
             updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Ayant reçu un premier objet témoin, je l'actualise.  
             addingToImageToAddRequest(addingPictureForm);                                                            // Je le remplace par son clone. 
             updatingTheImageToAddArray(addPictureTitle.value, addPictureCategory.value, addingPictureForm.imageUrl); // Que j'actualise.
