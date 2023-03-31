@@ -727,14 +727,11 @@ function applyingModification(arrayAdd, arrayRemove) {
 
 /* A FAIRE :
 
-- Envoyer les fetchs POST (image ADD) > fonction avec un seul eventListener sur publier.
-- Envoyer les fetchs POST (iamge DELETE) > la même fonction au dessus.
-- Gérer cette fonctionne pour gérer les envoies. Elle reçoit toutes les requêtes fetchs, les manipule, les envoies, s'assurent du truc.
-
 - Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
 - Faire en sorte de pouvoir scroller dans le CSS dans le contenant des images quand il y en a trop... MAIS SEULEMENT DANS LA BOITE !!
 - Faire en sorte que les images ajoutées par l'user se dimentionnent comme les autres.
-- Rendre possible l'envoie de plusieurs requêtes fetch POST d'un seul coup via publier (atm qu'une seule n'est permise) !
 - Faire en sorte de pouvoir supprimer les images ajoutées avant de publier les changements et que cela les retires donc des demandes d'ajouts d'image fetch.
+    !! N'est pas possible ATM !! Régler le bug de doublon d'ouverture d'abord !!
+- Bug quand on veut supprimer dans la premiere modale APRES avoir ajouté une image, surement dû au bug de doublons d'ajout quand on ouvre et réouvre la deuxieme modale.
 
 */
