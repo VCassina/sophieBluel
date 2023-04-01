@@ -462,22 +462,29 @@ function addingImageFormBehavior(arrayRequest, arrayRemove) {
     imageUrl: "",
     categoryId: 0, // Notre parfaite Sophie Bluel.
   };
+
   // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
   // Et donc stocker mes "instances" d'addPictureForm.
 
-  // Censé supprimer un eventListener si détecté mais ne fonctionne pas...
-  // addingImageFormDeleteEventListener();
-
-  addingImageformCondition(addingPictureForm, arrayRequest, arrayRemove);
+  addingImageformCondition(addingPictureForm.imageUrl, arrayRequest, arrayRemove);
 }
 
 /* FONCTION - Conditionne le fonctionnement du formulaire d'ajout d'image ! */
-function addingImageformCondition(array, arrayRequest, arrayRemove) {
+function addingImageformCondition(image, arrayRequest, arrayRemove) {
   let requestToAdd = []; // Stockage des fetchs en attendant leur envoie.
   let addPictureForm = document.querySelector("#pictureAdd"); // Le formulaire (pour écouter sa validation).
   let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd"); // La valeur titre.
   let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd"); // La valeur id (catégorie).
   let imageSize = 0;
+
+  // EN CAS DE CHANGEMENT d'état de l'input (quand une image est choisi par l'utilisateur), une valeur est immédiatement attribuée à l'image.
+  const inputedImage = document.getElementById('addedImage');
+  inputedImage.addEventListener("change", (event) => {
+    const imageSelected = event.target.files[0];
+    const imageSelectedUrl = URL.createObjectURL(imageSelected);
+  thumbnailOfImage(imageSelectedUrl)
+  });
+
   addPictureForm.addEventListener("submit", (event) => {
     // On écoute le questionnaire en cas de validation.
     event.preventDefault();
@@ -571,8 +578,23 @@ function addingImageformCondition(array, arrayRequest, arrayRemove) {
           imageUrl: "",
           categoryId: 0,
         };
-    }
+    }  
   });
+}
+
+/* FONCTION - Change l'icone en prévisualisation de l'image ! */
+function thumbnailOfImage(image) {
+  const iconeThumbnail = document.getElementById("iconeThumbnail");
+  const imageThumbnail = document.createElement("img");
+  const alreadyHereThumbnail = document.querySelector(".thumbnailImage");
+  iconeThumbnail.classList.add("hidden");
+  imageThumbnail.src = image;
+  imageThumbnail.classList.add("thumbnailImage");
+  if (alreadyHereThumbnail) {
+    alreadyHereThumbnail.parentNode.removeChild(alreadyHereThumbnail);
+  }
+  const imageSelection = document.getElementById("imageSelection");
+  imageSelection.parentNode.insertBefore(imageThumbnail, imageSelection);
 }
 
 /* FONCTION - Récupère les informations pour ajouter ensuite localement et dans l'API les images ! */
@@ -728,8 +750,6 @@ function applyingModification(arrayAdd, arrayRemove) {
 /* A FAIRE :
 
 - Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
-- Faire en sorte de pouvoir scroller dans le CSS dans le contenant des images quand il y en a trop... MAIS SEULEMENT DANS LA BOITE !!
-- Faire en sorte que les images ajoutées par l'user se dimentionnent comme les autres.
 - Faire en sorte de pouvoir supprimer les images ajoutées avant de publier les changements et que cela les retires donc des demandes d'ajouts d'image fetch.
     !! N'est pas possible ATM !! Régler le bug de doublon d'ouverture d'abord !!
 - Bug quand on veut supprimer dans la premiere modale APRES avoir ajouté une image, surement dû au bug de doublons d'ajout quand on ouvre et réouvre la deuxieme modale.
