@@ -32,7 +32,10 @@ function prerequisite() {
 function pageFeatures() {
   let arrayRequestToAdd = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour ajouter du contenu.
   let arrayRequestToDelete = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour supprimer du contenu.
-  mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete); // Ouverture de la modale principale pour interraction avec les features demandées.
+  let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
+  let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
+  console.log(mainModalButton)
+  mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, mainModalButton); // Ouverture de la modale principale pour interraction avec les features demandées.
   applyingModification(arrayRequestToAdd, arrayRequestToDelete);
 }
 
@@ -170,27 +173,30 @@ function mainModalClosingBehavior() {
 }
 
 /* FONCTION - L'action d'ouverture de la première modale ! */
-function mainModalOpening(arrayRequestAdd, arrayRequestDelete) {
-  let requestToDelete = []; // Toutes les requêtes qu'on va chercher à supprimer en cliquant sur "publier les changements", il va s'agir de requête fetch.
+function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton) {
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
   modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
   modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
   modalBox.setAttribute("aria-modal", "true");
   mainModalShowData(); // Vient afficher les images dynamiquement importée dans arrayData.
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
-  secondModalOpenListener(arrayRequestAdd, arrayRequestDelete);
-  trashCanListener(arrayRequestDelete);
+  console.log("Je vais appeler secondMOdalOpenListener de nouveau !", secondModalButton)
+  if(!secondModalButton) {
+    secondModalButton = document.querySelector("#addPictureModalOpener"); // Horrible mais il tard, je suis fatigué.
+  }
+  secondModalOpenListener(arrayRequestAdd, arrayRequestDelete, secondModalButton);
+  trashCanListener(arrayRequestDelete, arrayRequestAdd);
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
-function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete) {
-  let modalLink = document.querySelectorAll('a[href="#modalBoxContent"]'); // Notre lien avec ID #modalBoxContent, utilisation du ALL peut-être inapropriée ? Fonctionnel.
-  modalLink.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault(); // On ne veut pas un fonctionnement de l'ancrage.
-      mainModalOpening(arrayRequestAdd, arrayRequestDelete);
-      document.body.classList.add("modalOpened");
-    });
+function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, mainModalButton) {
+  console.log(secondModalButton)
+  removeModalEventListener(mainModalButton);  /* POURQUOI NE MARCHE-T'IL PAS ?? */
+  mainModalButton.addEventListener("click", (event) => {
+    event.preventDefault(); // Appel de preventDefault sur l'objet Event
+    mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton);
+    document.body.classList.add("modalOpened");
+    
   });
 }
 
@@ -258,18 +264,29 @@ function mainModalShowData() {
 }
 
 /* FONCTION - Gestion des trashCans et de leur capaciter à supprimer localement/stocker ce qui va l'être vraiment dans l'API plus tard ! */
-function trashCanListener(requestToDelete) {
-  // let requestToDelete = []; // Stockage des fetchs en attendant leur envoie.
+function trashCanListener(requestToDelete, arrayRequestAdd) {
+  console.log("Je suis rappelé !")
+  console.log(arrayRequestAdd)
+  console.log(requestToDelete)
+
+  // On vient récupérer l'ultime value ID d'arrayData.
+
   let trashCanId = []; // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
   let idToRemoveFromArrayData = []; // Venir supprimer les ID dans arrayData plus tard.
   let trashCans = document.querySelectorAll(".fa-trash-can"); // Selectionne nos trashcans.
   trashCans.forEach((trashCan, index) => {
     // Pour chaque élément trashcans :
+
+     /* PROBLEME ICI ! L'image ajoutée ne s'ajoute pas ici, elle ne reçoit pas d'ID, je ne peux donc pas les lier !! */
+     /* MAINTENANT ! ArrayData se voit ajouter des ID quand on ajoute les images en locales !! Je peux venir les récupérer 
+     ici et les transmettre à applyingModification avec un TROSIIEME argument secret qui lui permettra de supprimer des ajouts ce que j'ai supprimé en locale. */
+     console.log(arrayData)
+  
     trashCanId.push(arrayData[index].id); // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.
     let isTheTrashCanSelected = false; // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
     trashCan.addEventListener("click", () => {
       // Quand on clique sur une icone trashcan :
-      let idToDelete = trashCanId[index]; // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.
+      let idToDelete = trashCanId[index]; // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.     
       idToRemoveFromArrayData.push(idToDelete); // Pour éviter les doublons par la suite en cas de ré-ouverture du code voir L.430.
       isTheTrashCanSelected = !isTheTrashCanSelected; // Inverse l'état, superbe façon de faire, j'aurais faire ça bien avant déjà.
       if (isTheTrashCanSelected) {
@@ -327,6 +344,8 @@ function trashCanListener(requestToDelete) {
         idToDelete,
         "- Cela correspond au numéro de l'ID de l'objet importé."
       );
+
+      /* DOIT RESOUDRE LE SOUCIS DE L'UNDEFINED sur les images nouvellement ajoutées. Comme ça, on aura un point de repère pour les virer ensuite du tableau d'ajout de l'API !!! */
     });
   });
 
@@ -351,6 +370,7 @@ function trashCanListener(requestToDelete) {
 /* FONCTION - Procède à l'action de suppression locale conditionnée par trashCanListener en amont ! */
 function trashCanLocalApplying(array) {
   // Suppression LOCAL du contenu.
+  console.log(array)
   const galleryDelete = document.querySelector("#gallery_delete"); // Selection de tous nos éléments avec l'id.
   if (galleryDelete) {
     // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
@@ -398,7 +418,7 @@ function secondModalCloseContent() {
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
-function secondModalClosingBehavior(arrayRequestAdd, arrayrequestDelete) {
+function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondModalButton) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
@@ -408,7 +428,10 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayrequestDelete) {
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-    mainModalOpening(arrayRequestAdd, arrayrequestDelete);
+
+    /* POSE PROBLEME !!!! Ce n'est pas ce déroulé de fonction qui doit être executé !!! */
+    mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton);
+    
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -430,15 +453,22 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayrequestDelete) {
   });
 }
 
-function callBack() {
+function callBack() {         /* POURQUOI NE MARCHE-T'IL PAS ?? */
   console.log("La fonction callback a été appelée !");
+}
+
+/* FONCTION - Permet de retirer l'eventListener présent ! */
+function removeModalEventListener (button) {  /* POURQUOI NE MARCHE-T'IL PAS ?? */
+  button.removeEventListener("click", callBack);
+  console.log("Le fonction removeModalEventListener a été appelée !")
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
 /* DOIT EMPECHER CET EVENT LISTENER DE SE MULTIPLIER !! */
 /* PARITR DE LA POUR FAIRE UN CALLBACK !! */
-function secondModalOpenListener(arrayRequest, arrayRemove) {
-  let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
+
+function secondModalOpenListener(arrayRequest, arrayRemove, secondModalButton) {
+  removeModalEventListener(secondModalButton);    /* POURQUOI NE MARCHE-T'IL PAS ?? */
   secondModalButton.addEventListener("click", () => {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
     let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
@@ -448,11 +478,13 @@ function secondModalOpenListener(arrayRequest, arrayRemove) {
     mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
     // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
     // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-    secondModalClosingBehavior(arrayRequest);
+    secondModalClosingBehavior(arrayRequest, arrayRemove, secondModalButton);
     addingImageFormBehavior(arrayRequest, arrayRemove);
+    console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, j'ai pas remove l'eventListener) !");
   });
   console.log("Le clique d'ouverture de la première modale remonte jusqu'ici - Préparation de l'ouverture à la seconde modale, il y a un eventListener sur 'AJOUTER UNE PHOTO' à ce stade, déjà !(L.449).");
 }
+
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
 function addingImageFormBehavior(arrayRequest, arrayRemove) {
@@ -621,18 +653,28 @@ function addingImageFormNewImageToAdd(
   console.log(url); // URL LOCALE de l'image !!
   console.log(arrayToRequest); // Tableau pour stocker les requêtes fetchs ! TOUTES ! Vide à ce stade.
   console.log(imageValue); // Le files[0] à transmettre directement à l'API.
-
   addingImageLocale(array, title, category, url);
   addingImageApi(array, title, category, imageValue, arrayRequest, arrayRemove);
 }
 
 /* FONCTION - Ajoute les images ajoutées en LOCAL ! */
 function addingImageLocale(array, title, category, url) {
+
+  // Ajout d'un ID, il ne sera pas fourni à l'API mais contera seulement en locale pour une manipulation précise qui veut empêcher un bug d'ajout d'image supprimée.
+  let lastId = 0;
+  arrayData.forEach((item) => {
+    if (item.id > lastId) {
+      lastId = item.id;
+    }
+  });
+  let newId = lastId + 1;
   array = {
+    id: newId,
     title: title,
     category: category,
     imageUrl: url,
   };
+  
   console.log(array);
   arrayData.push(array);
   apiDataClear();
@@ -704,15 +746,24 @@ function sendAllPicturesToRemoveToApi(arrayRemove) {
   );
 }
 
+/* FONCTION - Retire les éventuels éléments à supprimer du tableau d'ajout pour éviter un bug ! */
+function removeRemovedFromAdded(arrayAdd, imageToRemove) {
+}
+
 /* FONCTION - L'eventListener de "publier les changements" ! */
 function applyingModification(arrayAdd, arrayRemove) {
   let urlAdding = "http://localhost:5678/api/works/";
-  console.log(arrayAdd); // Tout est good.
-  console.log(arrayRemove); // Tout est good.
+
   const changementApplyButton = document.getElementById("changementApply");
   changementApplyButton.addEventListener("click", () => {
+    removeRemovedFromAdded(arrayAdd, arrayRemove);
+    console.log("ARRAY DATA MESDAMES ET MESSIEURS : ", arrayData)
     console.log("Voici l'état d'arrayAdd : ", arrayAdd);
     console.log("Voici l'état d'arrayRemove : ", arrayRemove);
+
+    /* A CE STADE C'EST PAS MAL mais je supprime d'arrayData via la suppression locale, je dois donc, juste avant la suppression locale, envoyer les données des ID ici.
+    Sauf que non, en faisant ça, je vais envoyer des données genre "id 20" et si je RAJOUTE encore une image, ca sera également "id 20" car je l'aurais supprimé la précédente du local. 
+    Donc ca marche pas. Euh bah je sais pas... Je m'arrête là, échéc et mat. */
 
     console.log("Tiens, on clique sur 'publier les changements' !");
     switch (true) {
@@ -722,7 +773,7 @@ function applyingModification(arrayAdd, arrayRemove) {
           "Je détecte un changement, il y a un remove et c'est tout."
         );
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
-          location.reload();
+          // location.reload();
         });
         break;
       // Quand j'ajoute seulement.
@@ -731,7 +782,7 @@ function applyingModification(arrayAdd, arrayRemove) {
           "Je détecte un changement, il y a un ajout et c'est tout."
         );
         sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-          location.reload();
+          // location.reload();
         });
         break;
       // Quand je fais les deux.
@@ -739,7 +790,7 @@ function applyingModification(arrayAdd, arrayRemove) {
         console.log("Je détecte un changement, il y a un ajout et un remove.");
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
           sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-            location.reload();
+            // location.reload();
           });
         });
         break;
@@ -757,8 +808,12 @@ function applyingModification(arrayAdd, arrayRemove) {
 /* A FAIRE :
 
 - Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
-- Faire en sorte de pouvoir supprimer les images ajoutées avant de publier les changements et que cela les retires donc des demandes d'ajouts d'image fetch.
-    !! N'est pas possible ATM !! Régler le bug de doublon d'ouverture d'abord !!
-- Bug quand on veut supprimer dans la premiere modale APRES avoir ajouté une image, surement dû au bug de doublons d'ajout quand on ouvre et réouvre la deuxieme modale.
+--- !!! EN COURS !!! ---
+"POURQUOI NE MARCHE-T'IL PAS ??" a permit de marquer les lignes où le callBack a été éxécuté... Je ne comprends pas pourquoi il ne fonctionne pas, normalement tout est
+au vert mais pas moyen de supprimer le moindre eventListener... Je désespère. 
+--- !!! EN COURS !!! ---
 
+- Bug quand on veut supprimer tout de suite une image qu'on vient d'ajouter, 
+cela ne le supprime pas dans le tableau des choses à envoyer !! Ce qui fait qu'on upload une image qu'on vient de supprimer localement.
+"PROBLEME ICI" ! VOIR L.280.
 */
