@@ -431,6 +431,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayrequestDelete) {
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
+/* ICI LE BUG DE DOUBLON ! C'est cet eventListener qui doit être modifié ! */
 function secondModalOpenListener(arrayRequest, arrayRemove) {
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   secondModalButton.addEventListener("click", () => {
