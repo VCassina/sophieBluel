@@ -562,7 +562,7 @@ function addingImageformCondition(image, arrayRequest, arrayRemove) {
         console.log(newImageUrl);
 
         addingImageFormNewImageToAdd(
-          array,
+          image,
           addPictureTitle.value,
           addPictureCategory.value,
           newImageUrl,
