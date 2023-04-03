@@ -10,7 +10,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
 		rel="stylesheet">
 	<meta name="description" content="">
-	<script src="../assets/script.js" defer></script>
+	<script src="../assets/scriptEdit.js" defer></script>
 	<script src="https://kit.fontawesome.com/4925cffcbc.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="../assets/style.css">
 </head>
@@ -119,7 +119,7 @@
 				<h3 id="modalBox-title">Ajout photo</h3>
 				<div class="edit_addPicture">
 					<form id="imageSelection" action="#">
-						<i class="fa-solid fa-image"></i>
+						<i id="iconeThumbnail" class="fa-solid fa-image"></i>
 						<input type="file" id="addedImage" accept="image/*">
 						<button type="button" id="addPictureButton">+ Ajouter photo</button>
 						<!-- Ne renvoie pas directement à la séléction d'image, cela se fait en JS. Button va également déclancher un click sur l'input qui le précède. -->
