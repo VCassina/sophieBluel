@@ -32,6 +32,19 @@ function prerequisite() {
 function pageFeatures() {
   let arrayRequestToAdd = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour ajouter du contenu.
   let arrayRequestToDelete = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour supprimer du contenu.
+
+  /*
+ICI VALEUR QUI DETERMINE SI :
+
+  -  Il y a l'eventListener du bouton "ajouter une photo" de défini.
+      > mainModalOpeningListener dispose d'un eventListener (c'est même le but), quand le click se produit, il faut qu'il supprime cet eventListener (via la valeur ? Je vais voir ça).
+      > Ainsi, on arrive dans une situation où :
+        1 - L'eventListener d'ouverture de la PREMIERE modale est activé.
+        2 - Cela supprime tous les eventListener d'ajouter une photo SI J'EN TROUVE.
+        3 - Comme ça, je suis sûr qu'il n'y a qu'un à la fois.
+
+        Plus de doublons.
+  */
   mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete); // Ouverture de la modale principale pour interraction avec les features demandées.
   applyingModification(arrayRequestToAdd, arrayRequestToDelete);
 }
@@ -180,6 +193,7 @@ function mainModalOpening(arrayRequestAdd, arrayRequestDelete) {
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
   secondModalOpenListener(arrayRequestAdd, arrayRequestDelete);
   trashCanListener(arrayRequestDelete);
+  console.log("Le clique d'ouverture de la première modale remonte jusqu'ici (L.183).");
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
@@ -190,6 +204,7 @@ function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete) {
       event.preventDefault(); // On ne veut pas un fonctionnement de l'ancrage.
       mainModalOpening(arrayRequestAdd, arrayRequestDelete);
       document.body.classList.add("modalOpened");
+      console.log("Le clique d'ouverture de la première modale remonte jusqu'ici (L.194).");
     });
   });
 }
@@ -431,7 +446,6 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayrequestDelete) {
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-/* ICI LE BUG DE DOUBLON ! C'est cet eventListener qui doit être modifié ! */
 function secondModalOpenListener(arrayRequest, arrayRemove) {
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   secondModalButton.addEventListener("click", () => {
@@ -446,6 +460,7 @@ function secondModalOpenListener(arrayRequest, arrayRemove) {
     secondModalClosingBehavior(arrayRequest);
     addingImageFormBehavior(arrayRequest, arrayRemove);
   });
+  console.log("Le clique d'ouverture de la première modale remonte jusqu'ici - Préparation de l'ouverture à la seconde modale, il y a un eventListener sur 'AJOUTER UNE PHOTO' à ce stade, déjà !(L.449).");
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
