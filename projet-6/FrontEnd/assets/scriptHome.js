@@ -3,20 +3,20 @@
 /* ___________________________________________________________ */
 
 /* ACTIONS ! */
+/* ACTIONS ! *//* Comportement général du site. */
 /* ACTIONS ! */
-/* ACTIONS ! */
 
-let arrayData;                      // Mise en place des data de l'API dans un tableau (l'asynchrone rend difficile la mise en fonction de la variable).
-getData().then(result => {          // Une fois que la function aura été executée, prend sa valeur de retour.
-    arrayData = result;             // Et donne la au tableau arrayData (le JSON).
-    dataShow();                     // On appelle dataShow pour montrer ce que l'on a importé.
-})
-
-
+main();
 
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 /* FONCTIONS ! */
+
+/* FONCTION - Comportement général du site. */
+async function main() {
+    const arrayData = await getData();
+    dataShow(arrayData);
+}
 
 /* FONCTION - Récuparation des données de l'API ! */
 async function getData() {
@@ -68,7 +68,7 @@ function filterSelection(choose) {                                          // P
 }
 
 /* FONCTION - Affiche les éléments dynamiquement. */
-function dataShow() {
+function dataShow(arrayData) {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
         let galleryTargeting = document.querySelector(".gallery");
         if (galleryTargeting != null) {
