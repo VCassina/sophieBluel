@@ -466,8 +466,7 @@ function removeModalEventListener (button) {  /* POURQUOI NE MARCHE-T'IL PAS ?? 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
 /* DOIT EMPECHER CET EVENT LISTENER DE SE MULTIPLIER !! */
 /* PARITR DE LA POUR FAIRE UN CALLBACK !! */
-
-function secondModalOpenListener(arrayRequest, arrayRemove, secondModalButton) {
+function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton) {
   removeModalEventListener(secondModalButton);    /* POURQUOI NE MARCHE-T'IL PAS ?? */
   secondModalButton.addEventListener("click", () => {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
@@ -478,13 +477,12 @@ function secondModalOpenListener(arrayRequest, arrayRemove, secondModalButton) {
     mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
     // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
     // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-    secondModalClosingBehavior(arrayRequest, arrayRemove, secondModalButton);
-    addingImageFormBehavior(arrayRequest, arrayRemove);
+    secondModalClosingBehavior(arrayRequestAdd, arrayRemove, secondModalButton);
+    addingImageFormBehavior(arrayRequestAdd, arrayRemove);
     console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, j'ai pas remove l'eventListener) !");
   });
   console.log("Le clique d'ouverture de la première modale remonte jusqu'ici - Préparation de l'ouverture à la seconde modale, il y a un eventListener sur 'AJOUTER UNE PHOTO' à ce stade, déjà !(L.449).");
 }
-
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
 function addingImageFormBehavior(arrayRequest, arrayRemove) {
@@ -497,6 +495,7 @@ function addingImageFormBehavior(arrayRequest, arrayRemove) {
   // Tableau au format de ce que je vais devoir envoyer en fetch.
   let addingPictureForm = {
     // Pourquoi on "const" pose problème ?
+    id: "", // ON VA VENIR LE RETIRER EN FIN DE CODE ! Juste avant l'envoie à l'API car l'API gère cette partie, c'est juste pour du local, avoir un ID en local.
     title: "",
     imageUrl: "",
     categoryId: 0, // Notre parfaite Sophie Bluel.
@@ -610,9 +609,9 @@ function addingImageformCondition(image, arrayRequest, arrayRemove) {
           arrayRequest,
           arrayRemove
         );
-
         // Réinitialisation des données pour pouvoir en ajouter une nouvelle. Une DIFFERENTE notamment.
-        array = {
+        image = {
+          id: "",
           title: "",
           imageUrl: "",
           categoryId: 0,
@@ -651,30 +650,33 @@ function addingImageFormNewImageToAdd(
   console.log(title); // Titre, commun au local et à l'API.
   console.log(category); // Categorie, //
   console.log(url); // URL LOCALE de l'image !!
-  console.log(arrayToRequest); // Tableau pour stocker les requêtes fetchs ! TOUTES ! Vide à ce stade.
+  console.log(arrayRequest); // Tableau pour stocker les requêtes fetchs ! TOUTES ! Notre tableau à qui il faut rajouter les ID locaux ! A ce stade, il ne les a pas encore !
   console.log(imageValue); // Le files[0] à transmettre directement à l'API.
-  addingImageLocale(array, title, category, url);
-  addingImageApi(array, title, category, imageValue, arrayRequest, arrayRemove);
+
+    // Ajout d'un ID, il ne sera pas fourni à l'API mais contera seulement en locale pour une manipulation précise qui veut empêcher un bug d'ajout d'image supprimée.
+    let lastId = 0;
+    arrayData.forEach((item) => {
+      if (item.id > lastId) {
+        lastId = item.id;
+      }
+    });
+    let newId = lastId + 1;
+
+
+
+  addingImageLocale(array, title, category, url, newId);
+  addingImageApi(array, title, category, imageValue, arrayRequest, newId);
 }
 
 /* FONCTION - Ajoute les images ajoutées en LOCAL ! */
-function addingImageLocale(array, title, category, url) {
-
-  // Ajout d'un ID, il ne sera pas fourni à l'API mais contera seulement en locale pour une manipulation précise qui veut empêcher un bug d'ajout d'image supprimée.
-  let lastId = 0;
-  arrayData.forEach((item) => {
-    if (item.id > lastId) {
-      lastId = item.id;
-    }
-  });
-  let newId = lastId + 1;
+function addingImageLocale(array, title, category, url, id) {
   array = {
-    id: newId,
+    id: id,     /* Fonctionne jusqu'ici ! */
     title: title,
     category: category,
     imageUrl: url,
   };
-  
+
   console.log(array);
   arrayData.push(array);
   apiDataClear();
@@ -682,39 +684,30 @@ function addingImageLocale(array, title, category, url) {
 }
 
 /* FONCTION - Ajoute les images ajoutées dans l'API ! Début de la construction de la requête fetch. ! */
-function addingImageApi(array, title, category, imageValue, arrayRequest) {
+function addingImageApi(array, title, category, imageValue, arrayRequest, id) {
+  // Notre requête (à l'unité) !
   array = {
+    id: id,
     title: title,
     category: parseInt(category),
     imageUrl: imageValue,
   };
+  // On stocke l'image, une par une, toujours car FormData.
   arrayRequest.push(array);
+  
   let url = "http://localhost:5678/api/works/";
   let allImageToAdd = [];
   for (let i = 0; i <= arrayRequest.length - 1; i++) {
+    // L'ID est retiré à cet endroit ! Car on ne l'append pas dans la requête fetch. Il restera local.
     const imageToSend = new FormData();
     const imageRequest = arrayRequest[i];
     imageToSend.append("title", imageRequest.title);
     imageToSend.append("category", imageRequest.category);
     imageToSend.append("image", imageRequest.imageUrl);
-    addingImageStorage(imageToSend, url, allImageToAdd);
+    // addingImageStorage(imageToSend, url, allImageToAdd);
   }
+  // Reset entre chaque ajout d'image pour éviter d'en ajouter 1 puis 1 et 2 puis 1 et 2 et 3, etc.
   arrayRequest = [];
-}
-
-/* FONCTION - Ajoute les images ajoutées dans l'API ! Stockage des requêtes fetchs. */
-function addingImageStorage(image, apiUrl, apiAllRequest) {
-  apiAllRequest.push({
-    url: apiUrl,
-    options: {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + getTokenCookie("loginToken"),
-      },
-      body: image,
-    },
-  });
-  arrayRequest = apiAllRequest;
 }
 
 /* FONCTION - Envoie des requêtes fetchs d'AJOUT ! */
@@ -747,7 +740,21 @@ function sendAllPicturesToRemoveToApi(arrayRemove) {
 }
 
 /* FONCTION - Retire les éventuels éléments à supprimer du tableau d'ajout pour éviter un bug ! */
-function removeRemovedFromAdded(arrayAdd, imageToRemove) {
+function removeRemovedFromAdded(arrayAdd, arrayRemove) {
+  arrayRemove.forEach((removeObject) => {                 // Pour chaque objet de arrayRemove.
+    const idToRemove = removeObject.url.split('/').pop(); // On récupérer l'ID via la commande spéciale de manipulation d'une URL ! Miracle ! Pop sépare les composants de l'URL pour les analyser.
+    const index = arrayAdd.findIndex((addItem) => addItem.id === Number(idToRemove)); // Chercher l'index de l'élément correspondant dans arrayAdd pour chacun de ses objets, 
+    // un peu comme au dessus mais avec l'index, on isole ainsi (aprés le =>) les éléments qui ont comme .id (donc attribut id, tout simplement) parfaitement égal au number sous int d'idToRemove !
+    // Donc, index = l'ID arrayAdd de la correspondance avec l'objet ID que l'on cherche à retrouver de arrayRemove dans arrayAdd !
+    // Puis on va appliquer notre condition, si ses éléments sont trouvés, alors, toujours dans la "boucle", on vient les retirer d'arrayAdd.
+    if (index !== -1) {
+      arrayAdd.splice(index, 1);
+    }
+  });
+  
+  console.log("Voici, après scan dans removeRemovedFromAdded() les deux tableaux, s'il y a des ID correspondant, ils sont CENSES avoir été retiré d'arrayAdd pour ne pas être ajouté MALGRE la supression !!")
+  console.log(arrayAdd);
+  console.log(arrayRemove);
 }
 
 /* FONCTION - L'eventListener de "publier les changements" ! */
@@ -756,16 +763,11 @@ function applyingModification(arrayAdd, arrayRemove) {
 
   const changementApplyButton = document.getElementById("changementApply");
   changementApplyButton.addEventListener("click", () => {
-    removeRemovedFromAdded(arrayAdd, arrayRemove);
+
     console.log("ARRAY DATA MESDAMES ET MESSIEURS : ", arrayData)
     console.log("Voici l'état d'arrayAdd : ", arrayAdd);
     console.log("Voici l'état d'arrayRemove : ", arrayRemove);
-
-    /* A CE STADE C'EST PAS MAL mais je supprime d'arrayData via la suppression locale, je dois donc, juste avant la suppression locale, envoyer les données des ID ici.
-    Sauf que non, en faisant ça, je vais envoyer des données genre "id 20" et si je RAJOUTE encore une image, ca sera également "id 20" car je l'aurais supprimé la précédente du local. 
-    Donc ca marche pas. Euh bah je sais pas... Je m'arrête là, échéc et mat. */
-
-    console.log("Tiens, on clique sur 'publier les changements' !");
+    removeRemovedFromAdded(arrayAdd, arrayRemove);
     switch (true) {
       // Quand je supprime seulement.
       case arrayRemove.length > 0 && !arrayAdd.length > 0:
@@ -813,7 +815,6 @@ function applyingModification(arrayAdd, arrayRemove) {
 au vert mais pas moyen de supprimer le moindre eventListener... Je désespère. 
 --- !!! EN COURS !!! ---
 
-- Bug quand on veut supprimer tout de suite une image qu'on vient d'ajouter, 
-cela ne le supprime pas dans le tableau des choses à envoyer !! Ce qui fait qu'on upload une image qu'on vient de supprimer localement.
-"PROBLEME ICI" ! VOIR L.280.
+> 04/04/2023 ! Débug réussi des imgaes qui s'ajoutaient à l'API malgré une supression locale (gros bug donc j'en suis fier).
+
 */
