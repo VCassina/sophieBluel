@@ -6,11 +6,7 @@
 /* ACTIONS ! */
 /* ACTIONS ! */
 
-console.log("The script starts.");
-
-loginFormBehavior();
-
-console.log("The script just ended.");
+main();
 
 /* FONCTIONS ! */
 /* FONCTIONS ! */
@@ -64,7 +60,7 @@ async function postData(url = "", data = {}) {
 }
 
 /* FONCTION - Comportement du formulaire de connexion ! */
-function loginFormBehavior() {
+function main() {
   let form = document.getElementById("login_form"); // Selection de notre formulaire.
   if (form != null) {
     // Si l'ID "form" correspond à qq chose, alors :
