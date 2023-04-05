@@ -17,7 +17,6 @@ pageFeatures();
 
 
 
-
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 /* FONCTIONS ! */
@@ -196,7 +195,6 @@ function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondMod
     event.preventDefault(); // Appel de preventDefault sur l'objet Event
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton);
     document.body.classList.add("modalOpened");
-    
   });
 }
 
@@ -815,6 +813,6 @@ function applyingModification(arrayAdd, arrayRemove) {
 au vert mais pas moyen de supprimer le moindre eventListener... Je désespère. 
 --- !!! EN COURS !!! ---
 
-> 04/04/2023 ! Débug réussi des imgaes qui s'ajoutaient à l'API malgré une supression locale (gros bug donc j'en suis fier).
+-> AVIS DE THOMAS > TOUT METTRE DANS une fonction "main" AVANT d'essayer de procéder au callback.
 
 */
