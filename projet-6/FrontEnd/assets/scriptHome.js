@@ -3,7 +3,7 @@
 /* ___________________________________________________________ */
 
 /* ACTIONS ! */
-/* ACTIONS ! *//* Comportement général du site. */
+/* ACTIONS ! */
 /* ACTIONS ! */
 
 main();
