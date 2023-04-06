@@ -190,15 +190,19 @@ function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton
   console.log("Je vais appeler secondMOdalOpenListener de nouveau !", secondModalButton)
   if(!secondModalButton) {
     secondModalButton = document.querySelector("#addPictureModalOpener"); // Horrible mais il tard, je suis fatigué.
+    // Il faudrait idéalement repenser le code via les fonctions précédentes pour que secondModalButton ne se supprime pas après ajout...
   }
   secondModalOpenListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
   trashCanListener(arrayRequestDelete, arrayRequestAdd, arrayData);
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
+/* DOUBLON PERSISTANT !! */
 function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, mainModalButton, arrayData) {
   console.log(secondModalButton)
-  removeModalEventListener(mainModalButton);  /* POURQUOI NE MARCHE-T'IL PAS ?? */
+  const removeListener = () => {
+    removeModalEventListener(mainModalButton, "click", removeListener);
+  };
   mainModalButton.addEventListener("click", (event) => {
     event.preventDefault(); // Appel de preventDefault sur l'objet Event
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
@@ -416,7 +420,7 @@ function trashCanLocalApplying(array, arrayData) {
 }
 
 /* FONCTION - Ferme contenu de la seconde principal ! */
-function secondModalCloseContent() {
+function secondModalCloseContent(secondModalButton) {
   let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
   secondModalBox.classList.add("modalBox-hidden"); // On a rien vu, on remet comme c'était avant l'ouverture.
   secondModalBox.setAttribute("aria-hidden", "true"); //
@@ -434,7 +438,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   let secondModalBackButton = document.querySelector(".fa-arrow-left"); // On identifie la croix.
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
-    secondModalCloseContent();
+    secondModalCloseContent(secondModalButton);
 
     /* POSE PROBLEME !!!! Ce n'est pas ce déroulé de fonction qui doit être executé !!! */
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
@@ -460,21 +464,26 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   });
 }
 
-function callBack() {         /* POURQUOI NE MARCHE-T'IL PAS ?? */
-  console.log("La fonction callback a été appelée !");
-}
-
 /* FONCTION - Permet de retirer l'eventListener présent ! */
-function removeModalEventListener (button) {  /* POURQUOI NE MARCHE-T'IL PAS ?? */
-  button.removeEventListener("click", callBack);
+/* DOUBLON PERSISTANT !! */
+function removeModalEventListener (button, event, listener) { 
+  button.removeEventListener(event, listener);                  
+  // L'evenement (click), listener (la fonction cible où l'eventListener doit dégager) et bien sûr, button, le bouton concerné par l'eventListener.
   console.log("Le fonction removeModalEventListener a été appelée !")
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
 /* DOIT EMPECHER CET EVENT LISTENER DE SE MULTIPLIER !! */
 /* PARITR DE LA POUR FAIRE UN CALLBACK !! */
+/* DOUBLON PERSISTANT !! */
 function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton, arrayData) {
-  removeModalEventListener(secondModalButton);    /* POURQUOI NE MARCHE-T'IL PAS ?? */
+
+
+  // Choix de placer le remove ici car, comme cela, s'il y en a un AVANT, il sera supprimé et chaque fois qu'on en veut un nouveau, cela supprimera celui d'avant s'il y en a un.
+  const removeListener = () => {              
+    removeModalEventListener(secondModalButton, "click", removeListener);
+  };      /* ICI NE MARCHE PAS !! */
+
   secondModalButton.addEventListener("click", () => {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
     let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
@@ -486,7 +495,7 @@ function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton
     // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
     secondModalClosingBehavior(arrayRequestAdd, arrayRemove, secondModalButton, arrayData);
     addingImageFormBehavior(arrayRequestAdd, arrayRemove, arrayData);
-    console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, j'ai pas remove l'eventListener) !");
+    console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !");
   });
   console.log("Le clique d'ouverture de la première modale remonte jusqu'ici - Préparation de l'ouverture à la seconde modale, il y a un eventListener sur 'AJOUTER UNE PHOTO' à ce stade, déjà !(L.449).");
 }
@@ -817,11 +826,21 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
 /* A FAIRE :
 
 - Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
---- !!! EN COURS !!! ---
-"POURQUOI NE MARCHE-T'IL PAS ??" a permit de marquer les lignes où le callBack a été éxécuté... Je ne comprends pas pourquoi il ne fonctionne pas, normalement tout est
-au vert mais pas moyen de supprimer le moindre eventListener... Je désespère. 
---- !!! EN COURS !!! ---
+
+-- HISTORIQUE ! --
+--              --
+
+-- NEW ! --
+--       --
 
 -> AVIS DE THOMAS > TOUT METTRE DANS une fonction "main" AVANT d'essayer de procéder au callback.
+-> Car eventListener pas bon...
+
+C'est fait.
+
+Callback revu ! 06/04/2023 > Pour moi bon mais n'a pas d'effet ou bien le problème ne vient pas de là.
+REMARQUE : Quand on clique sur "revenir à la première modale" via la flèche, les addEventListener ne s'additionnent plus, ils se multiplient !!
+"removeModalEventListener" !
+"DOUBLON PERSISTANT !!" !
 
 */
