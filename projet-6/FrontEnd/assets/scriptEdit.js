@@ -41,7 +41,17 @@ function pageFeatures(arrayData) {
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
   console.log(mainModalButton)
-  mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, mainModalButton, arrayData); // Ouverture de la modale principale pour interraction avec les features demandées.
+  
+  mainModalButton.addEventListener("click", (event) => {
+    event.preventDefault(); // Appel de preventDefault sur l'objet Event
+    mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, arrayData); // Ouverture de la modale principale pour interraction avec les features demandées.
+  });
+
+  secondModalButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    secondModalOpenListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, arrayData); // Ouverture de la deuxieme modale.
+  })
+  
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
 }
 
@@ -188,27 +198,19 @@ function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton
   mainModalShowData(arrayData); // Vient afficher les images dynamiquement importée dans arrayData.
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
   console.log("Je vais appeler secondMOdalOpenListener de nouveau !", secondModalButton)
-  if(!secondModalButton) {
-    secondModalButton = document.querySelector("#addPictureModalOpener"); // Horrible mais il tard, je suis fatigué.
-    // Il faudrait idéalement repenser le code via les fonctions précédentes pour que secondModalButton ne se supprime pas après ajout...
-  }
-  secondModalOpenListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
+  /* Variable du boutton valider image. */ 
+  /* eventListener. */
+  /* Qui proc la fonction. */
   trashCanListener(arrayRequestDelete, arrayRequestAdd, arrayData);
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
 /* DOUBLON PERSISTANT !! */
-function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, mainModalButton, arrayData) {
+function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
   console.log(secondModalButton)
-  const removeListener = () => {
-    removeModalEventListener(mainModalButton, "click", removeListener);
-  };
-  mainModalButton.addEventListener("click", (event) => {
-    event.preventDefault(); // Appel de preventDefault sur l'objet Event
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
     document.body.classList.add("modalOpened");
-  });
-}
+  };
 
 /* FONCTION - Affichage dynamique de la modale principale ! */
 function mainModalShowData(arrayData) {
@@ -420,7 +422,7 @@ function trashCanLocalApplying(array, arrayData) {
 }
 
 /* FONCTION - Ferme contenu de la seconde principal ! */
-function secondModalCloseContent(secondModalButton) {
+function secondModalCloseContent() {
   let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
   secondModalBox.classList.add("modalBox-hidden"); // On a rien vu, on remet comme c'était avant l'ouverture.
   secondModalBox.setAttribute("aria-hidden", "true"); //
@@ -438,7 +440,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   let secondModalBackButton = document.querySelector(".fa-arrow-left"); // On identifie la croix.
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
-    secondModalCloseContent(secondModalButton);
+    secondModalCloseContent();
 
     /* POSE PROBLEME !!!! Ce n'est pas ce déroulé de fonction qui doit être executé !!! */
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
@@ -464,6 +466,8 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   });
 }
 
+/* PARTIE CALLBACK !! */
+
 /* FONCTION - Permet de retirer l'eventListener présent ! */
 /* DOUBLON PERSISTANT !! */
 function removeModalEventListener (button, event, listener) { 
@@ -472,19 +476,18 @@ function removeModalEventListener (button, event, listener) {
   console.log("Le fonction removeModalEventListener a été appelée !")
 }
 
+// Choix de placer le remove ici car, comme cela, s'il y en a un AVANT, il sera supprimé et chaque fois qu'on en veut un nouveau, cela supprimera celui d'avant s'il y en a un.
+// Fonction callback qui "lie" les différents boutons à remove.
+function removeListener(button) {              
+    removeModalEventListener(button, "click", removeListener);
+}
+
+/* !PARTIE CALLBACK !! */
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
 /* DOIT EMPECHER CET EVENT LISTENER DE SE MULTIPLIER !! */
 /* PARITR DE LA POUR FAIRE UN CALLBACK !! */
 /* DOUBLON PERSISTANT !! */
 function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton, arrayData) {
-
-
-  // Choix de placer le remove ici car, comme cela, s'il y en a un AVANT, il sera supprimé et chaque fois qu'on en veut un nouveau, cela supprimera celui d'avant s'il y en a un.
-  const removeListener = () => {              
-    removeModalEventListener(secondModalButton, "click", removeListener);
-  };      /* ICI NE MARCHE PAS !! */
-
-  secondModalButton.addEventListener("click", () => {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
     let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
     secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
@@ -496,8 +499,6 @@ function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton
     secondModalClosingBehavior(arrayRequestAdd, arrayRemove, secondModalButton, arrayData);
     addingImageFormBehavior(arrayRequestAdd, arrayRemove, arrayData);
     console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !");
-  });
-  console.log("Le clique d'ouverture de la première modale remonte jusqu'ici - Préparation de l'ouverture à la seconde modale, il y a un eventListener sur 'AJOUTER UNE PHOTO' à ce stade, déjà !(L.449).");
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
