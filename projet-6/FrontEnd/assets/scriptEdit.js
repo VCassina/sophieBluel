@@ -51,7 +51,8 @@ function pageFeatures(arrayData) {
     event.preventDefault();
     secondModalOpenListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, arrayData); // Ouverture de la deuxieme modale.
   })
-  
+
+  addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
 }
 
@@ -190,22 +191,16 @@ function mainModalClosingBehavior() {
 
 /* FONCTION - L'action d'ouverture de la première modale ! */
 function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
-  console.log("LM176 !!! >", arrayData)
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
   modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
   modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
   modalBox.setAttribute("aria-modal", "true");
   mainModalShowData(arrayData); // Vient afficher les images dynamiquement importée dans arrayData.
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
-  console.log("Je vais appeler secondMOdalOpenListener de nouveau !", secondModalButton)
-  /* Variable du boutton valider image. */ 
-  /* eventListener. */
-  /* Qui proc la fonction. */
   trashCanListener(arrayRequestDelete, arrayRequestAdd, arrayData);
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
-/* DOUBLON PERSISTANT !! */
 function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
   console.log(secondModalButton)
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
@@ -441,10 +436,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-
-    /* POSE PROBLEME !!!! Ce n'est pas ce déroulé de fonction qui doit être executé !!! */
     mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
-    
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -466,27 +458,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   });
 }
 
-/* PARTIE CALLBACK !! */
-
-/* FONCTION - Permet de retirer l'eventListener présent ! */
-/* DOUBLON PERSISTANT !! */
-function removeModalEventListener (button, event, listener) { 
-  button.removeEventListener(event, listener);                  
-  // L'evenement (click), listener (la fonction cible où l'eventListener doit dégager) et bien sûr, button, le bouton concerné par l'eventListener.
-  console.log("Le fonction removeModalEventListener a été appelée !")
-}
-
-// Choix de placer le remove ici car, comme cela, s'il y en a un AVANT, il sera supprimé et chaque fois qu'on en veut un nouveau, cela supprimera celui d'avant s'il y en a un.
-// Fonction callback qui "lie" les différents boutons à remove.
-function removeListener(button) {              
-    removeModalEventListener(button, "click", removeListener);
-}
-
-/* !PARTIE CALLBACK !! */
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-/* DOIT EMPECHER CET EVENT LISTENER DE SE MULTIPLIER !! */
-/* PARITR DE LA POUR FAIRE UN CALLBACK !! */
-/* DOUBLON PERSISTANT !! */
 function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton, arrayData) {
     // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
     let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
@@ -497,12 +469,11 @@ function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton
     // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
     // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
     secondModalClosingBehavior(arrayRequestAdd, arrayRemove, secondModalButton, arrayData);
-    addingImageFormBehavior(arrayRequestAdd, arrayRemove, arrayData);
     console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !");
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
-function addingImageFormBehavior(arrayRequest, arrayRemove, arrayData) {
+function addingImageFormBehavior(arrayRequest, arrayData) {
   let inputImage = document.getElementById("addedImage");
   addPictureButton.addEventListener("click", () => {
     // En cas de click sur le pictureButton (+ Ajouter photo).
@@ -518,123 +489,121 @@ function addingImageFormBehavior(arrayRequest, arrayRemove, arrayData) {
     categoryId: 0, // Notre parfaite Sophie Bluel.
   };
 
-  // Tableau pour stocker mes "sessions" d'addingPictureForm, me permettant de stocker les infos des images que je vais ensuite envoyer en fetch.
-  // Et donc stocker mes "instances" d'addPictureForm.
+  let validateButton = document.querySelector("#pictureAddConformation");
+  validateButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    addingImageformCondition(addingPictureForm, arrayRequest, arrayData);
+  });
 
-  addingImageformCondition(addingPictureForm.imageUrl, arrayRequest, arrayRemove, arrayData);
 }
 
 /* FONCTION - Conditionne le fonctionnement du formulaire d'ajout d'image ! */
-function addingImageformCondition(image, arrayRequest, arrayRemove, arrayData) {
-  let requestToAdd = []; // Stockage des fetchs en attendant leur envoie.
-  let addPictureForm = document.querySelector("#pictureAdd"); // Le formulaire (pour écouter sa validation).
-  let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd"); // La valeur titre.
-  let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd"); // La valeur id (catégorie).
+function addingImageformCondition(image, arrayRequest, arrayData) {
+  let addPictureForm = document.querySelector("#pictureAdd");
+  let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd");
+  let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");
   let imageSize = 0;
 
-  // EN CAS DE CHANGEMENT d'état de l'input (quand une image est choisi par l'utilisateur), une valeur est immédiatement attribuée à l'image.
   const inputedImage = document.getElementById('addedImage');
   inputedImage.addEventListener("change", (event) => {
     const imageSelected = event.target.files[0];
     const imageSelectedUrl = URL.createObjectURL(imageSelected);
-  thumbnailOfImage(imageSelectedUrl)
+    thumbnailOfImage(imageSelectedUrl);
   });
 
-  addPictureForm.addEventListener("submit", (event) => {
-    // On écoute le questionnaire en cas de validation.
-    event.preventDefault();
-    let addPictureSelectedByUserImage = document.querySelector("#addedImage");
-    let errorInformationModale = document.querySelector(".errorSecondModale"); // Si un message d'erreur est trouvé, est déjà là.
-    if (errorInformationModale) {
-      errorInformationModale.remove(); // Il est supprimé. Plus simple que pour login.
-    }
-    if (addPictureSelectedByUserImage.value) {
-      imageSize = addPictureSelectedByUserImage.files[0].size;
-      // On stock ENSUITE la propriété du poids de notre image récupéré dans le formulaire à part, sinon ça fait n'importe quoi au niveau de la value du poids.
-      // Et on le modifie uniquement s'il y a une valeur dans addPictureSelectedByUserImage.
-    }
-    switch (
-      true // Conditionnement qui se lance de base.
-    ) {
-      case !addPictureTitle.value ||
-        !addPictureCategory.value ||
-        !addPictureSelectedByUserImage.value: // Dans le cas où il manque un champs.
-        let link = document.querySelector("#pictureAddConformation"); // Affichage du message d'erreur, repris sur le login.
-        let p = document.createElement("p");
-        p.setAttribute("class", "errorSecondModale");
-        let textError = document.createTextNode(
-          "Veuillez remplir tous les champs."
-        );
-        p.appendChild(textError);
-        link.parentNode.insertBefore(p, link);
-        break;
-      case addPictureTitle.value.length > 180: // Nombre de charactère max pour le titre (arbitraire ici).
-        let link2 = document.querySelector("#pictureAddConformation"); // Affichage du message d'erreur, repris sur le login.
-        let p2 = document.createElement("p");
-        p2.setAttribute("class", "errorSecondModale");
-        let textError2 = document.createTextNode(
-          "Le titre est trop long (180 chars max)."
-        );
-        p2.appendChild(textError2);
-        link2.parentNode.insertBefore(p2, link2);
-        break;
-      case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value): // ASCII art uniquement - StackOverflow.
-        let link3 = document.querySelector("#pictureAddConformation"); // Affichage du message d'erreur, repris sur le login.
-        let p3 = document.createElement("p");
-        p3.setAttribute("class", "errorSecondModale");
-        let textError3 = document.createTextNode(
-          "Un ou plusieurs charactères spéciaux posent problèmes."
-        );
-        p3.appendChild(textError3);
-        link3.parentNode.insertBefore(p3, link3);
-        break;
-      case !/^[A-Z]/.test(addPictureTitle.value): // Maj uniquement - StackOverflow.
-        let link4 = document.querySelector("#pictureAddConformation"); // Affichage du message d'erreur, repris sur le login.
-        let p4 = document.createElement("p");
-        p4.setAttribute("class", "errorSecondModale");
-        let textError4 = document.createTextNode(
-          "Veuillez commencez votre titre par une lettre majuscule."
-        );
-        p4.appendChild(textError4);
-        link4.parentNode.insertBefore(p4, link4);
-        break;
-      case imageSize >= 4 * 1024 * 1024: // Adapté depuis le 20Mo de StackOverflow, calcule binaire dérrière, j'imagine ?
-        console.log(addPictureSelectedByUserImage.size);
-        let link5 = document.querySelector("#pictureAddConformation");
-        let p5 = document.createElement("p");
-        p5.setAttribute("class", "errorSecondModale");
-        let textError5 = document.createTextNode(
-          "La taille de l'image doit être inférieure à 4Mo."
-        );
-        p5.appendChild(textError5);
-        link5.parentNode.insertBefore(p5, link5);
-        break;
-      default:
-        console.log("L'image peut correctement s'ajouter sans soucis !");
-        let newImageUrl = URL.createObjectURL(
-          addPictureSelectedByUserImage.files[0]
-        );
-        console.log(newImageUrl);
+    console.log("Je suis bien appelée");
+      let addPictureSelectedByUserImage = document.querySelector("#addedImage");
+      let errorInformationModale = document.querySelector(".errorSecondModale");
+      if (errorInformationModale) {
+        errorInformationModale.remove();
+      }
+      if (addPictureSelectedByUserImage.value) {
+        imageSize = addPictureSelectedByUserImage.files[0].size;
+      }
+      switch (true) {
+        case !addPictureTitle.value ||
+          !addPictureCategory.value ||
+          !addPictureSelectedByUserImage.value:
+          let link = document.querySelector("#pictureAddConformation");
+          let p = document.createElement("p");
+          p.setAttribute("class", "errorSecondModale");
+          let textError = document.createTextNode(
+            "Veuillez remplir tous les champs."
+          );
+          p.appendChild(textError);
+          link.parentNode.insertBefore(p, link);
+          break;
+        case addPictureTitle.value.length > 180:
+          let link2 = document.querySelector("#pictureAddConformation");
+          let p2 = document.createElement("p");
+          p2.setAttribute("class", "errorSecondModale");
+          let textError2 = document.createTextNode(
+            "Le titre est trop long (180 chars max)."
+          );
+          p2.appendChild(textError2);
+          link2.parentNode.insertBefore(p2, link2);
+          break;
+        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):
+          let link3 = document.querySelector("#pictureAddConformation");
+          let p3 = document.createElement("p");
+          p3.setAttribute("class", "errorSecondModale");
+          let textError3 = document.createTextNode(
+            "Un ou plusieurs charactères spéciaux posent problèmes."
+          );
+          p3.appendChild(textError3);
+          link3.parentNode.insertBefore(p3, link3);
+          break;
+        case !/^[A-Z]/.test(addPictureTitle.value):
+          let link4 = document.querySelector("#pictureAddConformation");
+          let p4 = document.createElement("p");
+          p4.setAttribute("class", "errorSecondModale");
+          let textError4 = document.createTextNode(
+            "Veuillez commencez votre titre par une lettre majuscule."
+          );
+          p4.appendChild(textError4);
+          link4.parentNode.insertBefore(p4, link4);
+          break;
+        case imageSize >= 4 * 1024 * 1024:
+          console.log(addPictureSelectedByUserImage.size);
+          let link5 = document.querySelector("#pictureAddConformation");
+          let p5 = document.createElement("p");
+          p5.setAttribute("class", "errorSecondModale");
+          let textError5 = document.createTextNode(
+            "La taille de l'image doit être inférieure à 4Mo."
+          );
+          p5.appendChild(textError5);
+          link5.parentNode.insertBefore(p5, link5);
+          break;
+        default:
+          console.log("L'image peut correctement s'ajouter sans soucis !");
+          let newImageUrl = URL.createObjectURL(
+            addPictureSelectedByUserImage.files[0]
+          );
+          console.log(newImageUrl);
+  
+          addingImageFormNewImageToAdd(
+            image,
+            addPictureTitle.value,
+            addPictureCategory.value,
+            newImageUrl,
+            addPictureSelectedByUserImage.files[0],
+            arrayRequest,
+            arrayData
+          );
+          image = {
+            id: "",
+            title: "",
+            imageUrl: "",
+            categoryId: 0,
+          };
+      }
 
-        addingImageFormNewImageToAdd(
-          image,
-          addPictureTitle.value,
-          addPictureCategory.value,
-          newImageUrl,
-          addPictureSelectedByUserImage.files[0],
-          arrayRequest,
-          arrayData
-        );
-        // Réinitialisation des données pour pouvoir en ajouter une nouvelle. Une DIFFERENTE notamment.
-        image = {
-          id: "",
-          title: "",
-          imageUrl: "",
-          categoryId: 0,
-        };
-    }  
-  });
-}
+  }
+
+  
+
+
+
 
 /* FONCTION - Change l'icone en prévisualisation de l'image ! */
 function thumbnailOfImage(image) {
