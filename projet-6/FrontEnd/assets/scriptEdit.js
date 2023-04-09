@@ -38,21 +38,17 @@ function pageFeatures(arrayData) {
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
   /* Partie Listener de "modifier" ! */
-  mainModalButton.addEventListener("click", (event) => { // Ouverture de la modale principale pour interraction avec les features demandées.
+  mainModalButton.addEventListener("click", (event) => {
+    // Ouverture de la modale principale pour interraction avec les features demandées.
     event.preventDefault();
-    mainModalOpening(
-      arrayRequestToDelete,
-      arrayData
-    );
+    mainModalOpening(arrayRequestToDelete, arrayData);
     document.body.classList.add("modalOpened");
   });
   /* Partie Listener de "ajouter une photo" ! */
-  secondModalButton.addEventListener("click", (event) => { // Ouverture de la deuxieme modale.
+  secondModalButton.addEventListener("click", (event) => {
+    // Ouverture de la deuxieme modale.
     event.preventDefault();
-    secondModalOpenListener(
-      arrayRequestToAdd,
-      arrayData
-    );
+    secondModalOpenListener(arrayRequestToAdd, arrayData);
   });
   addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
@@ -60,24 +56,28 @@ function pageFeatures(arrayData) {
 
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
 function authorizationAcces() {
-    const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
-    let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
-    for (let i = 0; i < cookieArray.length; i++) { // Parcours du tableau.
-      let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
-      if (!authTookie.startsWith("loginToken=")) { // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
-        window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
-      }
+  const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
+  let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
+  for (let i = 0; i < cookieArray.length; i++) {
+    // Parcours du tableau.
+    let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
+    if (!authTookie.startsWith("loginToken=")) {
+      // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
+      window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
     }
-    /* !! NE MARCHE PLUS SOUS CHROME depuis AVRIL !!                            */
-    /* Voir explication dans la fonction : "stockTokenCookie" - scriptLogin.js. */
+  }
+  /* !! NE MARCHE PLUS SOUS CHROME depuis AVRIL !!                            */
+  /* Voir explication dans la fonction : "stockTokenCookie" - scriptLogin.js. */
 }
 
 // FONCTION - Récupérer le token stocké au besoin.
 function getTokenCookie(tokenWanted) {
   let cookieArray = document.cookie.split(";"); // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, récupération de tous les cookies.
-  for (let i = 0; i < cookieArray.length; i++) { // Tableau qu'on va mtn parcourir.
+  for (let i = 0; i < cookieArray.length; i++) {
+    // Tableau qu'on va mtn parcourir.
     let cookie = cookieArray[i].trim(); // A chaque cookie parcouru, on les trims par sécurité.
-    if (cookie.startsWith(tokenWanted + "=")) { // Quand on a trouvé le cookie que nous cherchons via l'argument fournis dans la function.
+    if (cookie.startsWith(tokenWanted + "=")) {
+      // Quand on a trouvé le cookie que nous cherchons via l'argument fournis dans la function.
       return cookie.substring(tokenWanted.length + 1); // On le return via substring pour avoir la valeur du cookie sans "Authtoken=".
     }
   }
@@ -88,7 +88,8 @@ async function apiDataGet() {
   try {
     const apiUrl = "http://localhost:5678/api/works/";
     const resp = await fetch(apiUrl); /* Réception de la promesse ! */
-    const respContent = await resp.json(); /* Mise en json des informations reçues ! */
+    const respContent =
+      await resp.json(); /* Mise en json des informations reçues ! */
     return respContent;
   } catch (error) {
     console.error(error);
@@ -97,30 +98,32 @@ async function apiDataGet() {
 
 /* FONCTION - Affiche les éléments dynamiquement ! */
 function apiDataShow(arrayData) {
-  for (let i = arrayData.length - 1; i >= 0; i--) { // Boucle qui affichera les images dans le sens inverse.
+  for (let i = arrayData.length - 1; i >= 0; i--) {
+    // Boucle qui affichera les images dans le sens inverse.
     /* Création de nos éléments dans le DOM ! */
     let galleryTargeting = document.querySelector(".gallery");
-      let galleryCard = document.createElement("figure");
-      let galleryImage = document.createElement("img");
-      let galleryTxt = document.createElement("figcaption");
-      galleryCard.setAttribute(
-        "class",
-        "figureCard show " + arrayData[i].categoryId
-      ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
-      galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
-      galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
-      galleryImage.setAttribute("alt", arrayData[i].title);
-      galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
-      galleryTxt.setAttribute("class", "img_title");
-      let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
-      InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
+    let galleryCard = document.createElement("figure");
+    let galleryImage = document.createElement("img");
+    let galleryTxt = document.createElement("figcaption");
+    galleryCard.setAttribute(
+      "class",
+      "figureCard show " + arrayData[i].categoryId
+    ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
+    galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
+    galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
+    galleryImage.setAttribute("alt", arrayData[i].title);
+    galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
+    galleryTxt.setAttribute("class", "img_title");
+    let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
+    InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
   }
 }
 
 /* FONCTION - Supprimes les éléments du DOM créés lors de l'affichage dynamique ! */
 function apiDataClear() {
-  const galleryTargeting = document.querySelector(".gallery"); // On prend les éléments de la gallery. 
-  if (galleryTargeting != null) { // Et temps que ce n'est pas null, on les efface.
+  const galleryTargeting = document.querySelector(".gallery"); // On prend les éléments de la gallery.
+  if (galleryTargeting != null) {
+    // Et temps que ce n'est pas null, on les efface.
     galleryTargeting.innerHTML = "";
   }
 }
@@ -151,7 +154,8 @@ function mainModalClosingBehavior() {
   modalCross.addEventListener("click", () => {
     mainModalClosingContent();
   });
-  document.addEventListener("keydown", (event) => { // On écoute le clavier.
+  document.addEventListener("keydown", (event) => {
+    // On écoute le clavier.
     if (event.key === "Escape") {
       // Si l'input est "Echap", on ferme.
       mainModalClosingContent();
@@ -172,10 +176,7 @@ function mainModalClosingBehavior() {
 }
 
 /* FONCTION - L'action d'ouverture de la première modale ! */
-function mainModalOpening(
-  arrayRequestDelete,
-  arrayData
-) {
+function mainModalOpening(arrayRequestDelete, arrayData) {
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
   modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
   modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
@@ -188,19 +189,19 @@ function mainModalOpening(
 /* FONCTION - Affichage dynamique de la modale principale ! */
 function mainModalShowData(arrayData) {
   // On récupère l'élément HTML qui va contenir les images
-  const galleryContainer = document.querySelector('.edit_gallery');
+  const galleryContainer = document.querySelector(".edit_gallery");
   // On vide le contenu de cet élément
-  galleryContainer.innerHTML = '';
+  galleryContainer.innerHTML = "";
 
   // On crée un nouvel élément <div> qui va contenir toutes les images à afficher
   let galleryEdit = document.createElement("div");
   galleryEdit.setAttribute("class", "edit_gallery");
-  
+
   // On boucle sur le tableau d'images passé en paramètre de la fonction
   for (let i = 0; i < arrayData.length; i++) {
     // On crée les différents éléments HTML nécessaires pour chaque image
     let galleryCardEdit = document.createElement("figure");
-    let galleryTxtEdit = document.createElement("a"); 
+    let galleryTxtEdit = document.createElement("a");
     let galleryIconeEdit = document.createElement("div");
     let galleryIconeTrashEdit = document.createElement("i");
     let galleryIconeMoveEdit = document.createElement("i");
@@ -211,7 +212,10 @@ function mainModalShowData(arrayData) {
     galleryImageEdit.setAttribute("alt", arrayData[i].title);
     galleryTxtEdit.innerText = "éditer";
     galleryIconeTrashEdit.setAttribute("class", "fa-solid fa-trash-can");
-    galleryIconeMoveEdit.setAttribute("class", "fa-solid fa-up-down-left-right");
+    galleryIconeMoveEdit.setAttribute(
+      "class",
+      "fa-solid fa-up-down-left-right"
+    );
     galleryCardEdit.setAttribute("class", "edit_figureCard");
     galleryIconeEdit.setAttribute("class", "edit_iconeManagement");
 
@@ -225,7 +229,7 @@ function mainModalShowData(arrayData) {
     galleryCardEdit.appendChild(galleryImageEdit);
     galleryCardEdit.appendChild(galleryTxtEdit);
   }
-  
+
   // On remplace l'ancien contenu de la galerie par la nouvelle structure créée
   galleryContainer.parentNode.replaceChild(galleryEdit, galleryContainer);
 }
@@ -359,10 +363,7 @@ function secondModalCloseContent() {
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
-function secondModalClosingBehavior(
-  arrayRequestAdd,
-  arrayData
-) {
+function secondModalClosingBehavior(arrayRequestAdd, arrayData) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
@@ -372,10 +373,7 @@ function secondModalClosingBehavior(
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-    mainModalOpening(
-      arrayRequestAdd,
-      arrayData
-    );
+    mainModalOpening(arrayRequestAdd, arrayData);
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -398,10 +396,7 @@ function secondModalClosingBehavior(
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-function secondModalOpenListener(
-  arrayRequestAdd,
-  arrayData
-) {
+function secondModalOpenListener(arrayRequestAdd, arrayData) {
   // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
   let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
   secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
@@ -410,10 +405,7 @@ function secondModalOpenListener(
   mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
   // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
   // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-  secondModalClosingBehavior(
-    arrayRequestAdd,
-    arrayData
-  );
+  secondModalClosingBehavior(arrayRequestAdd, arrayData);
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
@@ -425,15 +417,19 @@ function addingImageFormBehavior(arrayRequest, arrayData) {
     inputImage.click(); // Un autre click aura lieux sur inputImage.
     document.body.classList.add("modalOpened");
   });
+  const inputedImage = document.getElementById("addedImage");
+  inputedImage.addEventListener("change", (event) => {
+    const imageSelected = event.target.files[0];
+    const imageSelectedUrl = URL.createObjectURL(imageSelected);
+    thumbnailOfImage(imageSelectedUrl);
+  });
   // Tableau au format de ce que je vais devoir envoyer en fetch.
   let addingPictureForm = {
-    // Pourquoi on "const" pose problème ?
     id: "", // ON VA VENIR LE RETIRER EN FIN DE CODE ! Juste avant l'envoie à l'API car l'API gère cette partie, c'est juste pour du local, avoir un ID en local.
     title: "",
     imageUrl: "",
     categoryId: 0, // Notre parfaite Sophie Bluel.
   };
-
   let validateButton = document.querySelector("#pictureAddConformation");
   validateButton.addEventListener("click", (event) => {
     event.preventDefault();
@@ -447,12 +443,6 @@ function addingImageformCondition(image, arrayRequest, arrayData) {
   let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd");
   let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");
   let imageSize = 0;
-  const inputedImage = document.getElementById("addedImage");
-  inputedImage.addEventListener("change", (event) => {
-    const imageSelected = event.target.files[0];
-    const imageSelectedUrl = URL.createObjectURL(imageSelected);
-    thumbnailOfImage(imageSelectedUrl);
-  });
   let addPictureSelectedByUserImage = document.querySelector("#addedImage");
   let errorInformationModale = document.querySelector(".errorSecondModale");
   if (errorInformationModale) {
