@@ -566,13 +566,14 @@ body.modalOpened {
 
 .edit_gallery {
 	padding-bottom: 60px;
-	width: 110%;
+	width: 100%;
 	max-width: 50vw;
 	height: fit-content;
 	border-bottom: 1px solid #B3B3B3;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 	overflow: auto;
+	overflow-x: visible;
 }
 
 .edit_gallery img {
@@ -587,9 +588,9 @@ body.modalOpened {
 }
 
 .edit_figureCard {
-
-	width: 80px;
-	height: 125px;
+	max-width: 100%; /* Permet de ne pas forcer une barre de scroll latérale ! */
+	/* width: 85px; */
+	height: 145px;
 	padding: 10px 5px;
 	/* Pixel perfect ! */
 	display: flex;
@@ -600,14 +601,15 @@ body.modalOpened {
 
 .edit_figureCard a {
 	cursor: pointer;
+	padding-top: 5px;
 }
 
 .edit_iconeManagement {
 	display: flex;
 	flex-direction: row-reverse;
 	position: relative;
-	top: 30px;
-	left: 54px;
+	top: 28px;
+	left: 60px;
 	width: fit-content;
 }
 
