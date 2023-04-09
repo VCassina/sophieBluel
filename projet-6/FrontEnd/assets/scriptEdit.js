@@ -38,75 +38,60 @@ function pageFeatures(arrayData) {
   let arrayRequestToDelete = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour supprimer du contenu.
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
-  console.log(mainModalButton);
-
-  mainModalButton.addEventListener("click", (event) => {
-    event.preventDefault(); // Appel de preventDefault sur l'objet Event
-    mainModalOpeningListener(
+  /* Partie Listener de "modifier" ! */
+  mainModalButton.addEventListener("click", (event) => { // Ouverture de la modale principale pour interraction avec les features demandées.
+    event.preventDefault();
+    mainModalOpening(
       arrayRequestToAdd,
       arrayRequestToDelete,
-      secondModalButton,
       arrayData
-    ); // Ouverture de la modale principale pour interraction avec les features demandées.
+    );
+    document.body.classList.add("modalOpened");
   });
-
-  secondModalButton.addEventListener("click", (event) => {
+  /* Partie Listener de "ajouter une photo" ! */
+  secondModalButton.addEventListener("click", (event) => { // Ouverture de la deuxieme modale.
     event.preventDefault();
     secondModalOpenListener(
       arrayRequestToAdd,
       arrayRequestToDelete,
-      secondModalButton,
       arrayData
-    ); // Ouverture de la deuxieme modale.
+    );
   });
-
   addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
 }
 
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
 function authorizationAcces() {
-  if (window.location.href.includes("/index_edit.html")) {
-    // Si on se trouve sur la page de l'edit. (pathname ne fonctionne que pour les chemins complets !)
     const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
-    let ifLoginTokenFound; // Déclaration du token que nous cherchons.
-    for (let i = 0; i < cookieArray.length; i++) {
-      // Parcours du tableau.
-      let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1.
-      if (authTookie.startsWith("loginToken=")) {
-        // Si notre cookie "loginToken" est trouvé :
-        ifLoginTokenFound = 1;
-        console.log("Voici le token trouvé : ", authTookie);
-      } else {
+    let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
+    for (let i = 0; i < cookieArray.length; i++) { // Parcours du tableau.
+      let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
+      if (!authTookie.startsWith("loginToken=")) { // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
         window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
       }
     }
     /* !! NE MARCHE PLUS SOUS CHROME depuis AVRIL !!                            */
     /* Voir explication dans la fonction : "stockTokenCookie" - scriptLogin.js. */
-  }
 }
 
 // FONCTION - Récupérer le token stocké au besoin.
 function getTokenCookie(tokenWanted) {
-  let cookieData = document.cookie; // Parmis tous les cookies du domaine stockés //
-  let cookieArray = cookieData.split(";"); // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, on connait.
-  for (let i = 0; i < cookieArray.length; i++) {
-    // Tableau qu'on va mtn parcourir.
+  let cookieArray = document.cookie.split(";"); // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, récupération de tous les cookies.
+  for (let i = 0; i < cookieArray.length; i++) { // Tableau qu'on va mtn parcourir.
     let cookie = cookieArray[i].trim(); // A chaque cookie parcouru, on les trims par sécurité.
-    if (cookie.startsWith(tokenWanted + "=")) {
-      // Quand on a trouvé le cookie que nous recherchons via l'argument fournis dans la function.
-      return cookie.substring(tokenWanted.length + 1); // On le return.
+    if (cookie.startsWith(tokenWanted + "=")) { // Quand on a trouvé le cookie que nous cherchons via l'argument fournis dans la function.
+      return cookie.substring(tokenWanted.length + 1); // On le return via substring pour avoir la valeur du cookie sans "Authtoken=".
     }
-  } // Else non permit !?
+  }
 }
 
 /* FONCTION - Récuparation des données de l'API ! */
 async function apiDataGet() {
   try {
     const apiUrl = "http://localhost:5678/api/works/";
-    const resp = await fetch(apiUrl);
-    const respContent = await resp.json();
-    console.log("Affichage d'arrayData : ", respContent);
+    const resp = await fetch(apiUrl); /* Réception de la promesse ! */
+    const respContent = await resp.json(); /* Mise en json des informations reçues ! */
     return respContent;
   } catch (error) {
     console.error(error);
@@ -115,10 +100,9 @@ async function apiDataGet() {
 
 /* FONCTION - Affiche les éléments dynamiquement ! */
 function apiDataShow(arrayData) {
-  for (let i = arrayData.length - 1; i >= 0; i--) {
-    // Boucle qui affichera les images dans le sens inverse.
+  for (let i = arrayData.length - 1; i >= 0; i--) { // Boucle qui affichera les images dans le sens inverse.
+    /* Création de nos éléments dans le DOM ! */
     let galleryTargeting = document.querySelector(".gallery");
-    if (galleryTargeting != null) {
       let galleryCard = document.createElement("figure");
       let galleryImage = document.createElement("img");
       let galleryTxt = document.createElement("figcaption");
@@ -133,18 +117,18 @@ function apiDataShow(arrayData) {
       galleryTxt.setAttribute("class", "img_title");
       let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
       InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
-    }
   }
 }
 
+/* FONCTION - Supprimes les éléments du DOM créés lors de l'affichage dynamique ! */
 function apiDataClear() {
-  const galleryTargeting = document.querySelector(".gallery");
-  if (galleryTargeting != null) {
+  const galleryTargeting = document.querySelector(".gallery"); // On prend les éléments de la gallery. 
+  if (galleryTargeting != null) { // Et temps que ce n'est pas null, on les efface.
     galleryTargeting.innerHTML = "";
   }
 }
 
-/* FONCTION - Désactivation des boutons modifiers dont nous nous fichons ! */
+/* FONCTION - Désactivation des boutons modifiers dont nous nous fichons pour la V1 du site ! */
 function disableUselessModifiers() {
   const pictureProfilLink = document.querySelector("#modalBoxProfil");
   pictureProfilLink.addEventListener("click", function (event) {
@@ -160,13 +144,7 @@ function disableUselessModifiers() {
 function mainModalClosingContent() {
   modalBox.classList.add("modalBox-hidden"); // On lui remet la modalBox-hidden, ce qui le cache.
   modalBox.setAttribute("aria-hidden", "true"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
-  modalBox.setAttribute("aria-modal", "false"); // //                                             // La modale n'est plus ouverte.
-  // Déclaration des variables à supprimer !
-  let figureCardsToDeleteEdit = document.querySelectorAll(".edit_figureCard"); // Selection de toutes les classes .edit_figureCard.
-  figureCardsToDeleteEdit.forEach(function (e) {
-    // Remove ne peut être utilisé que sur un seul élément donc, pour chaque élément de figureCardsToDeleteEdit :
-    e.remove(); // Remove.
-  }); // Supprimer le contenu DOM générer pour pouvoir rouvrir la modale sans avoir une accumulation.
+  modalBox.setAttribute("aria-modal", "false"); // La modale n'est plus ouverte.
   document.body.classList.remove("modalOpened");
 }
 
@@ -174,11 +152,9 @@ function mainModalClosingContent() {
 function mainModalClosingBehavior() {
   let modalCross = document.querySelector(".fa-xmark"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
-    // Alors on place notre eventListener sur le clique.
     mainModalClosingContent();
   });
-  document.addEventListener("keydown", (event) => {
-    // Si on détecte la croix, on écoute également les inputs clavier.
+  document.addEventListener("keydown", (event) => { // On écoute le clavier.
     if (event.key === "Escape") {
       // Si l'input est "Echap", on ferme.
       mainModalClosingContent();
@@ -186,12 +162,13 @@ function mainModalClosingBehavior() {
   });
   let modalBoxHitBox = document.querySelector("#modalBox"); // On séléctionne la modale.
   document.addEventListener("click", (event) => {
-    // On écoute les clicks qui ont lieu sur TOUTE la page / BODY est couvert par la modal ? Body ne marche pas.
+    // On écoute les clicks qui ont lieu sur TOUTE la page.
     if (event.target === modalBoxHitBox) {
       // Si cela est exacte, il s'agit de la fenêtre modale MAIS :
       // #modalBox fait référence à l'entierté de la page car la modale prend toute la place.
       // Si c'est strictement égale à #modalBox, c'est qu'il ne s'agit pas du wrapper, des buttons, etc...
       // Et donc, forcement, il s'agit de ce qu'il reste, les contours transparents !
+      // En clair : On clique sur la MODAL (qui prend toute la page) mais pas sur MODALWRAPPER très précisement donc on est en dehors de modalwrapper.
       mainModalClosingContent();
     }
   });
@@ -201,7 +178,6 @@ function mainModalClosingBehavior() {
 function mainModalOpening(
   arrayRequestAdd,
   arrayRequestDelete,
-  secondModalButton,
   arrayData
 ) {
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
@@ -211,23 +187,6 @@ function mainModalOpening(
   mainModalShowData(arrayData); // Vient afficher les images dynamiquement importée dans arrayData.
   mainModalClosingBehavior(); // Conditionne le comportement de fermeture de la modale.
   trashCanListener(arrayRequestDelete, arrayRequestAdd, arrayData);
-}
-
-/* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
-function mainModalOpeningListener(
-  arrayRequestAdd,
-  arrayRequestDelete,
-  secondModalButton,
-  arrayData
-) {
-  console.log(secondModalButton);
-  mainModalOpening(
-    arrayRequestAdd,
-    arrayRequestDelete,
-    secondModalButton,
-    arrayData
-  );
-  document.body.classList.add("modalOpened");
 }
 
 /* FONCTION - Affichage dynamique de la modale principale ! */
@@ -449,7 +408,6 @@ function secondModalCloseContent() {
 function secondModalClosingBehavior(
   arrayRequestAdd,
   arrayRequestDelete,
-  secondModalButton,
   arrayData
 ) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
@@ -464,7 +422,6 @@ function secondModalClosingBehavior(
     mainModalOpening(
       arrayRequestAdd,
       arrayRequestDelete,
-      secondModalButton,
       arrayData
     );
   });
@@ -492,7 +449,6 @@ function secondModalClosingBehavior(
 function secondModalOpenListener(
   arrayRequestAdd,
   arrayRemove,
-  secondModalButton,
   arrayData
 ) {
   // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
@@ -506,17 +462,14 @@ function secondModalOpenListener(
   secondModalClosingBehavior(
     arrayRequestAdd,
     arrayRemove,
-    secondModalButton,
     arrayData
-  );
-  console.log(
-    "Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !"
   );
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
 function addingImageFormBehavior(arrayRequest, arrayData) {
   let inputImage = document.getElementById("addedImage");
+  /* Partie Listener de "Valider" ! */
   addPictureButton.addEventListener("click", () => {
     // En cas de click sur le pictureButton (+ Ajouter photo).
     inputImage.click(); // Un autre click aura lieux sur inputImage.
