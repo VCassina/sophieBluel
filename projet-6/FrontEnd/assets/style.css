@@ -566,7 +566,7 @@ body.modalOpened {
 
 .edit_gallery {
 	padding-bottom: 60px;
-	width: 110%;
+	width: 105%;
 	max-width: 50vw;
 	height: fit-content;
 	border-bottom: 1px solid #B3B3B3;
@@ -587,9 +587,8 @@ body.modalOpened {
 }
 
 .edit_figureCard {
-
-	width: 80px;
-	height: 125px;
+	width: 85px;
+	height: 145px;
 	padding: 10px 5px;
 	/* Pixel perfect ! */
 	display: flex;
@@ -600,14 +599,15 @@ body.modalOpened {
 
 .edit_figureCard a {
 	cursor: pointer;
+	padding-top: 5px;
 }
 
 .edit_iconeManagement {
 	display: flex;
 	flex-direction: row-reverse;
 	position: relative;
-	top: 30px;
-	left: 54px;
+	top: 28px;
+	left: 60px;
 	width: fit-content;
 }
 
