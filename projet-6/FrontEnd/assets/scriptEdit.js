@@ -16,16 +16,14 @@ main();
 function main() {
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
-  apiDataGet()
-    .then(data => {
-      // Stockage des datas UNE FOIS reçues !
-      arrayData = data;
-      console.log(arrayData)
-
-      // Puis application des fonctions non-asynchrones.
-      apiDataShow(arrayData);
-      pageFeatures(arrayData);
-    })
+  apiDataGet().then((data) => {
+    // Stockage des datas UNE FOIS reçues !
+    arrayData = data;
+    console.log(arrayData);
+    // Puis application des fonctions non-asynchrones.
+    apiDataShow(arrayData);
+    pageFeatures(arrayData);
+  });
 }
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
@@ -40,17 +38,27 @@ function pageFeatures(arrayData) {
   let arrayRequestToDelete = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour supprimer du contenu.
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
-  console.log(mainModalButton)
-  
+  console.log(mainModalButton);
+
   mainModalButton.addEventListener("click", (event) => {
     event.preventDefault(); // Appel de preventDefault sur l'objet Event
-    mainModalOpeningListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, arrayData); // Ouverture de la modale principale pour interraction avec les features demandées.
+    mainModalOpeningListener(
+      arrayRequestToAdd,
+      arrayRequestToDelete,
+      secondModalButton,
+      arrayData
+    ); // Ouverture de la modale principale pour interraction avec les features demandées.
   });
 
   secondModalButton.addEventListener("click", (event) => {
     event.preventDefault();
-    secondModalOpenListener(arrayRequestToAdd, arrayRequestToDelete, secondModalButton, arrayData); // Ouverture de la deuxieme modale.
-  })
+    secondModalOpenListener(
+      arrayRequestToAdd,
+      arrayRequestToDelete,
+      secondModalButton,
+      arrayData
+    ); // Ouverture de la deuxieme modale.
+  });
 
   addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
@@ -190,7 +198,12 @@ function mainModalClosingBehavior() {
 }
 
 /* FONCTION - L'action d'ouverture de la première modale ! */
-function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
+function mainModalOpening(
+  arrayRequestAdd,
+  arrayRequestDelete,
+  secondModalButton,
+  arrayData
+) {
   const modalBox = document.getElementById("modalBox"); // modalBox est notre élément comportement l'ID modalBox.
   modalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui le révèle.
   modalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
@@ -201,11 +214,21 @@ function mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton
 }
 
 /* FONCTION - Se tient prêt à ouvrir la modale principale dans le DOM ! */
-function mainModalOpeningListener(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
-  console.log(secondModalButton)
-    mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
-    document.body.classList.add("modalOpened");
-  };
+function mainModalOpeningListener(
+  arrayRequestAdd,
+  arrayRequestDelete,
+  secondModalButton,
+  arrayData
+) {
+  console.log(secondModalButton);
+  mainModalOpening(
+    arrayRequestAdd,
+    arrayRequestDelete,
+    secondModalButton,
+    arrayData
+  );
+  document.body.classList.add("modalOpened");
+}
 
 /* FONCTION - Affichage dynamique de la modale principale ! */
 function mainModalShowData(arrayData) {
@@ -272,9 +295,9 @@ function mainModalShowData(arrayData) {
 
 /* FONCTION - Gestion des trashCans et de leur capaciter à supprimer localement/stocker ce qui va l'être vraiment dans l'API plus tard ! */
 function trashCanListener(requestToDelete, arrayRequestAdd, arrayData) {
-  console.log("Je suis rappelé !")
-  console.log(arrayRequestAdd)
-  console.log(requestToDelete)
+  console.log("Je suis rappelé !");
+  console.log(arrayRequestAdd);
+  console.log(requestToDelete);
 
   // On vient récupérer l'ultime value ID d'arrayData.
 
@@ -284,16 +307,16 @@ function trashCanListener(requestToDelete, arrayRequestAdd, arrayData) {
   trashCans.forEach((trashCan, index) => {
     // Pour chaque élément trashcans :
 
-     /* PROBLEME ICI ! L'image ajoutée ne s'ajoute pas ici, elle ne reçoit pas d'ID, je ne peux donc pas les lier !! */
-     /* MAINTENANT ! ArrayData se voit ajouter des ID quand on ajoute les images en locales !! Je peux venir les récupérer 
+    /* PROBLEME ICI ! L'image ajoutée ne s'ajoute pas ici, elle ne reçoit pas d'ID, je ne peux donc pas les lier !! */
+    /* MAINTENANT ! ArrayData se voit ajouter des ID quand on ajoute les images en locales !! Je peux venir les récupérer 
      ici et les transmettre à applyingModification avec un TROSIIEME argument secret qui lui permettra de supprimer des ajouts ce que j'ai supprimé en locale. */
-     console.log(arrayData)
-  
+    console.log(arrayData);
+
     trashCanId.push(arrayData[index].id); // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.
     let isTheTrashCanSelected = false; // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
     trashCan.addEventListener("click", () => {
       // Quand on clique sur une icone trashcan :
-      let idToDelete = trashCanId[index]; // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.     
+      let idToDelete = trashCanId[index]; // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.
       idToRemoveFromArrayData.push(idToDelete); // Pour éviter les doublons par la suite en cas de ré-ouverture du code voir L.430.
       isTheTrashCanSelected = !isTheTrashCanSelected; // Inverse l'état, superbe façon de faire, j'aurais faire ça bien avant déjà.
       if (isTheTrashCanSelected) {
@@ -368,17 +391,14 @@ function trashCanListener(requestToDelete, arrayRequestAdd, arrayData) {
       arrayData.splice(i, 1);
     }
   }
-  trashCanLocalApplying(
-    idToRemoveFromArrayData,
-    arrayData
-  );
+  trashCanLocalApplying(idToRemoveFromArrayData, arrayData);
   // A ce stade, requestToDelete contient tout ce qu'il faut delete dans l'API.
 }
 
 /* FONCTION - Procède à l'action de suppression locale conditionnée par trashCanListener en amont ! */
 function trashCanLocalApplying(array, arrayData) {
   // Suppression LOCAL du contenu.
-  console.log(array)
+  console.log(array);
   const galleryDelete = document.querySelector("#gallery_delete"); // Selection de tous nos éléments avec l'id.
   if (galleryDelete) {
     // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
@@ -426,7 +446,12 @@ function secondModalCloseContent() {
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
-function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData) {
+function secondModalClosingBehavior(
+  arrayRequestAdd,
+  arrayRequestDelete,
+  secondModalButton,
+  arrayData
+) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
@@ -436,7 +461,12 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-    mainModalOpening(arrayRequestAdd, arrayRequestDelete, secondModalButton, arrayData);
+    mainModalOpening(
+      arrayRequestAdd,
+      arrayRequestDelete,
+      secondModalButton,
+      arrayData
+    );
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -459,17 +489,29 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayRequestDelete, secondM
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-function secondModalOpenListener(arrayRequestAdd, arrayRemove, secondModalButton, arrayData) {
-    // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
-    let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
-    secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
-    secondModalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
-    secondModalBox.setAttribute("aria-modal", "true");
-    mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
-    // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
-    // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-    secondModalClosingBehavior(arrayRequestAdd, arrayRemove, secondModalButton, arrayData);
-    console.log("Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !");
+function secondModalOpenListener(
+  arrayRequestAdd,
+  arrayRemove,
+  secondModalButton,
+  arrayData
+) {
+  // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
+  let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
+  secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
+  secondModalBox.removeAttribute("aria-hidden"); // Gestion des balises liées à l'accesibilité pour personnes mal-voyantes.
+  secondModalBox.setAttribute("aria-modal", "true");
+  mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
+  // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
+  // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
+  secondModalClosingBehavior(
+    arrayRequestAdd,
+    arrayRemove,
+    secondModalButton,
+    arrayData
+  );
+  console.log(
+    "Je suis ici, prêt à mettre des images égales à mon nombre de répétition dans la console (si c'est pas 1, je n'ai pas remove l'eventListener) !"
+  );
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
@@ -494,7 +536,6 @@ function addingImageFormBehavior(arrayRequest, arrayData) {
     event.preventDefault();
     addingImageformCondition(addingPictureForm, arrayRequest, arrayData);
   });
-
 }
 
 /* FONCTION - Conditionne le fonctionnement du formulaire d'ajout d'image ! */
@@ -504,106 +545,100 @@ function addingImageformCondition(image, arrayRequest, arrayData) {
   let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");
   let imageSize = 0;
 
-  const inputedImage = document.getElementById('addedImage');
+  const inputedImage = document.getElementById("addedImage");
   inputedImage.addEventListener("change", (event) => {
     const imageSelected = event.target.files[0];
     const imageSelectedUrl = URL.createObjectURL(imageSelected);
     thumbnailOfImage(imageSelectedUrl);
   });
 
-    console.log("Je suis bien appelée");
-      let addPictureSelectedByUserImage = document.querySelector("#addedImage");
-      let errorInformationModale = document.querySelector(".errorSecondModale");
-      if (errorInformationModale) {
-        errorInformationModale.remove();
-      }
-      if (addPictureSelectedByUserImage.value) {
-        imageSize = addPictureSelectedByUserImage.files[0].size;
-      }
-      switch (true) {
-        case !addPictureTitle.value ||
-          !addPictureCategory.value ||
-          !addPictureSelectedByUserImage.value:
-          let link = document.querySelector("#pictureAddConformation");
-          let p = document.createElement("p");
-          p.setAttribute("class", "errorSecondModale");
-          let textError = document.createTextNode(
-            "Veuillez remplir tous les champs."
-          );
-          p.appendChild(textError);
-          link.parentNode.insertBefore(p, link);
-          break;
-        case addPictureTitle.value.length > 180:
-          let link2 = document.querySelector("#pictureAddConformation");
-          let p2 = document.createElement("p");
-          p2.setAttribute("class", "errorSecondModale");
-          let textError2 = document.createTextNode(
-            "Le titre est trop long (180 chars max)."
-          );
-          p2.appendChild(textError2);
-          link2.parentNode.insertBefore(p2, link2);
-          break;
-        case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):
-          let link3 = document.querySelector("#pictureAddConformation");
-          let p3 = document.createElement("p");
-          p3.setAttribute("class", "errorSecondModale");
-          let textError3 = document.createTextNode(
-            "Un ou plusieurs charactères spéciaux posent problèmes."
-          );
-          p3.appendChild(textError3);
-          link3.parentNode.insertBefore(p3, link3);
-          break;
-        case !/^[A-Z]/.test(addPictureTitle.value):
-          let link4 = document.querySelector("#pictureAddConformation");
-          let p4 = document.createElement("p");
-          p4.setAttribute("class", "errorSecondModale");
-          let textError4 = document.createTextNode(
-            "Veuillez commencez votre titre par une lettre majuscule."
-          );
-          p4.appendChild(textError4);
-          link4.parentNode.insertBefore(p4, link4);
-          break;
-        case imageSize >= 4 * 1024 * 1024:
-          console.log(addPictureSelectedByUserImage.size);
-          let link5 = document.querySelector("#pictureAddConformation");
-          let p5 = document.createElement("p");
-          p5.setAttribute("class", "errorSecondModale");
-          let textError5 = document.createTextNode(
-            "La taille de l'image doit être inférieure à 4Mo."
-          );
-          p5.appendChild(textError5);
-          link5.parentNode.insertBefore(p5, link5);
-          break;
-        default:
-          console.log("L'image peut correctement s'ajouter sans soucis !");
-          let newImageUrl = URL.createObjectURL(
-            addPictureSelectedByUserImage.files[0]
-          );
-          console.log(newImageUrl);
-  
-          addingImageFormNewImageToAdd(
-            image,
-            addPictureTitle.value,
-            addPictureCategory.value,
-            newImageUrl,
-            addPictureSelectedByUserImage.files[0],
-            arrayRequest,
-            arrayData
-          );
-          image = {
-            id: "",
-            title: "",
-            imageUrl: "",
-            categoryId: 0,
-          };
-      }
-
+  console.log("Je suis bien appelée");
+  let addPictureSelectedByUserImage = document.querySelector("#addedImage");
+  let errorInformationModale = document.querySelector(".errorSecondModale");
+  if (errorInformationModale) {
+    errorInformationModale.remove();
   }
+  if (addPictureSelectedByUserImage.value) {
+    imageSize = addPictureSelectedByUserImage.files[0].size;
+  }
+  switch (true) {
+    case !addPictureTitle.value ||
+      !addPictureCategory.value ||
+      !addPictureSelectedByUserImage.value:
+      let link = document.querySelector("#pictureAddConformation");
+      let p = document.createElement("p");
+      p.setAttribute("class", "errorSecondModale");
+      let textError = document.createTextNode(
+        "Veuillez remplir tous les champs."
+      );
+      p.appendChild(textError);
+      link.parentNode.insertBefore(p, link);
+      break;
+    case addPictureTitle.value.length > 180:
+      let link2 = document.querySelector("#pictureAddConformation");
+      let p2 = document.createElement("p");
+      p2.setAttribute("class", "errorSecondModale");
+      let textError2 = document.createTextNode(
+        "Le titre est trop long (180 chars max)."
+      );
+      p2.appendChild(textError2);
+      link2.parentNode.insertBefore(p2, link2);
+      break;
+    case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):
+      let link3 = document.querySelector("#pictureAddConformation");
+      let p3 = document.createElement("p");
+      p3.setAttribute("class", "errorSecondModale");
+      let textError3 = document.createTextNode(
+        "Un ou plusieurs charactères spéciaux posent problèmes."
+      );
+      p3.appendChild(textError3);
+      link3.parentNode.insertBefore(p3, link3);
+      break;
+    case !/^[A-Z]/.test(addPictureTitle.value):
+      let link4 = document.querySelector("#pictureAddConformation");
+      let p4 = document.createElement("p");
+      p4.setAttribute("class", "errorSecondModale");
+      let textError4 = document.createTextNode(
+        "Veuillez commencez votre titre par une lettre majuscule."
+      );
+      p4.appendChild(textError4);
+      link4.parentNode.insertBefore(p4, link4);
+      break;
+    case imageSize >= 4 * 1024 * 1024:
+      console.log(addPictureSelectedByUserImage.size);
+      let link5 = document.querySelector("#pictureAddConformation");
+      let p5 = document.createElement("p");
+      p5.setAttribute("class", "errorSecondModale");
+      let textError5 = document.createTextNode(
+        "La taille de l'image doit être inférieure à 4Mo."
+      );
+      p5.appendChild(textError5);
+      link5.parentNode.insertBefore(p5, link5);
+      break;
+    default:
+      console.log("L'image peut correctement s'ajouter sans soucis !");
+      let newImageUrl = URL.createObjectURL(
+        addPictureSelectedByUserImage.files[0]
+      );
+      console.log(newImageUrl);
 
-  
-
-
-
+      addingImageFormNewImageToAdd(
+        image,
+        addPictureTitle.value,
+        addPictureCategory.value,
+        newImageUrl,
+        addPictureSelectedByUserImage.files[0],
+        arrayRequest,
+        arrayData
+      );
+      image = {
+        id: "",
+        title: "",
+        imageUrl: "",
+        categoryId: 0,
+      };
+  }
+}
 
 /* FONCTION - Change l'icone en prévisualisation de l'image ! */
 function thumbnailOfImage(image) {
@@ -637,16 +672,14 @@ function addingImageFormNewImageToAdd(
   console.log(arrayRequest); // Tableau pour stocker les requêtes fetchs ! TOUTES ! Notre tableau à qui il faut rajouter les ID locaux ! A ce stade, il ne les a pas encore !
   console.log(imageValue); // Le files[0] à transmettre directement à l'API.
 
-    // Ajout d'un ID, il ne sera pas fourni à l'API mais contera seulement en locale pour une manipulation précise qui veut empêcher un bug d'ajout d'image supprimée.
-    let lastId = 0;
-    arrayData.forEach((item) => {
-      if (item.id > lastId) {
-        lastId = item.id;
-      }
-    });
-    let newId = lastId + 1;
-
-
+  // Ajout d'un ID, il ne sera pas fourni à l'API mais contera seulement en locale pour une manipulation précise qui veut empêcher un bug d'ajout d'image supprimée.
+  let lastId = 0;
+  arrayData.forEach((item) => {
+    if (item.id > lastId) {
+      lastId = item.id;
+    }
+  });
+  let newId = lastId + 1;
 
   addingImageLocale(array, title, category, url, newId, arrayData);
   addingImageApi(array, title, category, imageValue, arrayRequest, newId);
@@ -655,16 +688,16 @@ function addingImageFormNewImageToAdd(
 /* FONCTION - Ajoute les images ajoutées en LOCAL ! */
 function addingImageLocale(array, title, category, url, id, arrayData) {
   array = {
-    id: id,     /* Fonctionne jusqu'ici ! */
+    id: id /* Fonctionne jusqu'ici ! */,
     title: title,
     category: category,
     imageUrl: url,
   };
 
   console.log(array);
-  console.log(arrayData)
+  console.log(arrayData);
   arrayData.push(array);
-  console.log(arrayData)
+  console.log(arrayData);
   apiDataClear();
   apiDataShow(arrayData);
 }
@@ -680,7 +713,7 @@ function addingImageApi(array, title, category, imageValue, arrayRequest, id) {
   };
   // On stocke l'image, une par une, toujours car FormData.
   arrayRequest.push(array);
-  
+
   let url = "http://localhost:5678/api/works/";
   let allImageToAdd = [];
   for (let i = 0; i <= arrayRequest.length - 1; i++) {
@@ -698,14 +731,15 @@ function addingImageApi(array, title, category, imageValue, arrayRequest, id) {
 
 /* FONCTION - Envoie des requêtes fetchs d'AJOUT ! */
 function sendAllPicturesToAddToApi(arrayAdd, url) {
-  console.log(arrayAdd)
+  console.log(arrayAdd);
   // Passage à Promise.all / map, comme pour la suppression, plus simple !!
   const imagePromise = arrayAdd.map((image) => {
     const imageToAdd = new FormData();
     imageToAdd.append("title", image.title);
     imageToAdd.append("category", image.category);
     imageToAdd.append("image", image.imageUrl);
-    return fetch(url, {         // Return car le .then de son appel peut tout faire planter. Premier return en cas d'envoie unique.
+    return fetch(url, {
+      // Return car le .then de son appel peut tout faire planter. Premier return en cas d'envoie unique.
       method: "POST",
       headers: {
         Authorization: "Bearer " + getTokenCookie("loginToken"),
@@ -718,7 +752,8 @@ function sendAllPicturesToAddToApi(arrayAdd, url) {
 
 /* FONCTION - Envoie des requêtes fetchs de SUPPRESSION ! */
 function sendAllPicturesToRemoveToApi(arrayRemove) {
-  return Promise.all(                                   // Return car le .then de son appel peut tout faire planter.
+  return Promise.all(
+    // Return car le .then de son appel peut tout faire planter.
     arrayRemove.map((request) =>
       fetch(request.url, { method: request.method, headers: request.headers })
     )
@@ -727,9 +762,12 @@ function sendAllPicturesToRemoveToApi(arrayRemove) {
 
 /* FONCTION - Retire les éventuels éléments à supprimer du tableau d'ajout pour éviter un bug ! */
 function removeRemovedFromAdded(arrayAdd, arrayRemove) {
-  arrayRemove.forEach((removeObject) => {                 // Pour chaque objet de arrayRemove.
-    const idToRemove = removeObject.url.split('/').pop(); // On récupérer l'ID via la commande spéciale de manipulation d'une URL ! Miracle ! Pop sépare les composants de l'URL pour les analyser.
-    const index = arrayAdd.findIndex((addItem) => addItem.id === Number(idToRemove)); // Chercher l'index de l'élément correspondant dans arrayAdd pour chacun de ses objets, 
+  arrayRemove.forEach((removeObject) => {
+    // Pour chaque objet de arrayRemove.
+    const idToRemove = removeObject.url.split("/").pop(); // On récupérer l'ID via la commande spéciale de manipulation d'une URL ! Miracle ! Pop sépare les composants de l'URL pour les analyser.
+    const index = arrayAdd.findIndex(
+      (addItem) => addItem.id === Number(idToRemove)
+    ); // Chercher l'index de l'élément correspondant dans arrayAdd pour chacun de ses objets,
     // un peu comme au dessus mais avec l'index, on isole ainsi (aprés le =>) les éléments qui ont comme .id (donc attribut id, tout simplement) parfaitement égal au number sous int d'idToRemove !
     // Donc, index = l'ID arrayAdd de la correspondance avec l'objet ID que l'on cherche à retrouver de arrayRemove dans arrayAdd !
     // Puis on va appliquer notre condition, si ses éléments sont trouvés, alors, toujours dans la "boucle", on vient les retirer d'arrayAdd.
@@ -737,8 +775,10 @@ function removeRemovedFromAdded(arrayAdd, arrayRemove) {
       arrayAdd.splice(index, 1);
     }
   });
-  
-  console.log("Voici, après scan dans removeRemovedFromAdded() les deux tableaux, s'il y a des ID correspondant, ils sont CENSES avoir été retiré d'arrayAdd pour ne pas être ajouté MALGRE la supression !!")
+
+  console.log(
+    "Voici, après scan dans removeRemovedFromAdded() les deux tableaux, s'il y a des ID correspondant, ils sont CENSES avoir été retiré d'arrayAdd pour ne pas être ajouté MALGRE la supression !!"
+  );
   console.log(arrayAdd);
   console.log(arrayRemove);
 }
@@ -749,8 +789,7 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
 
   const changementApplyButton = document.getElementById("changementApply");
   changementApplyButton.addEventListener("click", () => {
-
-    console.log("ARRAY DATA MESDAMES ET MESSIEURS : ", arrayData)
+    console.log("ARRAY DATA MESDAMES ET MESSIEURS : ", arrayData);
     console.log("Voici l'état d'arrayAdd : ", arrayAdd);
     console.log("Voici l'état d'arrayRemove : ", arrayRemove);
     removeRemovedFromAdded(arrayAdd, arrayRemove);
@@ -766,9 +805,7 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
         break;
       // Quand j'ajoute seulement.
       case !arrayRemove.length > 0 && arrayAdd.length > 0:
-        console.log(
-          "Je détecte un changement, il y a un ajout et c'est tout."
-        );
+        console.log("Je détecte un changement, il y a un ajout et c'est tout.");
         sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
           location.reload();
         });
@@ -792,25 +829,3 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
 /* ___________________________________________________________ */
 /* FIN DU SCRIPT !                                             */
 /* ___________________________________________________________ */
-
-/* A FAIRE :
-
-- Debugger les doublons d'ajout on ouvre et réouvre la deuxieme modale plusieurs fois en une instance.
-
--- HISTORIQUE ! --
---              --
-
--- NEW ! --
---       --
-
--> AVIS DE THOMAS > TOUT METTRE DANS une fonction "main" AVANT d'essayer de procéder au callback.
--> Car eventListener pas bon...
-
-C'est fait.
-
-Callback revu ! 06/04/2023 > Pour moi bon mais n'a pas d'effet ou bien le problème ne vient pas de là.
-REMARQUE : Quand on clique sur "revenir à la première modale" via la flèche, les addEventListener ne s'additionnent plus, ils se multiplient !!
-"removeModalEventListener" !
-"DOUBLON PERSISTANT !!" !
-
-*/
