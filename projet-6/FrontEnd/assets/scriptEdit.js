@@ -14,6 +14,7 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
+  prerequisite();
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
