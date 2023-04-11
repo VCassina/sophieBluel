@@ -24,7 +24,6 @@ async function getData() {
         const apiUrl = 'http://localhost:5678/api/works/';
         const resp = await fetch(apiUrl);
         const respContent = await resp.json();
-        console.log("Affichage d'arrayData : ", respContent)
         return respContent;
     } catch (error) {
         console.error(error);
@@ -88,17 +87,9 @@ function dataShow(arrayData) {
           InsideCardTargeting.prepend(galleryImage, galleryTxt);           // L'incorporation des deux sous-balises.
         }
     }
-    filterSelection("all");                                                 // Attend l'importation pour lancer le premier filtre : "all".
+    filterSelection("all");
     filterListening();
 }
-
-/* FONCTION -  Clear du code généré DOM via dataShow() ! */
-function dataClear() {
-    const galleryTargeting = document.querySelector(".gallery");
-    if (galleryTargeting != null) {
-      galleryTargeting.innerHTML = "";
-    }
-  }
 
 /* FONCTION - Ecoute et modification du filtre en cours !        */
 function filterListening() {
