@@ -94,7 +94,6 @@ function dataShow(arrayData) {
 /* FONCTION - Ecoute et modification du filtre en cours !        */
 function filterListening() {
     let buttonContainer = document.getElementById("sortingButton");                 // Récupération de la <div> contenant les filtres.
-    if (buttonContainer != null) {                                                  // S'il y a un "sortingButton" de trouvé, alors :
         let filterList = buttonContainer.getElementsByClassName("filter_button");   // Récupération des filters_button (enfants) dans une variable-tableau.
         for (let i = 0; i < filterList.length; i++) {                               // On parcourt la liste des filtres.
             filterList[i].addEventListener("click", function (event) {              // Pour y placer un eventListener de ce qui va être cliqué (sur chaque button filtre).
@@ -106,7 +105,6 @@ function filterListening() {
                 clickedButton.classList.add("active");                                              // Puis on ajoute en className "active" seulement au boutton clické ! Et voila.
             });
         }
-    }
 }
 
 /* ___________________________________________________________ */

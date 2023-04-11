@@ -12,6 +12,61 @@ main();
 /* FONCTIONS ! */
 /* FONCTIONS ! */
 
+/* FONCTION - Comportement du formulaire de connexion ! */
+function main() {
+  let form = document.getElementById("login_form"); // Selection de notre formulaire.
+  // Si l'ID "form" correspond à qq chose, alors :
+  form.addEventListener("submit", (el) => {
+    // Si on clique sur Submit avec l'argument étant le contenu du form !
+    el.preventDefault(); // N'actualise pas la page quand on clique.
+    let data = new FormData(el.target); // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
+    let user = {
+      // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
+      email: data.get("email_login"),
+      password: data.get("password_login"),
+    };
+    let errorField = document.querySelector(".errorEmptyField"); // S'il y a déjà un message d'erreur car le formulaire n'est pas correctement reseigné.
+    if (errorField != null) {
+      // Si l'élément est trouvé, alors :
+      errorField.parentNode.removeChild(errorField); // On supprime l'élément du DOM.
+    }
+    if (user.email.trim() !== "" && user.password.trim() !== "") {
+      // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
+      postData("http://127.0.0.1:5678/api/users/login", user).then((data) => {
+        // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
+        console.log(data); // Vérification du bon contenu de "data".
+        // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
+        // Dans le cas où l'API ne retourne pas d'erreur :             */
+        if (data.userId == 1) {
+          // En fait, si data.userID == 1, c'est que la réponse de l'API est 1 et donc qu'on est connecté à 1 qui est SophieBluel, pour être préçis.
+          window.location.href = "../pages/index_edit.html";
+        }
+        // Dans le cas où l'API retourne une erreur :                  */
+        else {
+          let link = document.querySelector("#button_login");
+          let p = document.createElement("p");
+          p.setAttribute("class", "errorEmptyField");
+          let textError = document.createTextNode(
+            "Les informations ne correspondent pas."
+          );
+          p.appendChild(textError);
+          link.parentNode.insertBefore(p, link);
+        }
+      });
+    } else {
+      // Et sinon, on insère en DOM à l'utilisateur qu'il doit remplir tous les champs !
+      let link = document.querySelector("#button_login");
+      let p = document.createElement("p");
+      p.setAttribute("class", "errorEmptyField");
+      let textError = document.createTextNode(
+        "Veuillez remplir tous les champs."
+      );
+      p.appendChild(textError);
+      link.parentNode.insertBefore(p, link);
+    }
+  });
+}
+
 /* FONCTION - Stock le Token dans le navigateur ! */
 function stockTokenCookie(token) {
   // Prendra le tokenSaved en argument pour le sauvegarder.
@@ -51,69 +106,8 @@ async function postData(url = "", data = {}) {
   const responseJSON = await response.json(); // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
   let tokenToSave = "";
   tokenToSave = responseJSON.token; // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
-  console.log(
-    "Voici ce que postData veut stocker en cache : ",
-    responseJSON.token
-  );
   stockTokenCookie(tokenToSave); // Stockage du token dans le navigateur sous forme de cookie.
   return responseJSON; // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
-}
-
-/* FONCTION - Comportement du formulaire de connexion ! */
-function main() {
-  let form = document.getElementById("login_form"); // Selection de notre formulaire.
-  if (form != null) {
-    // Si l'ID "form" correspond à qq chose, alors :
-    form.addEventListener("submit", (ev) => {
-      // Si on clique sur Submit avec l'argument étant le contenu du form !
-      ev.preventDefault(); // N'actualise pas la page quand on clique.
-      let data = new FormData(ev.target); // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
-      let user = {
-        // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
-        email: data.get("email_login"),
-        password: data.get("password_login"),
-      };
-      let errorField = document.querySelector(".errorEmptyField"); // S'il y a déjà un message d'erreur car le formulaire n'est pas correctement reseigné.
-      if (errorField != null) {
-        // Si l'élément est trouvé, alors :
-        errorField.parentNode.removeChild(errorField); // On supprime l'élément du DOM.
-      }
-      if (user.email.trim() !== "" && user.password.trim() !== "") {
-        // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
-        postData("http://127.0.0.1:5678/api/users/login", user).then((data) => {
-          // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
-          console.log(data); // Vérification du bon contenu de "data".
-          // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
-          // Dans le cas où l'API ne retourne pas d'erreur :             */
-          if (data.userId == 1) {
-            // En fait, si data.userID == 1, c'est que la réponse de l'API est 1 et donc qu'on est connecté à 1 qui est SophieBluel, pour être préçis.
-            window.location.href = "../pages/index_edit.html";
-          }
-          // Dans le cas où l'API retourne une erreur :                  */
-          else {
-            let link = document.querySelector("#button_login");
-            let p = document.createElement("p");
-            p.setAttribute("class", "errorEmptyField");
-            let textError = document.createTextNode(
-              "Les informations ne correspondent pas."
-            );
-            p.appendChild(textError);
-            link.parentNode.insertBefore(p, link);
-          }
-        });
-      } else {
-        // Et sinon, on insère en DOM à l'utilisateur qu'il doit remplir tous les champs !
-        let link = document.querySelector("#button_login");
-        let p = document.createElement("p");
-        p.setAttribute("class", "errorEmptyField");
-        let textError = document.createTextNode(
-          "Veuillez remplir tous les champs."
-        );
-        p.appendChild(textError);
-        link.parentNode.insertBefore(p, link);
-      }
-    });
-  }
 }
 
 /* ___________________________________________________________ */
