@@ -502,7 +502,7 @@ function addingImageformCondition(image, arrayRequest, arrayData) {
       let newImageUrl = URL.createObjectURL(
         addPictureSelectedByUserImage.files[0]
       );
-      addingImageFormNewImageToAdd(
+      addingImageManager(
         image,
         addPictureTitle.value,
         addPictureCategory.value,
@@ -536,7 +536,7 @@ function thumbnailOfImage(image) {
 }
 
 /* FONCTION - Récupère les informations pour ajouter ensuite localement et dans l'API les images ! */
-function addingImageFormNewImageToAdd(
+function addingImageManager(
   array,
   title,
   category,
