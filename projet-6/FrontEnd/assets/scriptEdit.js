@@ -290,8 +290,6 @@ function trashCanListener(requestToDelete, arrayData) {
       } else {
         imageOutOfModal.classList.remove("selectedBeforeDelete");
       }
-      /* DOIT RESOUDRE LE SOUCIS DE L'UNDEFINED sur les images nouvellement ajoutées. Comme ça, on aura un point de repère pour les virer ensuite du tableau d'ajout de l'API si besoin ! */
-      // Exemple, le cas où l'utilisateur se trompe et fait une faute dans le titre, qu'il aimerait supprimer son image.
     });
   });
   // Modification d'arrayData pour permettre de ré-ouvrir et continuer à supprimer des choses.
@@ -379,7 +377,6 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayData) {
       secondModalCloseContent();
     }
   });
-  // addingPictureFormInformation();
   let modalBoxHitBox = document.querySelector("#modalBoxAddPicture"); // On séléctionne notre deuxieme modale dans le HTML.
   document.addEventListener("click", (event) => {
     // On écoute les cliques sur toute la page.
@@ -425,7 +422,7 @@ function addingImageFormBehavior(arrayRequest, arrayData) {
     id: "", // ON VA VENIR LE RETIRER EN FIN DE CODE ! Juste avant l'envoie à l'API car l'API gère cette partie, c'est juste pour du local, avoir un ID en local.
     title: "",
     imageUrl: "",
-    categoryId: 0, // Notre parfaite Sophie Bluel.
+    categoryId: 0,
   };
   let validateButton = document.querySelector("#pictureAddConformation");
   validateButton.addEventListener("click", (event) => {
