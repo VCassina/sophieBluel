@@ -75,20 +75,6 @@ function stockTokenCookie(token) {
   document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`; // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
 }
 
-/* FONCTION - essaye de récupérer le TOKEN d'Authentification depuis la navigateur ! */
-function getTokenCookie(tokenWanted) {
-  let cookieData = document.cookie; // Parmis tous les cookies du domaine stockés.
-  let cookieArray = cookieData.split(";"); // Split est à nouveau utilisé pour diviser la chaine de charactère en tableau, on connait.
-  for (let i = 0; i < cookieArray.length; i++) {
-    // Tableau qu'on va mtn parcourir.
-    let cookie = cookieArray[i].trim(); // A chaque cookie parcouru, on les trims par sécurité.
-    if (cookie.startsWith(tokenWanted + "=")) {
-      // Quand on a trouvé le cookie que nous recherchons via l'argument fournis dans la function.
-      return cookie.substring(tokenWanted.length + 1); // On le return.
-    }
-  }
-}
-
 /* FONCTION - Question le formulaire de connexion pour savoir si c'est good ! */
 async function postData(url = "", data = {}) {
   // Function async ayant besoin d'une URL et de données.
