@@ -474,7 +474,7 @@ function addingImageformCondition(image, arrayRequest, arrayData) {
       p2.appendChild(textError2);
       link2.parentNode.insertBefore(p2, link2);
       break;
-    case !/^[A-Za-z0-9\s]+$/.test(addPictureTitle.value):
+      case !/^[A-Za-z0-9\s\-\'\"À-ÖØ-öø-ÿ]+$/.test(addPictureTitle.value): // Autorise les accents et autres caractères spéciaux "gentils" mais pas les gros !
       let link3 = document.querySelector("#pictureAddConformation");
       let p3 = document.createElement("p");
       p3.setAttribute("class", "errorSecondModale");
