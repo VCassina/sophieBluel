@@ -62,13 +62,12 @@ function authorizationAcces() {
   for (let i = 0; i < cookieArray.length; i++) {
     // Parcours du tableau.
     let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
+    console.log(authTookie);
     if (!authTookie.startsWith("loginToken=")) {
       // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
       window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
     }
   }
-  /* !! NE MARCHE PLUS SOUS CHROME depuis AVRIL !!                            */
-  /* Voir explication dans la fonction : "stockTokenCookie" - scriptLogin.js. */
 }
 
 // FONCTION - Récupérer le token stocké au besoin.
@@ -243,9 +242,6 @@ function trashCanListener(requestToDelete, arrayData) {
   let trashCans = document.querySelectorAll(".fa-trash-can"); // Selectionne nos trashcans.
   trashCans.forEach((trashCan, index) => {
     // Pour chaque élément trashcans :
-    /* PROBLEME ICI ! L'image ajoutée ne s'ajoute pas ici, elle ne reçoit pas d'ID, je ne peux donc pas les lier !! */
-    /* MAINTENANT ! ArrayData se voit ajouter des ID quand on ajoute les images en locales !! Je peux venir les récupérer 
-     ici et les transmettre à applyingModification avec un TROSIIEME argument secret qui lui permettra de supprimer des ajouts ce que j'ai supprimé en locale. */
     trashCanId.push(arrayData[index].id); // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.
     let isTheTrashCanSelected = false; // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
     trashCan.addEventListener("click", () => {
