@@ -73,9 +73,6 @@ function stockTokenCookie(token) {
   let expirationDate = new Date(); // Représente la date et heure actuelle en fonction de quand on appelle la fonction.
   expirationDate.setDate(expirationDate.getDate() + 7); // Expiration dans 7 jours (arbitraire).
   document.cookie = `loginToken=${token};expires=${expirationDate.toUTCString()};path=/;SameSite=Strict`; // Utilisation de document.cookie avec précision qu'il expirera dans une semaine.
-  /* NE FONCTIONNE PAS SOUS CHROME car changement de politique de certificat des cookies !! */
-  /* Je ne trouve pas de solution à ce jour, SSL requis ! */
-  /* Possibilité de passer en "force" via le stockage en storage local apparement... */
 }
 
 /* FONCTION - essaye de récupérer le TOKEN d'Authentification depuis la navigateur ! */
