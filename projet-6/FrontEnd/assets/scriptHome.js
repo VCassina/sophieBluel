@@ -70,7 +70,6 @@ function filterSelection(choose) {                                          // P
 function dataShow(arrayData) {
     for (let i = arrayData.length - 1; i >= 0; i--) {                           // Boucle qui affichera les images dans le sens inverse.
         let galleryTargeting = document.querySelector(".gallery");
-        if (galleryTargeting != null) {
           let galleryCard = document.createElement("figure");
           let galleryImage = document.createElement("img");
           let galleryTxt = document.createElement("figcaption");
@@ -86,7 +85,6 @@ function dataShow(arrayData) {
           let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
           InsideCardTargeting.prepend(galleryImage, galleryTxt);           // L'incorporation des deux sous-balises.
         }
-    }
     filterSelection("all");
     filterListening();
 }
