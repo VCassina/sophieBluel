@@ -15,11 +15,9 @@ main();
 /* FONCTION - Comportement du formulaire de connexion ! */
 function main() {
   let form = document.getElementById("login_form"); // Selection de notre formulaire.
-  // Si l'ID "form" correspond à qq chose, alors :
   form.addEventListener("submit", (el) => {
-    // Si on clique sur Submit avec l'argument étant le contenu du form !
     el.preventDefault(); // N'actualise pas la page quand on clique.
-    let data = new FormData(el.target); // Création d'un objet "data" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
+    let data = new FormData(el.target); // Création d'un objet de nature "FormData" qu'on vient remplir avec le contenu de la cible, à savoir lui même, en gros : Envoie du contenu du formulaire dans "data".
     let user = {
       // Nouvel objet user qui vient recevoir pour email le contenu de la balise "email_login" de l'objet "data" et idem pour le password.
       email: data.get("email_login"),
@@ -33,10 +31,6 @@ function main() {
     if (user.email.trim() !== "" && user.password.trim() !== "") {
       // trim permet de valider une chaine de charactère vide, cela évite les erreurs d'interprétations de "false".
       postData("http://127.0.0.1:5678/api/users/login", user).then((data) => {
-        // Ensuite, appelle de la fonction postData avec l'URL de l'API et nos données de formulaire en argument.
-        console.log(data); // Vérification du bon contenu de "data".
-        // S'il est renseigné un champ email et MDP, il ne peut y avoir que deux cas de figure :
-        // Dans le cas où l'API ne retourne pas d'erreur :             */
         if (data.userId == 1) {
           // En fait, si data.userID == 1, c'est que la réponse de l'API est 1 et donc qu'on est connecté à 1 qui est SophieBluel, pour être préçis.
           window.location.href = "../pages/index_edit.html";

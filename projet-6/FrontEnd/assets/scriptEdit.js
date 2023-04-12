@@ -49,7 +49,7 @@ function pageFeatures(arrayData) {
   secondModalButton.addEventListener("click", (event) => {
     // Ouverture de la deuxieme modale.
     event.preventDefault();
-    secondModalOpenListener(arrayRequestToAdd, arrayData);
+    secondModalOpening(arrayRequestToDelete, arrayData);
   });
   addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
@@ -62,7 +62,6 @@ function authorizationAcces() {
   for (let i = 0; i < cookieArray.length; i++) {
     // Parcours du tableau.
     let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
-    console.log(authTookie);
     if (!authTookie.startsWith("loginToken=")) {
       // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
       window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
@@ -259,23 +258,15 @@ function trashCanListener(requestToDelete, arrayData) {
         });
       } else {
         // Si l'état n'est pas true, c'est que la trashCan n'a pas été ou bien ou a été désélectionnée.
-        // Methode de Thomas :
         let indexLookedFor = requestToDelete.findIndex(
-          // La variable indexLookedFor représente l'index de la requête que l'on cherche à effacer DANS requestToDelete (via l'instruction findIndex).
-          // findIndex va retourner la valeur (de l'index) quand le conditionnement qui va suivre est trouvé :
           (req) => req.url === "http://localhost:5678/api/works/" + idToDelete
-          // Ici, on cherche donc une requête qui irai (potentiellement existante) vers notre API avec l'idToDelete.
         );
         // Si cela est trouvé (toujours en forEach donc tout cela sera scanné pour voir si, oui ou non, il y aura un élément de trouvé) :
         if (indexLookedFor >= 0) {
           // On vient alors retirer la requete dans le tableau :) !
           requestToDelete.splice(indexLookedFor, 1);
         }
-        // En d'autre terme : "L'index à supprimer est le résultat de la recherche d'une requête hypotétique sur l'idToDelete dans le tableau requestToDelete.
-        // Si indexLookedFor renvoie qq chose, cela existe donc bel et bien, alors supprime cette requête dans le tableau requestToDelete parce que je viens de recliquer.
       }
-      // Ajoutez ou supprimez la classe MAIS, cette fois ci, nouvelle feature : En fonction de si la trashCan est selected ou pas !
-      // Cela participe uniquement à la gestion de l'affichage retour local pour l'utilisateur.
       const image = document.querySelectorAll(".edit_gallery img")[index];
       if (isTheTrashCanSelected) {
         // Si isTheTrashCanSelected est true :
@@ -358,7 +349,7 @@ function secondModalCloseContent() {
 }
 
 /* FONCTION - Conditionne les motifs de fermeture de la seconde modale ! */
-function secondModalClosingBehavior(arrayRequestAdd, arrayData) {
+function secondModalClosingBehavior(arrayRequestDelete, arrayData) {
   let modalCross = document.querySelector(".fa-xmarkOfSecondModal"); // On identifie la croix.
   modalCross.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
@@ -368,7 +359,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayData) {
   secondModalBackButton.addEventListener("click", () => {
     // Alors on place notre eventListener sur le clique.
     secondModalCloseContent();
-    mainModalOpening(arrayRequestAdd, arrayData);
+    mainModalOpening(arrayRequestDelete, arrayData);
   });
   document.addEventListener("keydown", (event) => {
     // Si on détecte la croix, on écoute également les inputs clavier.
@@ -390,7 +381,7 @@ function secondModalClosingBehavior(arrayRequestAdd, arrayData) {
 }
 
 /* FONCTION - Listener d'ouverture de la seconde modale ! */
-function secondModalOpenListener(arrayRequestAdd, arrayData) {
+function secondModalOpening(arrayRequestDelete, arrayData) {
   // On ajoute notre listener au boutton "Ajouter une photo" précedemment séléctionner.
   let secondModalBox = document.getElementById("modalBoxAddPicture"); // modalBox est notre élément comportement l'ID modalBox.
   secondModalBox.classList.remove("modalBox-hidden"); // On lui retire la modalBox-hidden, ce qui révèle notre seconde modale à la place.
@@ -399,19 +390,19 @@ function secondModalOpenListener(arrayRequestAdd, arrayData) {
   mainModalClosingContent(); // Retirer la première permet de ne plus la voir en fond (au cas où), c'est plus propre.
   // Fermeture de la modale possible au click de la croix + hors cadre & ESC.
   // Désormais ici car rajout du boolean (pour mieux suivre ET considérer le clique en dehors de la modale) !
-  secondModalClosingBehavior(arrayRequestAdd, arrayData);
+  secondModalClosingBehavior(arrayRequestDelete, arrayData);
 }
 
 /* FONCTION - Comportement du FORMULAIRE d'AJOUT d'IMAGE ! */
 function addingImageFormBehavior(arrayRequest, arrayData) {
-  let inputImage = document.getElementById("addedImage");
+  const inputedImage = document.getElementById("addedImage");
   /* Partie Listener de "Valider" ! */
+  let addPictureButton = document.getElementById("addPictureButton");
   addPictureButton.addEventListener("click", () => {
     // En cas de click sur le pictureButton (+ Ajouter photo).
-    inputImage.click(); // Un autre click aura lieux sur inputImage.
+    inputedImage.click(); // Un autre click aura lieux sur inputImage.
     document.body.classList.add("modalOpened");
   });
-  const inputedImage = document.getElementById("addedImage");
   inputedImage.addEventListener("change", (event) => {
     const imageSelected = event.target.files[0];
     const imageSelectedUrl = URL.createObjectURL(imageSelected);
@@ -427,12 +418,12 @@ function addingImageFormBehavior(arrayRequest, arrayData) {
   let validateButton = document.querySelector("#pictureAddConformation");
   validateButton.addEventListener("click", (event) => {
     event.preventDefault();
-    addingImageformCondition(addingPictureForm, arrayRequest, arrayData);
+    addingImageFormCondition(addingPictureForm, arrayRequest, arrayData);
   });
 }
 
 /* FONCTION - Conditionne le fonctionnement du formulaire d'ajout d'image ! */
-function addingImageformCondition(image, arrayRequest, arrayData) {
+function addingImageFormCondition(image, arrayRequest, arrayData) {
   let addPictureForm = document.querySelector("#pictureAdd");
   let addPictureTitle = addPictureForm.querySelector("#titlePictureAdd");
   let addPictureCategory = addPictureForm.querySelector("#categoryPictureAdd");
@@ -468,7 +459,7 @@ function addingImageformCondition(image, arrayRequest, arrayData) {
       p2.appendChild(textError2);
       link2.parentNode.insertBefore(p2, link2);
       break;
-      case !/^[A-Za-z0-9\s\-\'\"À-ÖØ-öø-ÿ]+$/.test(addPictureTitle.value): // Autorise les accents et autres caractères spéciaux "gentils" mais pas les gros ! - Première utilisation de l'instruction test.
+    case !/^[A-Za-z0-9\s\-\'\"À-ÖØ-öø-ÿ]+$/.test(addPictureTitle.value): // Autorise les accents et autres caractères spéciaux "gentils" mais pas les gros ! - Première utilisation de l'instruction test.
       let link3 = document.querySelector("#pictureAddConformation");
       let p3 = document.createElement("p");
       p3.setAttribute("class", "errorSecondModale");
