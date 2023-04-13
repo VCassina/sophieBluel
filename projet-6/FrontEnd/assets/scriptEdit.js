@@ -572,19 +572,6 @@ function addingImageApi(array, title, category, imageValue, arrayRequest, id) {
   };
   // On stocke l'image, une par une, toujours car FormData.
   arrayRequest.push(array);
-  let url = "http://localhost:5678/api/works/";
-  let allImageToAdd = [];
-  for (let i = 0; i <= arrayRequest.length - 1; i++) {
-    // L'ID est retiré à cet endroit ! Car on ne l'append pas dans la requête fetch. Il restera local.
-    const imageToSend = new FormData();
-    const imageRequest = arrayRequest[i];
-    imageToSend.append("title", imageRequest.title);
-    imageToSend.append("category", imageRequest.category);
-    imageToSend.append("image", imageRequest.imageUrl);
-    // addingImageStorage(imageToSend, url, allImageToAdd);
-  }
-  // Reset entre chaque ajout d'image pour éviter d'en ajouter 1 puis 1 et 2 puis 1 et 2 et 3, etc.
-  arrayRequest = [];
 }
 
 /* FONCTION - Envoie des requêtes fetchs d'AJOUT ! */
@@ -644,20 +631,44 @@ function applyingModification(arrayAdd, arrayRemove) {
       // Quand je supprime seulement.
       case arrayRemove.length > 0 && !arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
-          location.reload();
+          apiDataGet().then((data) => {
+            // Stockage des datas UNE FOIS reçues !
+            arrayData = data;
+            // Puis application des fonctions non-asynchrones.
+            apiDataClear();
+            apiDataShow(arrayData);
+            arrayRemove = [];
+            arrayAdd = [];
+          });
         });
         break;
       // Quand j'ajoute seulement.
       case !arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-          location.reload();
+          apiDataGet().then((data) => {
+            // Stockage des datas UNE FOIS reçues !
+            arrayData = data;
+            // Puis application des fonctions non-asynchrones.
+            apiDataClear();
+            apiDataShow(arrayData);
+            arrayRemove = [];
+            arrayAdd = [];
+          });
         });
         break;
       // Quand je fais les deux.
       case arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
           sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-            location.reload();
+            apiDataGet().then((data) => {
+              // Stockage des datas UNE FOIS reçues !
+              arrayData = data;
+              // Puis application des fonctions non-asynchrones.
+              apiDataClear();
+              apiDataShow(arrayData);
+              arrayRemove = [];
+              arrayAdd = [];
+            });
           });
         });
         break;

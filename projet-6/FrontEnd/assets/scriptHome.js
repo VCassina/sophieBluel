@@ -100,6 +100,22 @@ function dataShow(arrayData) {
         InsideCardTargeting.prepend(galleryImage, galleryTxt);           // L'incorporation des deux sous-balises.
       }
   filterSelection("all");
+  const filterAllButton = document.getElementById("filterAll");
+filterAllButton.addEventListener("click", function() {
+  filterSelection("all");
+});
+const filter1 = document.getElementById("filter1");
+filter1.addEventListener("click", function() {
+  filterSelection(1);
+});
+const filter2 = document.getElementById("filter2");
+filter2.addEventListener("click", function() {
+  filterSelection(2);
+});
+const filter3 = document.getElementById("filter3");
+filter3.addEventListener("click", function() {
+  filterSelection(3);
+});
   filterListening();
 }
 
