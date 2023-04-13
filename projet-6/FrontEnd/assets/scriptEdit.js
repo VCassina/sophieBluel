@@ -622,7 +622,7 @@ function removeRemovedFromAdded(arrayAdd, arrayRemove) {
 }
 
 /* FONCTION - UPDATE des informations de la page - Evite le reload ! */
-function updatedData(arrayData, arrayRemove, arrayAdd) {
+function updatedData(arrayData) {
   apiDataGet().then((data) => {
     // Stockage des datas UNE FOIS reçues !
     arrayData = data;
@@ -642,7 +642,7 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
       // Quand je supprime seulement.
       case arrayRemove.length > 0 && !arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
-          updatedData(arrayData, arrayRemove, arrayAdd);
+          updatedData(arrayData);
           arrayRemove = [];
           arrayAdd = [];
         });
@@ -650,7 +650,7 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
       // Quand j'ajoute seulement.
       case !arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-          updatedData(arrayData, arrayRemove, arrayAdd);
+          updatedData(arrayData);
           arrayRemove = [];
           arrayAdd = [];
         });
@@ -659,7 +659,7 @@ function applyingModification(arrayAdd, arrayRemove, arrayData) {
       case arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
           sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-            updatedData(arrayData, arrayRemove, arrayAdd);
+            updatedData(arrayData);
             arrayRemove = [];
             arrayAdd = [];
           });
