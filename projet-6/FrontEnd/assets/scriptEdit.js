@@ -621,8 +621,19 @@ function removeRemovedFromAdded(arrayAdd, arrayRemove) {
   });
 }
 
+/* FONCTION - UPDATE des informations de la page - Evite le reload ! */
+function updatedData(arrayData, arrayRemove, arrayAdd) {
+  apiDataGet().then((data) => {
+    // Stockage des datas UNE FOIS reçues !
+    arrayData = data;
+    // Puis application des fonctions non-asynchrones.
+    apiDataClear();
+    apiDataShow(arrayData);
+  });
+}
+
 /* FONCTION - L'eventListener de "publier les changements" ! */
-function applyingModification(arrayAdd, arrayRemove) {
+function applyingModification(arrayAdd, arrayRemove, arrayData) {
   let urlAdding = "http://localhost:5678/api/works/";
   const changementApplyButton = document.getElementById("changementApply");
   changementApplyButton.addEventListener("click", () => {
@@ -631,44 +642,26 @@ function applyingModification(arrayAdd, arrayRemove) {
       // Quand je supprime seulement.
       case arrayRemove.length > 0 && !arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
-          apiDataGet().then((data) => {
-            // Stockage des datas UNE FOIS reçues !
-            arrayData = data;
-            // Puis application des fonctions non-asynchrones.
-            apiDataClear();
-            apiDataShow(arrayData);
-            arrayRemove = [];
-            arrayAdd = [];
-          });
+          updatedData(arrayData, arrayRemove, arrayAdd);
+          arrayRemove = [];
+          arrayAdd = [];
         });
         break;
       // Quand j'ajoute seulement.
       case !arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-          apiDataGet().then((data) => {
-            // Stockage des datas UNE FOIS reçues !
-            arrayData = data;
-            // Puis application des fonctions non-asynchrones.
-            apiDataClear();
-            apiDataShow(arrayData);
-            arrayRemove = [];
-            arrayAdd = [];
-          });
+          updatedData(arrayData, arrayRemove, arrayAdd);
+          arrayRemove = [];
+          arrayAdd = [];
         });
         break;
       // Quand je fais les deux.
       case arrayRemove.length > 0 && arrayAdd.length > 0:
         sendAllPicturesToRemoveToApi(arrayRemove).then(() => {
           sendAllPicturesToAddToApi(arrayAdd, urlAdding).then(() => {
-            apiDataGet().then((data) => {
-              // Stockage des datas UNE FOIS reçues !
-              arrayData = data;
-              // Puis application des fonctions non-asynchrones.
-              apiDataClear();
-              apiDataShow(arrayData);
-              arrayRemove = [];
-              arrayAdd = [];
-            });
+            updatedData(arrayData, arrayRemove, arrayAdd);
+            arrayRemove = [];
+            arrayAdd = [];
           });
         });
         break;
