@@ -21,7 +21,7 @@ function main() {
     // Stockage des datas UNE FOIS reçues !
     arrayData = data;
     // Puis application des fonctions non-asynchrones.
-    apiDataShow(arrayData);
+    dataShow(arrayData);
     pageFeatures(arrayData);
   });
 }
@@ -66,10 +66,16 @@ function authorizationAcces() {
     let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
     if (!authTookie.startsWith("loginToken=")) {
       // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
-      window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
+      // window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
     }
+    if(/* la variable inter-script > editingMode est true, alors, balance la fonction : */1) {
+        editingMode();
+      }
   }
+}
 
+
+  function editingMode() {
   /* !!! REFONTE DU SITE FULL DYNAMIQUE !!! */
   /* Si la connexion login/mdp à renvoyé un "true" + Cookie bon > (ou jsp), cela va venir réactualiser dans le DOM tous les éléments masqués et les afficher ! */
   /* A savoir : 
@@ -79,8 +85,8 @@ function authorizationAcces() {
   - les filtres sont cachés.
   - Les modifiers sont dévoilés.
   - Les modales sont toujours masquées, rien à retoucher. */
+  }
 
-}
 
 // FONCTION - Récupérer le token stocké au besoin.
 function getTokenCookie(tokenWanted) {
@@ -109,27 +115,27 @@ async function apiDataGet() {
 }
 
 /* FONCTION - Affiche les éléments dynamiquement ! */
-function apiDataShow(arrayData) {
-  for (let i = arrayData.length - 1; i >= 0; i--) {
-    // Boucle qui affichera les images dans le sens inverse.
-    /* Création de nos éléments dans le DOM ! */
-    let galleryTargeting = document.querySelector(".gallery");
-    let galleryCard = document.createElement("figure");
-    let galleryImage = document.createElement("img");
-    let galleryTxt = document.createElement("figcaption");
-    galleryCard.setAttribute(
-      "class",
-      "figureCard show " + arrayData[i].categoryId
-    ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
-    galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
-    galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
-    galleryImage.setAttribute("alt", arrayData[i].title);
-    galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
-    galleryTxt.setAttribute("class", "img_title");
-    let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
-    InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
-  }
-}
+// function dataShow(arrayData) {
+//   for (let i = arrayData.length - 1; i >= 0; i--) {
+//     // Boucle qui affichera les images dans le sens inverse.
+//     /* Création de nos éléments dans le DOM ! */
+//     let galleryTargeting = document.querySelector(".gallery");
+//     let galleryCard = document.createElement("figure");
+//     let galleryImage = document.createElement("img");
+//     let galleryTxt = document.createElement("figcaption");
+//     galleryCard.setAttribute(
+//       "class",
+//       "figureCard show " + arrayData[i].categoryId
+//     ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
+//     galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
+//     galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
+//     galleryImage.setAttribute("alt", arrayData[i].title);
+//     galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
+//     galleryTxt.setAttribute("class", "img_title");
+//     let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
+//     InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
+//   }
+// }
 
 /* FONCTION - Supprimes les éléments du DOM créés lors de l'affichage dynamique ! */
 function apiDataClear() {
@@ -571,7 +577,7 @@ function addingImageLocale(array, title, category, url, id, arrayData) {
   };
   arrayData.push(array);
   apiDataClear();
-  apiDataShow(arrayData);
+  dataShow(arrayData);
 }
 
 /* FONCTION - Ajoute les images ajoutées dans l'API ! Début de la construction de la requête fetch. ! */
@@ -641,7 +647,7 @@ function updatedData(arrayData) {
     arrayData = data;
     // Puis application des fonctions non-asynchrones.
     apiDataClear();
-    apiDataShow(arrayData);
+    dataShow(arrayData);
   });
 }
 
