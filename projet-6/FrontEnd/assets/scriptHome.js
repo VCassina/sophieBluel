@@ -8,10 +8,6 @@
 
 main();
 
-/* FONCTIONS ! */
-/* FONCTIONS ! */
-/* FONCTIONS ! */
-
 /* FONCTION - Comportement général du site. */
 async function main() {
     const arrayData = await getData();

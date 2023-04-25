@@ -28,6 +28,8 @@ function main() {
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
 function prerequisite() {
+  /* !!! REFONTE DU SITE FULL DYNAMIQUE !!! */
+  /* Il faudrait que authorizationAcces() débloquent l'affichage, on garde le token pour sécuriser les envoies à l'API. */
   authorizationAcces();
   disableUselessModifiers();
 }
@@ -58,7 +60,7 @@ function pageFeatures(arrayData) {
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
 function authorizationAcces() {
   const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
-  let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
+  // let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
   for (let i = 0; i < cookieArray.length; i++) {
     // Parcours du tableau.
     let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
@@ -67,6 +69,17 @@ function authorizationAcces() {
       window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
     }
   }
+
+  /* !!! REFONTE DU SITE FULL DYNAMIQUE !!! */
+  /* Si la connexion login/mdp à renvoyé un "true" + Cookie bon > (ou jsp), cela va venir réactualiser dans le DOM tous les éléments masqués et les afficher ! */
+  /* A savoir : 
+
+  - La bannière de modification est révélée.
+  - Le login devient logout / on révèle l'un, cache l'autre.
+  - les filtres sont cachés.
+  - Les modifiers sont dévoilés.
+  - Les modales sont toujours masquées, rien à retoucher. */
+
 }
 
 // FONCTION - Récupérer le token stocké au besoin.
