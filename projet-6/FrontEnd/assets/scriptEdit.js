@@ -14,21 +14,29 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
-  prerequisite();
+  prerequisite();     /* FULL DYNAMIC !!! --- Ne regarde plus seulement le cookie d'auth mais si l'utilisateur vient d'être redirigé, si c'est le cas, on lui révèle les features d'editeurs.  --- !!! */
+                      /* En cas de redirection de la part d'un site malveillant, les cookies d'authentification offriront la protection nécéssaire et empêcheront les actions vers l'API. */
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
     // Stockage des datas UNE FOIS reçues !
     arrayData = data;
     // Puis application des fonctions non-asynchrones.
-    apiDataShow(arrayData);
+    dataShow(arrayData);
     pageFeatures(arrayData);
   });
 }
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
 function prerequisite() {
+
+  /* ! REFONTE DU SITE FULL DYNAMIQUE ! */
+  /* Il faudrait que authorizationAcces() débloquent l'affichage, on garde le token pour sécuriser les envoies à l'API. */
+const params = new URLSearchParams(window.location.search);
+  if (params.get("from") === "login") {
   authorizationAcces();
+  console.log("I come from login.html.")
+  } 
   disableUselessModifiers();
 }
 
@@ -58,16 +66,38 @@ function pageFeatures(arrayData) {
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
 function authorizationAcces() {
   const cookieArray = document.cookie.split(";"); // Récupération des cookies du navigateurs.
-  let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
+  // let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
   for (let i = 0; i < cookieArray.length; i++) {
     // Parcours du tableau.
-    let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
-    if (!authTookie.startsWith("loginToken=")) {
-      // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
-      window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
+    let authCookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
+    if (authCookie.includes("loginToken=")) {
+      editingMode();
+      console.log("Editing mode allowed, i got the cookie.")
     }
   }
 }
+
+function editingMode() {
+    console.log("I've been called - editingMode.")
+    let editOnlyElements = document.querySelectorAll(".edit_only");
+    for (let i = 0; i < editOnlyElements.length; i++) {
+      editOnlyElements[i].classList.remove("edit_only");
+    }
+    let filterElements = document.querySelectorAll(".filter");
+    for (let i = 0; i < filterElements.length; i++) {
+      filterElements[i].classList.add("hidden");
+    }
+    const projectMenu = document.getElementById('edit_portfolio-title');
+    projectMenu.classList.remove('edit_portfolio-title-column');
+    projectMenu.classList.add('edit_portfolio-title-row');
+
+    const headerBar = document.querySelector('.header_standard-content');
+    headerBar.classList.add('header_standard-content-margin');
+
+    const login = document.querySelector('.loginEdit');
+    login.classList.add('hidden');
+}
+
 
 // FONCTION - Récupérer le token stocké au besoin.
 function getTokenCookie(tokenWanted) {
@@ -92,29 +122,6 @@ async function apiDataGet() {
     return respContent;
   } catch (error) {
     console.error(error);
-  }
-}
-
-/* FONCTION - Affiche les éléments dynamiquement ! */
-function apiDataShow(arrayData) {
-  for (let i = arrayData.length - 1; i >= 0; i--) {
-    // Boucle qui affichera les images dans le sens inverse.
-    /* Création de nos éléments dans le DOM ! */
-    let galleryTargeting = document.querySelector(".gallery");
-    let galleryCard = document.createElement("figure");
-    let galleryImage = document.createElement("img");
-    let galleryTxt = document.createElement("figcaption");
-    galleryCard.setAttribute(
-      "class",
-      "figureCard show " + arrayData[i].categoryId
-    ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
-    galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
-    galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
-    galleryImage.setAttribute("alt", arrayData[i].title);
-    galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
-    galleryTxt.setAttribute("class", "img_title");
-    let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
-    InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
   }
 }
 
@@ -235,109 +242,82 @@ function mainModalShowData(arrayData) {
 
 /* FONCTION - Gestion des trashCans et de leur capaciter à supprimer localement/stocker ce qui va l'être vraiment dans l'API plus tard ! */
 function trashCanListener(requestToDelete, arrayData) {
-  // On vient récupérer l'ultime value ID d'arrayData.
-  let trashCanId = []; // Va permettre de lier nos ID et nos index pour faire correspondre les trashcans aux images séléctionnées.
-  let idToRemoveFromArrayData = []; // Venir supprimer les ID dans arrayData plus tard.
-  let trashCans = document.querySelectorAll(".fa-trash-can"); // Selectionne nos trashcans.
+  console.log("trashCanListener has been called.");
+
+  let trashCanIds = []; // Tableau des ID des trashCans
+  let selectedImageIds = []; // Tableau des ID des images sélectionnées
+
+  let trashCans = document.querySelectorAll(".fa-trash-can");
   trashCans.forEach((trashCan, index) => {
-    // Pour chaque élément trashcans :
-    trashCanId.push(arrayData[index].id); // On ajoute l'ID en cours dans le tableau trashCanId, cela affecte l'ID de l'élément à "sa" trashCan.
-    let isTheTrashCanSelected = false; // NEW ! Prise en compte de si la trashCan a été ou non séléctionnée déjà.
+    const image = document.querySelectorAll(".edit_gallery img")[index];
+    const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
+
+    const imageId = arrayData[index].id;
+    trashCanIds.push(imageId);
+
+    let isTheTrashCanSelected = false;
     trashCan.addEventListener("click", () => {
-      // Quand on clique sur une icone trashcan :
-      let idToDelete = trashCanId[index]; // L'icone exacte sur laquelle on à cliqué est numérotée et renseignée dans idToDelete pour transmettre plus tard la liste d'élément(s) à supprimer.
-      idToRemoveFromArrayData.push(idToDelete); // Pour éviter les doublons par la suite en cas de ré-ouverture du code voir L.430.
-      isTheTrashCanSelected = !isTheTrashCanSelected; // Inverse l'état, superbe façon de faire, j'aurais faire ça bien avant déjà.
+      isTheTrashCanSelected = !isTheTrashCanSelected;
+
       if (isTheTrashCanSelected) {
-        // Si l'état est en true, que l'élément est séléctionné :
+        selectedImageIds.push(imageId);
+        image.classList.add("selectedBeforeDelete");
+        imageOutOfModal.classList.add("selectedBeforeDelete");
+
         requestToDelete.push({
-          // On ajoute, en agrandissant le tableau requestToDelete, une requête fetch qu'on enverra plus tard.
           method: "DELETE",
-          url: "http://localhost:5678/api/works/" + idToDelete, // La demande touche à notre idtoDelete, là où nous avons cliqué.
-          headers: { Authorization: "Bearer " + getTokenCookie("loginToken") }, // Ne pas oublier le token pour se faire accepter par la demande.
+          url: "http://localhost:5678/api/works/" + imageId,
+          headers: { Authorization: "Bearer " + getTokenCookie("loginToken") },
         });
       } else {
-        // Si l'état n'est pas true, c'est que la trashCan n'a pas été ou bien ou a été désélectionnée.
-        let indexLookedFor = requestToDelete.findIndex(
-          (req) => req.url === "http://localhost:5678/api/works/" + idToDelete
-        );
-        // Si cela est trouvé (toujours en forEach donc tout cela sera scanné pour voir si, oui ou non, il y aura un élément de trouvé) :
-        if (indexLookedFor >= 0) {
-          // On vient alors retirer la requete dans le tableau :) !
-          requestToDelete.splice(indexLookedFor, 1);
+        const indexToRemove = selectedImageIds.indexOf(imageId);
+        if (indexToRemove >= 0) {
+          selectedImageIds.splice(indexToRemove, 1);
+          image.classList.remove("selectedBeforeDelete");
+          imageOutOfModal.classList.remove("selectedBeforeDelete");
+
+          const requestIndexToRemove = requestToDelete.findIndex(
+            (req) => req.url === "http://localhost:5678/api/works/" + imageId
+          );
+          if (requestIndexToRemove >= 0) {
+            requestToDelete.splice(requestIndexToRemove, 1);
+          }
         }
-      }
-      const image = document.querySelectorAll(".edit_gallery img")[index];
-      if (isTheTrashCanSelected) {
-        // Si isTheTrashCanSelected est true :
-        image.classList.add("selectedBeforeDelete"); // On ajoute la classe.
-      } else {
-        image.classList.remove("selectedBeforeDelete");
-        // Sinon, on l'enlève, si ca a été décoché, c'est ce qu'on voulait faire et si ca n'a jamais été le cas, ça ne fera rien, ca revient au même.
-      }
-      const imageOutOfModal = document.querySelectorAll(".gallery img")[index]; // Même logique.
-      if (isTheTrashCanSelected) {
-        imageOutOfModal.classList.add("selectedBeforeDelete");
-      } else {
-        imageOutOfModal.classList.remove("selectedBeforeDelete");
       }
     });
   });
-  // Modification d'arrayData pour permettre de ré-ouvrir et continuer à supprimer des choses.
-  // Si l'utilisateur veut revenir en arrière, il n'a qu'à réactualiser pour ne pas publiquer les changements.
-  for (let i = 0; i < arrayData.length; i++) {
-    // On parcours arrayData, notre tableau "cible", finalement.
-    if (idToRemoveFromArrayData.includes(arrayData[i].id)) {
-      // !! Nouvelle instruction, includes (même si déjà utilisée pour rediriger une page, cela marche également pour vérifier des éléments inter-tableaux).
-      // Includes prend comme argument l'élément que l'on cherche et renvoie une valeur booléenne, d'où le fait que le condition se suffit à lui même.
-      // Ici : idToRemoveFromArrayData inclut-il la valeur "i" d'arrayData.id ?
-      // Si oui > Retire le d'arrayData !
-      arrayData.splice(i, 1);
-    }
-  }
-  trashCanLocalApplying(idToRemoveFromArrayData, arrayData);
-  // A ce stade, requestToDelete contient tout ce qu'il faut delete dans l'API.
+
+  // Suppression des éléments sélectionnés
+  arrayData = arrayData.filter((item) => !selectedImageIds.includes(item.id));
+  trashCanLocalApplying(selectedImageIds, arrayData, requestToDelete);
 }
 
+
 /* FONCTION - Procède à l'action de suppression locale conditionnée par trashCanListener en amont ! */
-function trashCanLocalApplying(array, arrayData) {
-  // Suppression LOCAL du contenu.
-  const galleryDelete = document.querySelector("#gallery_delete"); // Selection de tous nos éléments avec l'id.
-  if (galleryDelete) {
-    // Pour eviter les erreurs consoles (car je n'utilise qu'un seul script).
+function trashCanLocalApplying(array, arrayData, requestToDelete) {
+  const galleryDelete = document.querySelector("#gallery_delete");
     galleryDelete.addEventListener("click", () => {
-      // Supprime les éléments correspondants aux trashcans sélectionnées mais pour la modale.
-      let selectedCards = document.querySelectorAll(".edit_figureCard"); // On vient prendre toutes les classes qui nous intéressent.
+      let selectedCards = document.querySelectorAll(".edit_figureCard");
       selectedCards.forEach((card) => {
-        // Il les parcourt.
         if (card.querySelector(".selectedBeforeDelete")) {
-          // Si un enfant contenant la classe .selectedBeforeDelete est trouvé, on supprime .edit_figureCard.
-          card.parentNode.removeChild(card); // Ainsi, si une image dispose de la classe, toute la card est delete.
+          card.parentNode.removeChild(card);
         }
       });
-      // Supprime les éléments correspondants aux trashcans sélectionnées hors modale, sur le "vrai site".
       const selectedCardsOutOfModal = document.querySelectorAll(".figureCard"); // Même procédé.
       selectedCardsOutOfModal.forEach((card) => {
         if (card.querySelector(".selectedBeforeDelete")) {
           card.parentNode.removeChild(card);
         }
       });
-
-      // Modification d'arrayData pour permettre de ré-ouvrir et continuer à supprimer des choses.
-      // Si l'utilisateur veut revenir en arrière, il n'a qu'à réactualiser pour ne pas publiquer les changements.
       for (let i = arrayData.length - 1; i >= 0; i--) {
-        // On parcours arrayData, notre tableau "cible", finalement.
         if (array.includes(arrayData[i].id)) {
-          // !! Nouvelle instruction, includes (même si déjà utilisée pour rediriger une page, cela marche également pour vérifier des éléments inter-tableaux).
-          // Includes prend comme argument l'élément que l'on cherche et renvoie une valeur booléenne, d'où le fait que le condition se suffit à lui même.
-          // Ici : array inclut-il la valeur "i" d'arrayData.id ?
-          // Si oui > Retire le d'arrayData !
           arrayData.splice(i, 1);
         }
       }
+      trashCanListener(requestToDelete, arrayData);
     });
-  }
 }
+
 
 /* FONCTION - Ferme contenu de la seconde principal ! */
 function secondModalCloseContent() {
@@ -558,7 +538,7 @@ function addingImageLocale(array, title, category, url, id, arrayData) {
   };
   arrayData.push(array);
   apiDataClear();
-  apiDataShow(arrayData);
+  dataShow(arrayData);
 }
 
 /* FONCTION - Ajoute les images ajoutées dans l'API ! Début de la construction de la requête fetch. ! */
@@ -628,7 +608,7 @@ function updatedData(arrayData) {
     arrayData = data;
     // Puis application des fonctions non-asynchrones.
     apiDataClear();
-    apiDataShow(arrayData);
+    dataShow(arrayData);
   });
 }
 

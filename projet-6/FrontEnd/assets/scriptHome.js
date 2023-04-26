@@ -8,14 +8,10 @@
 
 main();
 
-/* FONCTIONS ! */
-/* FONCTIONS ! */
-/* FONCTIONS ! */
-
 /* FONCTION - Comportement général du site. */
 async function main() {
     const arrayData = await getData();
-    dataShow(arrayData);
+    // dataShow(arrayData); /* Plus nécessaire car la page se partage les deux scrips et le second script appel la fonction déclarée ici ! */
 }
 
 /* FONCTION - Récuparation des données de l'API ! */

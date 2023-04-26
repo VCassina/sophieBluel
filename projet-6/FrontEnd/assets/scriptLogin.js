@@ -33,7 +33,7 @@ function main() {
       postData("http://127.0.0.1:5678/api/users/login", user).then((data) => {
         if (data.userId == 1) {
           // En fait, si data.userID == 1, c'est que la réponse de l'API est 1 et donc qu'on est connecté à 1 qui est SophieBluel, pour être préçis.
-          window.location.href = "../pages/index_edit.html";
+          window.location.href = "./index.html?from=login";;
         }
         // Dans le cas où l'API retourne une erreur :                  */
         else {

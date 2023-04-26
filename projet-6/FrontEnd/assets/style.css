@@ -152,10 +152,11 @@ a:hover {
 	color: #B1663C;
 }
 
-header {
+.header_standard-content {
 	display: flex;
 	justify-content: space-between;
-	margin: 50px 0
+	margin: 50px 0px;
+	margin-top: 20px; /* Devient 75px quand passe en mode edit ! */
 }
 
 section {
@@ -189,7 +190,6 @@ nav ul {
 	display: flex;
 	align-items: center;
 	list-style-type: none;
-
 }
 
 nav li {
@@ -406,9 +406,6 @@ footer nav ul {
 	object-fit: cover;
 }
 
-/* _______________________________ */
-/* Doivent être à la fin pour être lu dans le bon ordre ! */
-
 .show {
 	display: block;
 }
@@ -444,11 +441,6 @@ input[type="submit"] {
 	gap: 8px;
 }
 
-#edit_body {
-	margin-top: 100px;
-	/* Pixel perfect (60px edit_bar + 40px d'espacement) ! */
-}
-
 #edit_bar {
 	position: absolute;
 	top: 0;
@@ -461,7 +453,7 @@ input[type="submit"] {
 	align-items: center;
 	color: white;
 	gap: 30px;
-}
+  }
 
 #edit_bar .edit_texte,
 #edit_bar i {
@@ -502,9 +494,22 @@ input[type="submit"] {
 
 #edit_portfolio-title {
 	display: flex;
-	flex-direction: row;
 	justify-content: center;
+}
+
+.edit_portfolio-title-column {
+	flex-direction: column;
+	gap: 10px;
+}
+
+.edit_portfolio-title-row {
+	flex-direction: row;
+	margin-bottom: 30px;
 	gap: 30px;
+}
+
+#edit_portfolio-title h2 {
+	align-self: center;
 }
 
 #edit_portfolio .edit {
@@ -831,4 +836,13 @@ body.modalOpened {
 .thumbnailImage {
 	width: 160px;
 	height: auto;
+}
+
+.edit_only {
+	display: none;
+	visibility: hidden; /* Pour edit_bar/.header_standard-content ! */
+}
+
+.header_standard-content-margin {
+	margin-top: 80px;
 }
