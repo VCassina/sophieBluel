@@ -81,9 +81,13 @@ async function postData(url = "", data = {}) {
     body: JSON.stringify(data), // Les données de "data" sont stringifiées en JSON avant d'être envoyées.
   });
   const responseJSON = await response.json(); // Attente de notre réponse en .JSON de l'API et stockage de son contenu.
-  let tokenToSave = "";
-  tokenToSave = responseJSON.token; // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
-  stockTokenCookie(tokenToSave); // Stockage du token dans le navigateur sous forme de cookie.
+
+  if (!responseJSON.error) { // Updated !! Il ne stock le token que si la réponse de l'API est bonne, comme convenu...
+    let tokenToSave = "";
+    tokenToSave = responseJSON.token; // Stocker le token de réponse dans la variable "token" (sautera après la redirection - COOKIE requis).
+    stockTokenCookie(tokenToSave); // Stockage du token dans le navigateur sous forme de cookie.
+  }
+
   return responseJSON; // On return notre constante qui fait la demande et reçoit la réponse comme résultat de la function.
 }
 

@@ -31,7 +31,6 @@ function prerequisite() {
   const params = new URLSearchParams(window.location.search);
   if (params.get("from") === "login") {
     authorizationAcces();
-    console.log("I come from login.html.");
   }
   disableUselessModifiers();
 }
@@ -68,13 +67,11 @@ function authorizationAcces() {
     let authCookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
     if (authCookie.includes("loginToken=")) {
       editingMode();
-      console.log("Editing mode allowed, i got the cookie.");
     }
   }
 }
 
 function editingMode() {
-  console.log("I've been called - editingMode.");
   let editOnlyElements = document.querySelectorAll(".edit_only");
   for (let i = 0; i < editOnlyElements.length; i++) {
     editOnlyElements[i].classList.remove("edit_only");
@@ -237,8 +234,6 @@ function mainModalShowData(arrayData) {
 
 /* FONCTION - Gestion des trashCans et de leur capaciter à supprimer localement/stocker ce qui va l'être vraiment dans l'API plus tard ! */
 function trashCanListener(requestToDelete, arrayData) {
-  console.log("trashCanListener has been called.");
-
   let trashCanIds = []; // Tableau des ID des trashCans
   let selectedImageId = []; // Tableau des ID des images sélectionnées
 
