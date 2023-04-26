@@ -14,8 +14,7 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
-  prerequisite();     /* FULL DYNAMIC !!! --- Ne regarde plus seulement le cookie d'auth mais si l'utilisateur vient d'être redirigé, si c'est le cas, on lui révèle les features d'editeurs.  --- !!! */
-                      /* En cas de redirection de la part d'un site malveillant, les cookies d'authentification offriront la protection nécéssaire et empêcheront les actions vers l'API. */
+  prerequisite();   
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
