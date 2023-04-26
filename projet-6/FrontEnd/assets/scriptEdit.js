@@ -14,7 +14,7 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
-  prerequisite();   
+  prerequisite();
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
@@ -28,14 +28,11 @@ function main() {
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
 function prerequisite() {
-
-  /* ! REFONTE DU SITE FULL DYNAMIQUE ! */
-  /* Il faudrait que authorizationAcces() débloquent l'affichage, on garde le token pour sécuriser les envoies à l'API. */
-const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search);
   if (params.get("from") === "login") {
-  authorizationAcces();
-  console.log("I come from login.html.")
-  } 
+    authorizationAcces();
+    console.log("I come from login.html.");
+  }
   disableUselessModifiers();
 }
 
@@ -71,32 +68,31 @@ function authorizationAcces() {
     let authCookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
     if (authCookie.includes("loginToken=")) {
       editingMode();
-      console.log("Editing mode allowed, i got the cookie.")
+      console.log("Editing mode allowed, i got the cookie.");
     }
   }
 }
 
 function editingMode() {
-    console.log("I've been called - editingMode.")
-    let editOnlyElements = document.querySelectorAll(".edit_only");
-    for (let i = 0; i < editOnlyElements.length; i++) {
-      editOnlyElements[i].classList.remove("edit_only");
-    }
-    let filterElements = document.querySelectorAll(".filter");
-    for (let i = 0; i < filterElements.length; i++) {
-      filterElements[i].classList.add("hidden");
-    }
-    const projectMenu = document.getElementById('edit_portfolio-title');
-    projectMenu.classList.remove('edit_portfolio-title-column');
-    projectMenu.classList.add('edit_portfolio-title-row');
+  console.log("I've been called - editingMode.");
+  let editOnlyElements = document.querySelectorAll(".edit_only");
+  for (let i = 0; i < editOnlyElements.length; i++) {
+    editOnlyElements[i].classList.remove("edit_only");
+  }
+  let filterElements = document.querySelectorAll(".filter");
+  for (let i = 0; i < filterElements.length; i++) {
+    filterElements[i].classList.add("hidden");
+  }
+  const projectMenu = document.getElementById("edit_portfolio-title");
+  projectMenu.classList.remove("edit_portfolio-title-column");
+  projectMenu.classList.add("edit_portfolio-title-row");
 
-    const headerBar = document.querySelector('.header_standard-content');
-    headerBar.classList.add('header_standard-content-margin');
+  const headerBar = document.querySelector(".header_standard-content");
+  headerBar.classList.add("header_standard-content-margin");
 
-    const login = document.querySelector('.loginEdit');
-    login.classList.add('hidden');
+  const login = document.querySelector(".loginEdit");
+  login.classList.add("hidden");
 }
-
 
 // FONCTION - Récupérer le token stocké au besoin.
 function getTokenCookie(tokenWanted) {
@@ -247,15 +243,17 @@ function trashCanListener(requestToDelete, arrayData) {
   let selectedImageId = []; // Tableau des ID des images sélectionnées
 
   let trashCans = document.querySelectorAll(".fa-trash-can");
-  trashCans.forEach((trashCan, index) => {  // Fléchée prenant nos trashCans et les index associés.
+  trashCans.forEach((trashCan, index) => {
+    // Fléchée prenant nos trashCans et les index associés.
     const image = document.querySelectorAll(".edit_gallery img")[index];
     const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
 
-    const imageId = arrayData[index].id;  // Rajout des ID pour manipuler les trashcan plutôt que les index directement ! Cela permet de venir les lier sans les perdre en plein cours de manipulation.
+    const imageId = arrayData[index].id; // Rajout des ID pour manipuler les trashcan plutôt que les index directement ! Cela permet de venir les lier sans les perdre en plein cours de manipulation.
     trashCanIds.push(imageId);
 
     let isTheTrashCanSelected = false; // Permet l'inversion d'état et la réversabilité.
-    trashCan.addEventListener("click", () => { // eventListener sur chaque trashCans.
+    trashCan.addEventListener("click", () => {
+      // eventListener sur chaque trashCans.
       isTheTrashCanSelected = !isTheTrashCanSelected;
 
       if (isTheTrashCanSelected) {
@@ -289,32 +287,30 @@ function trashCanListener(requestToDelete, arrayData) {
   trashCanLocalApplying(selectedImageId, arrayData, requestToDelete);
 }
 
-
 /* FONCTION - Procède à l'action de suppression locale conditionnée par trashCanListener en amont ! */
 function trashCanLocalApplying(array, arrayData, requestToDelete) {
   const galleryDelete = document.querySelector("#gallery_delete");
-    galleryDelete.addEventListener("click", () => {
-      let selectedCards = document.querySelectorAll(".edit_figureCard");
-      selectedCards.forEach((card) => {
-        if (card.querySelector(".selectedBeforeDelete")) {
-          card.parentNode.removeChild(card);
-        }
-      });
-      const selectedCardsOutOfModal = document.querySelectorAll(".figureCard"); // Même procédé.
-      selectedCardsOutOfModal.forEach((card) => {
-        if (card.querySelector(".selectedBeforeDelete")) {
-          card.parentNode.removeChild(card);
-        }
-      });
-      for (let i = arrayData.length - 1; i >= 0; i--) {
-        if (array.includes(arrayData[i].id)) {
-          arrayData.splice(i, 1);
-        }
+  galleryDelete.addEventListener("click", () => {
+    let selectedCards = document.querySelectorAll(".edit_figureCard");
+    selectedCards.forEach((card) => {
+      if (card.querySelector(".selectedBeforeDelete")) {
+        card.parentNode.removeChild(card);
       }
-      trashCanListener(requestToDelete, arrayData);
     });
+    const selectedCardsOutOfModal = document.querySelectorAll(".figureCard"); // Même procédé.
+    selectedCardsOutOfModal.forEach((card) => {
+      if (card.querySelector(".selectedBeforeDelete")) {
+        card.parentNode.removeChild(card);
+      }
+    });
+    for (let i = arrayData.length - 1; i >= 0; i--) {
+      if (array.includes(arrayData[i].id)) {
+        arrayData.splice(i, 1);
+      }
+    }
+    trashCanListener(requestToDelete, arrayData);
+  });
 }
-
 
 /* FONCTION - Ferme contenu de la seconde principal ! */
 function secondModalCloseContent() {
