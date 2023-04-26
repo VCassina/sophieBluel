@@ -494,8 +494,17 @@ input[type="submit"] {
 
 #edit_portfolio-title {
 	display: flex;
-	flex-direction: column;
 	justify-content: center;
+}
+
+.edit_portfolio-title-column {
+	flex-direction: column;
+	gap: 10px;
+}
+
+.edit_portfolio-title-row {
+	flex-direction: row;
+	margin-bottom: 30px;
 	gap: 30px;
 }
 
@@ -832,4 +841,8 @@ body.modalOpened {
 .edit_only {
 	display: none;
 	visibility: hidden; /* Pour edit_bar/.header_standard-content ! */
+}
+
+.header_standard-content-margin {
+	margin-top: 80px;
 }

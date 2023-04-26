@@ -14,7 +14,8 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
-  prerequisite();
+  prerequisite();     /* FULL DYNAMIC !!! --- Ne regarde plus seulement le cookie d'auth mais si l'utilisateur vient d'être redirigé, si c'est le cas, on lui révèle les features d'editeurs.  --- !!! */
+                      /* En cas de redirection de la part d'un site malveillant, les cookies d'authentification offriront la protection nécéssaire et empêcheront les actions vers l'API. */
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
@@ -28,9 +29,14 @@ function main() {
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
 function prerequisite() {
-  /* !!! REFONTE DU SITE FULL DYNAMIQUE !!! */
+
+  /* ! REFONTE DU SITE FULL DYNAMIQUE ! */
   /* Il faudrait que authorizationAcces() débloquent l'affichage, on garde le token pour sécuriser les envoies à l'API. */
+const params = new URLSearchParams(window.location.search);
+  if (params.get("from") === "login") {
   authorizationAcces();
+  console.log("I come from login.html.")
+  } 
   disableUselessModifiers();
 }
 
@@ -63,29 +69,34 @@ function authorizationAcces() {
   // let ifLoginTokenFound; // Déclaration du token que nous allons chercher.
   for (let i = 0; i < cookieArray.length; i++) {
     // Parcours du tableau.
-    let authTookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
-    if (!authTookie.startsWith("loginToken=")) {
-      // Si cette variable fini par être ne pas être égale à notre début de cookie, notre cookie "loginToken" n'est pas trouvé :
-      // window.location.href = "./login.html"; // Redirige l'utilisateur vers le login !
+    let authCookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
+    if (authCookie.includes("loginToken=")) {
+      editingMode();
+      console.log("Editing mode allowed, i got the cookie.")
     }
-    if(/* la variable inter-script > editingMode est true, alors, balance la fonction : */1) {
-        editingMode();
-      }
   }
 }
 
+function editingMode() {
+    console.log("I've been called - editingMode.")
+    let editOnlyElements = document.querySelectorAll(".edit_only");
+    for (let i = 0; i < editOnlyElements.length; i++) {
+      editOnlyElements[i].classList.remove("edit_only");
+    }
+    let filterElements = document.querySelectorAll(".filter");
+    for (let i = 0; i < filterElements.length; i++) {
+      filterElements[i].classList.add("hidden");
+    }
+    const projectMenu = document.getElementById('edit_portfolio-title');
+    projectMenu.classList.remove('edit_portfolio-title-column');
+    projectMenu.classList.add('edit_portfolio-title-row');
 
-  function editingMode() {
-  /* !!! REFONTE DU SITE FULL DYNAMIQUE !!! */
-  /* Si la connexion login/mdp à renvoyé un "true" + Cookie bon > (ou jsp), cela va venir réactualiser dans le DOM tous les éléments masqués et les afficher ! */
-  /* A savoir : 
+    const headerBar = document.querySelector('.header_standard-content');
+    headerBar.classList.add('header_standard-content-margin');
 
-  - La bannière de modification est révélée.
-  - Le login devient logout / on révèle l'un, cache l'autre.
-  - les filtres sont cachés.
-  - Les modifiers sont dévoilés.
-  - Les modales sont toujours masquées, rien à retoucher. */
-  }
+    const login = document.querySelector('.loginEdit');
+    login.classList.add('hidden');
+}
 
 
 // FONCTION - Récupérer le token stocké au besoin.
@@ -113,29 +124,6 @@ async function apiDataGet() {
     console.error(error);
   }
 }
-
-/* FONCTION - Affiche les éléments dynamiquement ! */
-// function dataShow(arrayData) {
-//   for (let i = arrayData.length - 1; i >= 0; i--) {
-//     // Boucle qui affichera les images dans le sens inverse.
-//     /* Création de nos éléments dans le DOM ! */
-//     let galleryTargeting = document.querySelector(".gallery");
-//     let galleryCard = document.createElement("figure");
-//     let galleryImage = document.createElement("img");
-//     let galleryTxt = document.createElement("figcaption");
-//     galleryCard.setAttribute(
-//       "class",
-//       "figureCard show " + arrayData[i].categoryId
-//     ); // Attribution d'une class aux arrayData.length cards (balises <figure>).
-//     galleryTargeting.prepend(galleryCard); // Ajout des cards (balises <figure>).
-//     galleryImage.setAttribute("src", arrayData[i].imageUrl); // Modification de l'attribut de la source img via l'API.
-//     galleryImage.setAttribute("alt", arrayData[i].title);
-//     galleryTxt.innerText = arrayData[i].title; // Modification de le la description de l'img via l'API.
-//     galleryTxt.setAttribute("class", "img_title");
-//     let InsideCardTargeting = document.querySelector(".figureCard"); // Préparation d'un placement dans les cards via la classe des balises <figure>.
-//     InsideCardTargeting.prepend(galleryImage, galleryTxt); // L'incorporation des deux sous-balises.
-//   }
-// }
 
 /* FONCTION - Supprimes les éléments du DOM créés lors de l'affichage dynamique ! */
 function apiDataClear() {
