@@ -245,22 +245,22 @@ function trashCanListener(requestToDelete, arrayData) {
   console.log("trashCanListener has been called.");
 
   let trashCanIds = []; // Tableau des ID des trashCans
-  let selectedImageIds = []; // Tableau des ID des images sélectionnées
+  let selectedImageId = []; // Tableau des ID des images sélectionnées
 
   let trashCans = document.querySelectorAll(".fa-trash-can");
-  trashCans.forEach((trashCan, index) => {
+  trashCans.forEach((trashCan, index) => {  // Fléchée prenant nos trashCans et les index associés.
     const image = document.querySelectorAll(".edit_gallery img")[index];
     const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
 
-    const imageId = arrayData[index].id;
+    const imageId = arrayData[index].id;  // Rajout des ID pour manipuler les trashcan plutôt que les index directement ! Cela permet de venir les lier sans les perdre en plein cours de manipulation.
     trashCanIds.push(imageId);
 
-    let isTheTrashCanSelected = false;
-    trashCan.addEventListener("click", () => {
+    let isTheTrashCanSelected = false; // Permet l'inversion d'état et la réversabilité.
+    trashCan.addEventListener("click", () => { // eventListener sur chaque trashCans.
       isTheTrashCanSelected = !isTheTrashCanSelected;
 
       if (isTheTrashCanSelected) {
-        selectedImageIds.push(imageId);
+        selectedImageId.push(imageId);
         image.classList.add("selectedBeforeDelete");
         imageOutOfModal.classList.add("selectedBeforeDelete");
 
@@ -270,9 +270,9 @@ function trashCanListener(requestToDelete, arrayData) {
           headers: { Authorization: "Bearer " + getTokenCookie("loginToken") },
         });
       } else {
-        const indexToRemove = selectedImageIds.indexOf(imageId);
+        const indexToRemove = selectedImageId.indexOf(imageId);
         if (indexToRemove >= 0) {
-          selectedImageIds.splice(indexToRemove, 1);
+          selectedImageId.splice(indexToRemove, 1);
           image.classList.remove("selectedBeforeDelete");
           imageOutOfModal.classList.remove("selectedBeforeDelete");
 
@@ -286,10 +286,8 @@ function trashCanListener(requestToDelete, arrayData) {
       }
     });
   });
-
   // Suppression des éléments sélectionnés
-  arrayData = arrayData.filter((item) => !selectedImageIds.includes(item.id));
-  trashCanLocalApplying(selectedImageIds, arrayData, requestToDelete);
+  trashCanLocalApplying(selectedImageId, arrayData, requestToDelete);
 }
 
 
