@@ -62,7 +62,7 @@ function pageFeatures(arrayData, authCookie) {
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
   logoutButton.addEventListener("click", (event) => {
     event.preventDefault();
-    document.cookie = "loginToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = `${authCookie}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     window.location.href = "index.html";
   });
 }
