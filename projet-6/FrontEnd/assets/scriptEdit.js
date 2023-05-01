@@ -14,7 +14,10 @@ main();
 
 /* FONCTION - Comportement général du site ! */
 function main() {
-  prerequisite();
+  let authCookie = null;
+  authCookie = authorizationAcces()
+  console.log(authCookie)
+  prerequisite(authCookie);
   // Gestion des fonctions asynchrones et synchrones via système de promesse.
   let arrayData;
   apiDataGet().then((data) => {
@@ -22,25 +25,26 @@ function main() {
     arrayData = data;
     // Puis application des fonctions non-asynchrones.
     dataShow(arrayData);
-    pageFeatures(arrayData);
+    pageFeatures(arrayData, authCookie);
   });
 }
 
 /* FONCTION - Prérequis d'accès à la page et avant éxécution des features. */
-function prerequisite() {
+function prerequisite(authCookie) {
   const params = new URLSearchParams(window.location.search);
   if (params.get("from") === "login") {
-    authorizationAcces();
+    authorizationAcces(authCookie);
   }
   disableUselessModifiers();
 }
 
 /* FONCTION - Contrôle de l'acces, début des features ! */
-function pageFeatures(arrayData) {
+function pageFeatures(arrayData, authCookie) {
   let arrayRequestToAdd = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour ajouter du contenu.
   let arrayRequestToDelete = []; // Sert à stocker les requêtes qui vont être envoyés en fetch à l'API par la suite pour supprimer du contenu.
   let secondModalButton = document.querySelector("#addPictureModalOpener"); // On vient selectionner le bouton "Ajouter une photo".
   let mainModalButton = document.querySelector("#modalBoxContent"); // On vient séléctionner le bouton "modifier" de la main modale !
+  let logoutButton = document.querySelector("#logout");
   /* Partie Listener de "modifier" ! */
   mainModalButton.addEventListener("click", (event) => {
     // Ouverture de la modale principale pour interraction avec les features demandées.
@@ -56,6 +60,11 @@ function pageFeatures(arrayData) {
   });
   addingImageFormBehavior(arrayRequestToAdd, arrayData);
   applyingModification(arrayRequestToAdd, arrayRequestToDelete, arrayData);
+  logoutButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    document.cookie = "loginToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    window.location.href = "index.html";
+  });
 }
 
 /* FONCTION - Contrôle de l'acces, demande a avoir le TOKEN d'identification ! */
@@ -67,10 +76,12 @@ function authorizationAcces() {
     let authCookie = cookieArray[i].trim(); // On déclare une variable qui vient attraper temporairement la valeur de chaque cookie 1 par 1 à chaque fois.
     if (authCookie.includes("loginToken=")) {
       editingMode();
+      return  authCookie;
     }
   }
 }
 
+/* FONCTION - Passage en mode edition pour le DOM ! */
 function editingMode() {
   let editOnlyElements = document.querySelectorAll(".edit_only");
   for (let i = 0; i < editOnlyElements.length; i++) {
@@ -243,7 +254,8 @@ function trashCanListener(requestToDelete, arrayData) {
     const image = document.querySelectorAll(".edit_gallery img")[index];
     const imageOutOfModal = document.querySelectorAll(".gallery img")[index];
 
-    const imageId = arrayData[index].id; // Rajout des ID pour manipuler les trashcan plutôt que les index directement ! Cela permet de venir les lier sans les perdre en plein cours de manipulation.
+    const imageId = arrayData[index].id; // Rajout des ID pour manipuler les trashcan plutôt que les index directement ! 
+    // Cela permet de venir les lier sans les perdre en plein cours de manipulation.
     trashCanIds.push(imageId);
 
     let isTheTrashCanSelected = false; // Permet l'inversion d'état et la réversabilité.

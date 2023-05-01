@@ -846,3 +846,10 @@ body.modalOpened {
 .header_standard-content-margin {
 	margin-top: 80px;
 }
+
+.header_login {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-top: 20px;
+}
